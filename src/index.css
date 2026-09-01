@@ -1,0 +1,45 @@
+* . {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f7fb;
+  color: #111827;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px;
+}
+
+.app h1 {
+  font-size: 48px;
+  margin-bottom: 15px;
+}
+
+.app p {
+  font-size: 18px;
+  margin-bottom: 30px;
+  color: #6b7280;
+}
+
+.app button {
+  border: none;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-size: 16px;
+  background: #111827;
+  color: white;
+}
