@@ -2,64 +2,59 @@ import {
   Search,
   Bell,
   ChevronDown,
-  Command,
+  Sun,
 } from "lucide-react";
-
-import { student } from "../services/data";
 
 function Topbar() {
   return (
     <header className="topbar">
-
       {/* Search */}
-      <div className="search-box">
+      <div className="top-search">
         <Search size={18} />
 
         <input
           type="text"
-          placeholder="Search Campus OS..."
+          placeholder="Search for buildings, rooms, labs..."
         />
 
-        <div className="search-shortcut">
-          <Command size={11} />
-          <span>K</span>
-        </div>
+        <span className="search-key">⌘ K</span>
       </div>
 
       {/* Right side */}
       <div className="topbar-right">
-
-        {/* Notification */}
-        <button
-          className="icon-button"
-          aria-label="Notifications"
-        >
-          <Bell size={19} />
-
-          <span className="notification-dot"></span>
-        </button>
-
-        {/* Profile */}
-        <div className="profile">
-
-          <img
-            src="/src/assets/avatar.svg"
-            alt="Student avatar"
-            className="profile-image"
-          />
-
-          <div>
-            <strong>{student.name}</strong>
-            <small>{student.course}</small>
-          </div>
-
-          <ChevronDown
-            size={15}
-            className="profile-arrow"
-          />
-
+        <div className="weather-mini">
+          <Sun size={21} />
+          <span>28°C</span>
         </div>
 
+        <div className="top-time">
+          12:45 PM
+        </div>
+
+        <div className="top-divider"></div>
+
+        <button className="notification-button">
+          <Bell size={20} />
+
+          <span className="notification-count">
+            3
+          </span>
+        </button>
+
+        <div className="profile-box">
+          <img
+            src="https://i.pravatar.cc/100?img=47"
+            alt="Likitha"
+            className="profile-avatar"
+          />
+
+          <div className="profile-info">
+            <strong>Likitha</strong>
+            <span>Admin</span>
+          </div>
+
+          <ChevronDown size={17} />
+        </div>
       </div>
     </header>
   );

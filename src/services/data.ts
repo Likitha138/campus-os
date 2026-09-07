@@ -1,5 +1,5 @@
 export const student = {
-  name: "Bhuvan M",
+  name: "likitha",
   id: "STU2026001",
   course: "BCA",
   semester: "6th Semester",

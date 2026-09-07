@@ -1,63 +1,70 @@
 import {
-  LayoutDashboard,
-  CalendarCheck,
-  BookOpen,
-  ClipboardList,
-  FileBarChart,
-  BrainCircuit,
-  BriefcaseBusiness,
-  Bell,
+  Compass,
+  Navigation,
+  Activity,
+  Car,
+  CalendarDays,
+  TriangleAlert,
+  Boxes,
+  Leaf,
+  Bot,
+  Workflow,
   Settings,
   GraduationCap,
-  Activity,
+  ChevronRight,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 const menuItems = [
   {
-    name: "Dashboard",
+    name: "Explore",
     path: "/",
-    icon: LayoutDashboard,
+    icon: Compass,
   },
   {
-    name: "Attendance",
+    name: "Navigation",
     path: "/attendance",
-    icon: CalendarCheck,
+    icon: Navigation,
   },
   {
-    name: "Marks",
+    name: "Campus Activity",
     path: "/marks",
-    icon: BookOpen,
+    icon: Activity,
   },
   {
-    name: "Assignments",
+    name: "Traffic",
     path: "/assignments",
-    icon: ClipboardList,
+    icon: Car,
   },
   {
-    name: "Reports",
+    name: "Events",
     path: "/reports",
-    icon: FileBarChart,
+    icon: CalendarDays,
   },
   {
-    name: "AI Performance",
-    path: "/ai-performance",
-    icon: BrainCircuit,
-  },
-  {
-    name: "Career Intelligence",
-    path: "/career",
-    icon: BriefcaseBusiness,
-  },
-  {
-    name: "Alerts",
+    name: "Emergency",
     path: "/alerts",
-    icon: Bell,
+    icon: TriangleAlert,
   },
   {
-    name: "Settings",
+    name: "Build (Future)",
+    path: "/ai-performance",
+    icon: Boxes,
+  },
+  {
+    name: "Environment",
+    path: "/career",
+    icon: Leaf,
+  },
+  {
+    name: "AI Assistant",
     path: "/settings",
-    icon: Settings,
+    icon: Bot,
+  },
+  {
+    name: "Scenarios",
+    path: "/settings",
+    icon: Workflow,
   },
 ];
 
@@ -65,48 +72,67 @@ function Sidebar() {
   return (
     <aside className="sidebar">
       {/* Logo */}
-      <div className="logo-area">
-        <div className="logo-icon">
-          <GraduationCap size={23} />
+      <div className="campus-logo">
+        <div className="campus-logo-icon">
+          <GraduationCap size={27} />
         </div>
 
         <div>
-          <h2>Campus OS</h2>
-          <span>SMART CAMPUS PLATFORM</span>
+          <h2>CAMPUS OS</h2>
+          <span>Smart Campus Operating System</span>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav>
-        {menuItems.map((item) => {
+      <nav className="sidebar-nav">
+        {menuItems.map((item, index) => {
           const Icon = item.icon;
 
           return (
             <NavLink
-              key={item.path}
+              key={`${item.name}-${index}`}
               to={item.path}
               end={item.path === "/"}
               className={({ isActive }) =>
-                `nav-item ${isActive ? "active" : ""}`
+                `campus-nav-item ${isActive ? "active" : ""}`
               }
             >
-              <Icon size={18} />
+              <Icon size={19} />
 
               <span>{item.name}</span>
+
+              <ChevronRight className="nav-arrow" size={15} />
             </NavLink>
           );
         })}
+
+        <NavLink
+          to="/settings"
+          className={({ isActive }) =>
+            `campus-nav-item ${isActive ? "active" : ""}`
+          }
+        >
+          <Settings size={19} />
+
+          <span>Settings</span>
+
+          <ChevronRight className="nav-arrow" size={15} />
+        </NavLink>
       </nav>
 
-      {/* Bottom status */}
-      <div className="sidebar-bottom">
-        <div className="sidebar-status">
-          <span className="status-dot"></span>
+      {/* AI Assistant */}
+      <div className="ai-assistant-box">
+        <div className="ai-glow"></div>
 
-          <span>Campus OS System Online</span>
-
-          <Activity size={13} />
+        <div className="ai-robot">
+          <Bot size={35} />
         </div>
+
+        <div className="ai-label">AI ASSISTANT</div>
+
+        <p>Ask anything about campus...</p>
+
+        <button className="ai-chat-button">→</button>
       </div>
     </aside>
   );

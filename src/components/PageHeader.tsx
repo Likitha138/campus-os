@@ -1,29 +1,35 @@
+import type { ReactNode } from "react";
+
 interface PageHeaderProps {
   title: string;
-  description: string;
-  action?: React.ReactNode;
+  subtitle?: string;
+  description?: string;
+  action?: ReactNode;
 }
 
 function PageHeader({
   title,
+  subtitle,
   description,
   action,
 }: PageHeaderProps) {
+  const supportingText = subtitle || description;
+
   return (
     <div className="page-header">
-
       <div>
         <h1>{title}</h1>
 
-        <p>{description}</p>
+        {supportingText && (
+          <p>{supportingText}</p>
+        )}
       </div>
 
       {action && (
-        <div className="page-header-action">
+        <div>
           {action}
         </div>
       )}
-
     </div>
   );
 }
