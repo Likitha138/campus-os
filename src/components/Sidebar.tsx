@@ -8,132 +8,166 @@ import {
   Boxes,
   Leaf,
   Bot,
-  Workflow,
+  Network,
   Settings,
-  GraduationCap,
   ChevronRight,
 } from "lucide-react";
+
 import { NavLink } from "react-router-dom";
 
 const menuItems = [
   {
-    name: "Explore",
-    path: "/",
+    label: "Explore",
     icon: Compass,
+    path: "/",
   },
   {
-    name: "Navigation",
-    path: "/attendance",
+    label: "Navigation",
     icon: Navigation,
+    path: "/navigation",
   },
   {
-    name: "Campus Activity",
-    path: "/marks",
+    label: "Campus Activity",
     icon: Activity,
+    path: "/activity",
   },
   {
-    name: "Traffic",
-    path: "/assignments",
+    label: "Traffic",
     icon: Car,
+    path: "/traffic",
   },
   {
-    name: "Events",
-    path: "/reports",
+    label: "Events",
     icon: CalendarDays,
+    path: "/events",
   },
   {
-    name: "Emergency",
-    path: "/alerts",
+    label: "Emergency",
     icon: TriangleAlert,
+    path: "/emergency",
   },
   {
-    name: "Build (Future)",
-    path: "/ai-performance",
+    label: "Build (Future)",
     icon: Boxes,
+    path: "/build",
   },
   {
-    name: "Environment",
-    path: "/career",
+    label: "Environment",
     icon: Leaf,
+    path: "/environment",
   },
   {
-    name: "AI Assistant",
-    path: "/settings",
+    label: "AI Assistant",
     icon: Bot,
+    path: "/ai-assistant",
   },
   {
-    name: "Scenarios",
+    label: "Scenarios",
+    icon: Network,
+    path: "/scenarios",
+  },
+  {
+    label: "Settings",
+    icon: Settings,
     path: "/settings",
-    icon: Workflow,
   },
 ];
 
 function Sidebar() {
   return (
     <aside className="sidebar">
-      {/* Logo */}
-      <div className="campus-logo">
-        <div className="campus-logo-icon">
-          <GraduationCap size={27} />
+
+      {/* LOGO */}
+      <div className="sidebar-logo">
+
+        <div className="logo-mark">
+          <Compass size={25} />
         </div>
 
-        <div>
-          <h2>CAMPUS OS</h2>
+        <div className="logo-text">
+          <strong>CAMPUS OS</strong>
           <span>Smart Campus Operating System</span>
         </div>
+
       </div>
 
-      {/* Navigation */}
-      <nav className="sidebar-nav">
-        {menuItems.map((item, index) => {
+      {/* NAVIGATION */}
+      <nav className="sidebar-navigation">
+
+        {menuItems.map((item) => {
+
           const Icon = item.icon;
 
           return (
             <NavLink
-              key={`${item.name}-${index}`}
+              key={item.label}
               to={item.path}
               end={item.path === "/"}
               className={({ isActive }) =>
-                `campus-nav-item ${isActive ? "active" : ""}`
+                `sidebar-item ${isActive ? "active" : ""}`
               }
             >
-              <Icon size={19} />
 
-              <span>{item.name}</span>
+              <div className="sidebar-item-left">
 
-              <ChevronRight className="nav-arrow" size={15} />
+                <Icon
+                  size={20}
+                  strokeWidth={1.8}
+                />
+
+                <span>{item.label}</span>
+
+              </div>
+
+              <ChevronRight
+                className="sidebar-chevron"
+                size={17}
+                strokeWidth={1.8}
+              />
+
             </NavLink>
           );
+
         })}
 
-        <NavLink
-          to="/settings"
-          className={({ isActive }) =>
-            `campus-nav-item ${isActive ? "active" : ""}`
-          }
-        >
-          <Settings size={19} />
-
-          <span>Settings</span>
-
-          <ChevronRight className="nav-arrow" size={15} />
-        </NavLink>
       </nav>
 
-      {/* AI Assistant */}
+      {/* AI ASSISTANT */}
       <div className="ai-assistant-box">
+
         <div className="ai-glow"></div>
 
         <div className="ai-robot">
-          <Bot size={35} />
+
+          <Bot
+            size={42}
+            strokeWidth={1.5}
+          />
+
         </div>
 
-        <div className="ai-label">AI ASSISTANT</div>
+        <div className="ai-title">
+          AI ASSISTANT
+        </div>
 
-        <p>Ask anything about campus...</p>
+        <div className="ai-description">
+          Ask anything about campus...
+        </div>
 
-        <button className="ai-chat-button">→</button>
+        <div className="ai-input">
+
+          <span>
+            Ask anything about campus...
+          </span>
+
+          <button>
+            →
+          </button>
+
+        </div>
+
       </div>
+
     </aside>
   );
 }

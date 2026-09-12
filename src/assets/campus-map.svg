@@ -1,0 +1,348 @@
+<svg width="1200" height="720" viewBox="0 0 1200 720" xmlns="http://www.w3.org/2000/svg">
+
+<defs>
+
+  <linearGradient id="ground" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#0c2430"/>
+    <stop offset="50%" stop-color="#102d26"/>
+    <stop offset="100%" stop-color="#071821"/>
+  </linearGradient>
+
+  <linearGradient id="building" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#5c6870"/>
+    <stop offset="100%" stop-color="#29343b"/>
+  </linearGradient>
+
+  <linearGradient id="roof" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#9ca8ad"/>
+    <stop offset="100%" stop-color="#59666e"/>
+  </linearGradient>
+
+  <filter id="glow">
+    <feGaussianBlur stdDeviation="12"/>
+  </filter>
+
+</defs>
+
+<!-- Ground -->
+<rect width="1200" height="720" fill="url(#ground)"/>
+
+<!-- Trees -->
+<g opacity="0.65">
+
+<circle cx="90" cy="120" r="35" fill="#173d2c"/>
+<circle cx="150" cy="90" r="28" fill="#1c4933"/>
+<circle cx="1020" cy="100" r="38" fill="#173d2c"/>
+<circle cx="1110" cy="170" r="30" fill="#1c4933"/>
+<circle cx="90" cy="600" r="45" fill="#153a2a"/>
+<circle cx="1120" cy="610" r="50" fill="#163b2b"/>
+
+</g>
+
+<!-- Road network -->
+<g
+  stroke="#697875"
+  stroke-width="8"
+  stroke-dasharray="15 10"
+  fill="none"
+  opacity="0.7"
+>
+
+<path d="M80 220 L420 360 L740 250 L1100 400"/>
+<path d="M130 520 L420 360 L700 520 L1080 350"/>
+<path d="M420 100 L420 360 L700 520"/>
+<path d="M740 250 L700 520"/>
+
+</g>
+
+<!-- Road glow -->
+<g
+  stroke="#4fa5d9"
+  stroke-width="2"
+  stroke-dasharray="10 14"
+  fill="none"
+  opacity="0.7"
+>
+
+<path d="M80 220 L420 360 L740 250 L1100 400"/>
+<path d="M130 520 L420 360 L700 520 L1080 350"/>
+
+</g>
+
+<!-- LIBRARY -->
+<g>
+
+<polygon
+points="460,80 610,105 590,215 440,190"
+fill="url(#roof)"
+stroke="#b9c8cc"
+stroke-width="3"
+/>
+
+<polygon
+points="440,190 590,215 570,280 425,255"
+fill="url(#building)"
+/>
+
+<line x1="460" y1="120" x2="590" y2="140"
+stroke="#75c7ed"
+stroke-width="3"
+opacity=".6"/>
+
+<text
+x="510"
+y="70"
+fill="white"
+font-size="18"
+font-family="Arial"
+font-weight="bold"
+text-anchor="middle">
+LIBRARY
+</text>
+
+</g>
+
+<!-- AUDITORIUM -->
+<g>
+
+<polygon
+points="790,115 930,135 915,245 775,225"
+fill="url(#roof)"
+stroke="#b9c8cc"
+stroke-width="3"
+/>
+
+<polygon
+points="775,225 915,245 900,295 765,275"
+fill="url(#building)"
+/>
+
+<text
+x="850"
+y="105"
+fill="white"
+font-size="17"
+font-family="Arial"
+font-weight="bold"
+text-anchor="middle">
+AUDITORIUM
+</text>
+
+</g>
+
+<!-- BLOCK A -->
+<g>
+
+<polygon
+points="180,285 350,320 330,440 160,405"
+fill="url(#roof)"
+stroke="#b9c8cc"
+stroke-width="3"
+/>
+
+<polygon
+points="160,405 330,440 310,485 145,450"
+fill="url(#building)"
+/>
+
+<line x1="205" y1="335" x2="330" y2="360"
+stroke="#6fc5ec"
+stroke-width="3"
+opacity=".6"/>
+
+<text
+x="250"
+y="270"
+fill="white"
+font-size="17"
+font-family="Arial"
+font-weight="bold"
+text-anchor="middle">
+BLOCK A
+</text>
+
+</g>
+
+<!-- BLOCK B -->
+<g>
+
+<polygon
+points="450,300 620,325 600,455 430,425"
+fill="url(#roof)"
+stroke="#b9c8cc"
+stroke-width="3"
+/>
+
+<polygon
+points="430,425 600,455 580,500 415,470"
+fill="url(#building)"
+/>
+
+<text
+x="520"
+y="285"
+fill="white"
+font-size="17"
+font-family="Arial"
+font-weight="bold"
+text-anchor="middle">
+BLOCK B
+</text>
+
+</g>
+
+<!-- BLOCK C -->
+<g>
+
+<polygon
+points="800,300 970,325 950,440 780,415"
+fill="url(#roof)"
+stroke="#b9c8cc"
+stroke-width="3"
+/>
+
+<polygon
+points="780,415 950,440 930,485 765,455"
+fill="url(#building)"
+/>
+
+<text
+x="860"
+y="285"
+fill="white"
+font-size="17"
+font-family="Arial"
+font-weight="bold"
+text-anchor="middle">
+BLOCK C
+</text>
+
+</g>
+
+<!-- ADMIN BLOCK -->
+<g>
+
+<polygon
+points="470,510 640,535 620,650 450,620"
+fill="url(#roof)"
+stroke="#b9c8cc"
+stroke-width="3"
+/>
+
+<polygon
+points="450,620 620,650 600,690 435,660"
+fill="url(#building)"
+/>
+
+<text
+x="535"
+y="495"
+fill="white"
+font-size="17"
+font-family="Arial"
+font-weight="bold"
+text-anchor="middle">
+ADMIN BLOCK
+</text>
+
+</g>
+
+<!-- Sports ground -->
+<g>
+
+<ellipse
+cx="875"
+cy="565"
+rx="125"
+ry="78"
+fill="#285b43"
+stroke="#bf8165"
+stroke-width="12"
+/>
+
+<ellipse
+cx="875"
+cy="565"
+rx="108"
+ry="62"
+fill="none"
+stroke="#d5ddd8"
+stroke-width="2"
+/>
+
+<line
+x1="875"
+y1="503"
+x2="875"
+y2="627"
+stroke="#d5ddd8"
+stroke-width="2"
+/>
+
+<circle
+cx="875"
+cy="565"
+r="18"
+fill="none"
+stroke="#d5ddd8"
+stroke-width="2"
+/>
+
+</g>
+
+<!-- Trees around campus -->
+<g fill="#34784c">
+
+<circle cx="350" cy="180" r="20"/>
+<circle cx="380" cy="210" r="15"/>
+<circle cx="690" cy="150" r="20"/>
+<circle cx="720" cy="180" r="16"/>
+<circle cx="1050" cy="300" r="25"/>
+<circle cx="1040" cy="480" r="18"/>
+<circle cx="350" cy="550" r="25"/>
+<circle cx="700" cy="390" r="20"/>
+
+</g>
+
+<!-- Map marker -->
+<g>
+
+<circle
+cx="625"
+cy="365"
+r="40"
+fill="#32aaff"
+opacity=".25"
+filter="url(#glow)"
+/>
+
+<circle
+cx="625"
+cy="365"
+r="13"
+fill="#55c5ff"
+/>
+
+<path
+d="M625 335 C610 335 600 347 600 362 C600 382 625 405 625 405 C625 405 650 382 650 362 C650 347 640 335 625 335Z"
+fill="#49baff"
+/>
+
+</g>
+
+<!-- glowing routes -->
+<g
+stroke="#50c9ff"
+stroke-width="3"
+stroke-dasharray="8 12"
+fill="none"
+opacity=".8"
+>
+
+<path d="M625 365 L740 250"/>
+<path d="M625 365 L520 420"/>
+<path d="M625 365 L700 520"/>
+
+</g>
+
+</svg>

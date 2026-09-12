@@ -1,5 +1,3 @@
-import React from "react";
-
 import {
   Search,
   Route,
@@ -7,192 +5,238 @@ import {
   Layers,
   Info,
   RotateCcw,
-  BookOpen,
+  Plus,
+  Minus,
+  Navigation,
+  Users,
+  Car,
+  CalendarDays,
+  Leaf,
+  Library,
   Utensils,
   FlaskConical,
-  CarFront,
-  Users,
-  Leaf,
-  MapPin,
-  CalendarDays,
-  Building2,
-  AlertTriangle,
+  ParkingCircle,
+  Accessibility,
+  CircleHelp,
+  Map,
   CloudSun,
-  Compass,
-  Navigation,
-  Activity,
+  TriangleAlert,
+  ChevronRight,
+  Bell,
+  Sun,
 } from "lucide-react";
 
 import {
   LineChart,
   Line,
-  ResponsiveContainer,
   XAxis,
   YAxis,
+  ResponsiveContainer,
   Tooltip,
 } from "recharts";
 
+import campusMap from "../assets/campus-map.svg";
+
 const activityData = [
-  { time: "6 AM", students: 700, faculty: 500, visitors: 300 },
-  { time: "9 AM", students: 1800, faculty: 1200, visitors: 700 },
-  { time: "12 PM", students: 2500, faculty: 1600, visitors: 1300 },
-  { time: "3 PM", students: 2100, faculty: 2200, visitors: 1500 },
-  { time: "6 PM", students: 1500, faculty: 1800, visitors: 1200 },
-  { time: "9 PM", students: 1300, faculty: 1500, visitors: 900 },
+  { time: "6 AM", students: 800, faculty: 500, visitors: 300 },
+  { time: "9 AM", students: 1800, faculty: 1000, visitors: 650 },
+  { time: "12 PM", students: 2400, faculty: 1400, visitors: 1100 },
+  { time: "3 PM", students: 2200, faculty: 1800, visitors: 1400 },
+  { time: "6 PM", students: 1500, faculty: 1000, visitors: 1100 },
+  { time: "9 PM", students: 1200, faculty: 900, visitors: 700 },
+];
+
+const events = [
+  {
+    title: "Annual Tech Fest",
+    date: "15 - 17 Aug 2026",
+    location: "Main Auditorium",
+    type: "purple",
+  },
+  {
+    title: "Placement Drive",
+    date: "20 Aug 2026",
+    location: "Placement Cell",
+    type: "blue",
+  },
+  {
+    title: "Sports Meet",
+    date: "25 Aug 2026",
+    location: "Sports Complex",
+    type: "green",
+  },
 ];
 
 function Dashboard() {
   return (
-    <div className="campus-dashboard">
+    <div className="explore-page">
 
-      {/* HERO HEADER */}
-      <section className="dashboard-hero">
+      {/* =========================================
+          TOP HEADER AREA
+      ========================================= */}
 
-        <div>
-          <div className="welcome-small">
-            WELCOME TO
-          </div>
+      <section className="explore-header">
 
-          <h1>
-            CAMPUS OS
-          </h1>
+        <div className="explore-heading">
+          <span>WELCOME TO</span>
 
-          <p>
-            Explore. Simulate. Optimize.
-          </p>
+          <h1>CAMPUS OS</h1>
 
-          <span>
-            Your intelligent 3D campus twin.
-          </span>
+          <p>Explore. Simulate. Optimize.</p>
+
+          <small>Your intelligent 3D campus twin.</small>
         </div>
 
-        {/* Dashboard tabs */}
-        <div className="dashboard-tabs">
-          <button className="dashboard-tab active">
-            <CompassIcon />
+        <div className="explore-tabs">
+
+          <button className="explore-tab active">
+            <Map size={18} />
             <span>Explore</span>
           </button>
 
-          <button className="dashboard-tab">
-            <NavigationIcon />
+          <button className="explore-tab">
+            <Navigation size={18} />
             <span>Navigate</span>
           </button>
 
-          <button className="dashboard-tab">
+          <button className="explore-tab">
             <ActivityIcon />
             <span>Activity</span>
           </button>
 
-          <button className="dashboard-tab">
-            <CarFront size={21} />
+          <button className="explore-tab">
+            <Car size={18} />
             <span>Traffic</span>
           </button>
 
-          <button className="dashboard-tab">
-            <CalendarDays size={21} />
+          <button className="explore-tab">
+            <CalendarDays size={18} />
             <span>Events</span>
           </button>
 
-          <button className="dashboard-tab">
+          <button className="explore-tab">
             <span className="more-dots">•••</span>
             <span>More</span>
           </button>
+
         </div>
+
       </section>
 
-      {/* MAIN GRID */}
-      <section className="main-dashboard-grid">
 
-        {/* CAMPUS MAP */}
-        <div className="campus-map-card">
+      {/* =========================================
+          MAIN CONTENT
+      ========================================= */}
 
-          <div className="map-stat-cards">
+      <section className="dashboard-main-grid">
+
+        {/* =====================================
+            CAMPUS MAP
+        ===================================== */}
+
+        <div className="campus-map-panel">
+
+          {/* Statistics floating over map */}
+
+          <div className="map-statistics">
 
             <div className="map-stat">
-              <Building2 size={20} />
+
+              <div className="map-stat-icon purple">
+                <Map size={21} />
+              </div>
+
               <div>
-                <small>BUILDINGS</small>
+                <span>BUILDINGS</span>
                 <strong>24</strong>
               </div>
+
             </div>
 
+
             <div className="map-stat">
-              <BookOpen size={20} />
+
+              <div className="map-stat-icon green">
+                <Library size={21} />
+              </div>
+
               <div>
-                <small>ROOMS</small>
+                <span>ROOMS</span>
                 <strong>215</strong>
               </div>
+
             </div>
 
+
             <div className="map-stat">
-              <Users size={20} />
+
+              <div className="map-stat-icon orange">
+                <Users size={21} />
+              </div>
+
               <div>
-                <small>STUDENTS</small>
+                <span>STUDENTS</span>
                 <strong>3,248</strong>
               </div>
+
             </div>
 
           </div>
 
-          {/* Campus twin */}
+
+          {/* Map */}
+
           <div className="campus-map">
 
-            <div className="map-glow"></div>
+            <img
+              src={campusMap}
+              alt="Campus digital twin"
+              className="campus-map-image"
+            />
 
-            {/* Roads */}
-            <div className="road road-one"></div>
-            <div className="road road-two"></div>
-            <div className="road road-three"></div>
+            {/* Map labels */}
 
-            {/* Green areas */}
-            <div className="tree-zone tree-zone-one"></div>
-            <div className="tree-zone tree-zone-two"></div>
-            <div className="tree-zone tree-zone-three"></div>
-
-            {/* Buildings */}
-            <div className="building building-a">
-              <span>BLOCK A</span>
+            <div className="map-label label-library">
+              LIBRARY
             </div>
 
-            <div className="building building-b">
-              <span>BLOCK B</span>
+            <div className="map-label label-auditorium">
+              AUDITORIUM
             </div>
 
-            <div className="building building-c">
-              <span>BLOCK C</span>
+            <div className="map-label label-a">
+              BLOCK A
             </div>
 
-            <div className="building building-library">
-              <span>LIBRARY</span>
+            <div className="map-label label-b">
+              BLOCK B
             </div>
 
-            <div className="building building-auditorium">
-              <span>AUDITORIUM</span>
+            <div className="map-label label-c">
+              BLOCK C
             </div>
 
-            <div className="building building-admin">
-              <span>ADMIN BLOCK</span>
+            <div className="map-label label-admin">
+              ADMIN BLOCK
             </div>
 
-            {/* Sports ground */}
-            <div className="sports-ground">
-              <div className="football-field">
-                <div className="field-line"></div>
-                <div className="field-circle"></div>
-              </div>
+
+            {/* Location marker */}
+
+            <div className="campus-marker">
+              <Navigation size={24} fill="currentColor" />
             </div>
 
-            {/* Map pin */}
-            <div className="map-pin">
-              <MapPin size={25} fill="currentColor" />
-            </div>
 
-            {/* Map controls */}
-            <div className="map-controls">
+            {/* 2D / 3D controls */}
 
-              <button>2D</button>
+            <div className="map-mode-controls">
 
-              <button className="selected-control">
+              <button>
+                2D
+              </button>
+
+              <button className="selected">
                 3D
               </button>
 
@@ -200,16 +244,23 @@ function Dashboard() {
                 <Layers size={18} />
               </button>
 
-              <button>+</button>
-              <button>−</button>
+              <button>
+                <Plus size={19} />
+              </button>
 
               <button>
-                <RotateCcw size={17} />
+                <Minus size={19} />
+              </button>
+
+              <button>
+                <RotateCcw size={18} />
               </button>
 
             </div>
 
+
             {/* Bottom map toolbar */}
+
             <div className="map-toolbar">
 
               <button>
@@ -245,125 +296,180 @@ function Dashboard() {
             </div>
 
           </div>
+
         </div>
 
-        {/* RIGHT PANEL */}
-        <div className="right-dashboard">
 
-          {/* Campus status */}
-          <div className="side-card">
+        {/* =====================================
+            RIGHT SIDEBAR
+        ===================================== */}
 
-            <div className="side-card-header">
+        <aside className="right-dashboard">
+
+          {/* Campus Status */}
+
+          <div className="side-panel">
+
+            <div className="panel-heading">
+
               <h3>CAMPUS STATUS</h3>
 
-              <span className="live-status">
-                <i></i>
+              <span className="live-badge">
+                <span></span>
                 Live
               </span>
+
             </div>
+
 
             <div className="status-grid">
 
-              <StatusBox
-                icon={<Users size={22} />}
-                title="Occupancy"
+              <StatusCard
+                icon={<Users />}
                 value="63%"
-                sub="Medium"
+                label="Occupancy"
+                note="Medium"
                 type="orange"
               />
 
-              <StatusBox
-                icon={<CarFront size={22} />}
-                title="Traffic"
+              <StatusCard
+                icon={<Car />}
                 value="Moderate"
-                sub="Smooth Flow"
+                label="Traffic"
+                note="Smooth Flow"
                 type="green"
               />
 
-              <StatusBox
-                icon={<CalendarDays size={22} />}
-                title="Events Today"
+              <StatusCard
+                icon={<CalendarDays />}
                 value="2"
-                sub="Active"
+                label="Events Today"
+                note="Active"
                 type="red"
               />
 
-              <StatusBox
-                icon={<Leaf size={22} />}
-                title="Air Quality"
+              <StatusCard
+                icon={<Leaf />}
                 value="Good"
-                sub="AQI 42"
+                label="Air Quality"
+                note="AQI 42"
                 type="green"
               />
 
             </div>
+
           </div>
 
-          {/* Events */}
-          <div className="side-card">
 
-            <div className="side-card-header">
+          {/* Upcoming Events */}
+
+          <div className="side-panel">
+
+            <div className="panel-heading">
+
               <h3>UPCOMING EVENTS</h3>
 
-              <button className="view-all">
+              <a href="#">
                 View All
-              </button>
+              </a>
+
             </div>
 
-            <EventItem
-              icon={<CalendarDays size={20} />}
-              title="Annual Tech Fest"
-              date="15 - 17 Aug 2026"
-              place="Main Auditorium"
-              color="purple"
-            />
 
-            <EventItem
-              icon={<CalendarDays size={20} />}
-              title="Placement Drive"
-              date="20 Aug 2026"
-              place="Placement Cell"
-              color="blue"
-            />
+            <div className="events-list">
 
-            <EventItem
-              icon={<Users size={20} />}
-              title="Sports Meet"
-              date="25 Aug 2026"
-              place="Sports Complex"
-              color="green"
-            />
+              {events.map((event) => (
+
+                <div
+                  className="event-row"
+                  key={event.title}
+                >
+
+                  <div
+                    className={`event-icon ${event.type}`}
+                  >
+                    <CalendarDays size={17} />
+                  </div>
+
+
+                  <div className="event-info">
+
+                    <strong>
+                      {event.title}
+                    </strong>
+
+                    <span>
+                      ▣ {event.date}
+                    </span>
+
+                    <span>
+                      ⌖ {event.location}
+                    </span>
+
+                  </div>
+
+
+                  <span
+                    className={`event-status ${event.type}`}
+                  >
+                    UPCOMING
+                  </span>
+
+                </div>
+
+              ))}
+
+            </div>
 
           </div>
 
-          {/* Activity chart */}
-          <div className="side-card activity-card">
 
-            <div className="side-card-header">
-              <h3>CAMPUS ACTIVITY (LIVE)</h3>
+          {/* Campus Activity */}
+
+          <div className="side-panel activity-panel">
+
+            <div className="panel-heading">
+
+              <h3>
+                CAMPUS ACTIVITY (LIVE)
+              </h3>
+
             </div>
 
-            <div className="chart-legend">
-              <span className="legend-student">
-                <i></i> Students
+
+            <div className="activity-legend">
+
+              <span>
+                <i className="legend-student"></i>
+                Students
               </span>
 
-              <span className="legend-faculty">
-                <i></i> Faculty
+              <span>
+                <i className="legend-faculty"></i>
+                Faculty
               </span>
 
-              <span className="legend-visitor">
-                <i></i> Visitors
+              <span>
+                <i className="legend-visitor"></i>
+                Visitors
               </span>
+
             </div>
+
 
             <div className="activity-chart">
-              <ResponsiveContainer width="100%" height="100%">
+
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
+              >
+
                 <LineChart data={activityData}>
+
                   <XAxis
                     dataKey="time"
                     tick={{
-                      fill: "#64748b",
+                      fill: "#718096",
                       fontSize: 9,
                     }}
                     axisLine={false}
@@ -372,18 +478,22 @@ function Dashboard() {
 
                   <YAxis
                     tick={{
-                      fill: "#64748b",
+                      fill: "#718096",
                       fontSize: 9,
                     }}
                     axisLine={false}
                     tickLine={false}
+                    tickFormatter={(value) =>
+                      `${value / 1000}K`
+                    }
                   />
 
                   <Tooltip
                     contentStyle={{
-                      background: "#0b1728",
-                      border: "1px solid rgba(100,116,139,.3)",
-                      borderRadius: "8px",
+                      background: "#081321",
+                      border:
+                        "1px solid rgba(96,165,250,.25)",
+                      borderRadius: 8,
                       color: "#fff",
                     }}
                   />
@@ -391,7 +501,7 @@ function Dashboard() {
                   <Line
                     type="monotone"
                     dataKey="students"
-                    stroke="#22c55e"
+                    stroke="#26d67b"
                     strokeWidth={2}
                     dot={false}
                   />
@@ -399,7 +509,7 @@ function Dashboard() {
                   <Line
                     type="monotone"
                     dataKey="faculty"
-                    stroke="#3b82f6"
+                    stroke="#3d8bff"
                     strokeWidth={2}
                     dot={false}
                   />
@@ -411,105 +521,161 @@ function Dashboard() {
                     strokeWidth={2}
                     dot={false}
                   />
+
                 </LineChart>
+
               </ResponsiveContainer>
+
             </div>
 
           </div>
 
-        </div>
+        </aside>
+
       </section>
 
-      {/* BOTTOM CARDS */}
+
+      {/* =========================================
+          BOTTOM SECTION
+      ========================================= */}
+
       <section className="bottom-dashboard-grid">
 
-        {/* Quick actions */}
-        <div className="bottom-card">
+        {/* Quick Actions */}
+
+        <div className="bottom-panel">
 
           <h3>QUICK ACTIONS</h3>
 
           <div className="quick-actions">
 
             <QuickAction
-              icon={<Navigation size={23} />}
+              icon={<Navigation />}
               title="Find Route"
               type="green"
             />
 
             <QuickAction
-              icon={<CalendarDays size={23} />}
+              icon={<CalendarDays />}
               title="Book Facility"
               type="purple"
             />
 
             <QuickAction
-              icon={<AlertTriangle size={23} />}
+              icon={<TriangleAlert />}
               title="Report Issue"
               type="red"
             />
 
           </div>
+
         </div>
 
+
         {/* Shortcuts */}
-        <div className="bottom-card">
+
+        <div className="bottom-panel shortcuts-panel">
 
           <h3>SHORTCUTS</h3>
 
-          <div className="shortcut-grid">
+          <div className="shortcut-list">
 
-            <Shortcut icon={<BookOpen />} name="Library" />
-            <Shortcut icon={<Utensils />} name="Canteen" />
-            <Shortcut icon={<FlaskConical />} name="Labs" />
-            <Shortcut icon={<CarFront />} name="Parking" />
-            <Shortcut icon={<Users />} name="Washroom" />
-            <Shortcut icon={<Leaf />} name="Help Desk" />
+            <Shortcut
+              icon={<Library />}
+              label="Library"
+              type="green"
+            />
+
+            <Shortcut
+              icon={<Utensils />}
+              label="Canteen"
+              type="red"
+            />
+
+            <Shortcut
+              icon={<FlaskConical />}
+              label="Labs"
+              type="orange"
+            />
+
+            <Shortcut
+              icon={<ParkingCircle />}
+              label="Parking"
+              type="blue"
+            />
+
+            <Shortcut
+              icon={<Accessibility />}
+              label="Washroom"
+              type="purple"
+            />
+
+            <Shortcut
+              icon={<CircleHelp />}
+              label="Help Desk"
+              type="green"
+            />
 
           </div>
+
         </div>
 
+
         {/* Weather */}
-        <div className="bottom-card weather-card">
+
+        <div className="bottom-panel weather-panel">
 
           <h3>WEATHER</h3>
 
           <div className="weather-main">
-            <CloudSun size={48} />
+
+            <Sun size={48} />
 
             <div>
               <strong>28°C</strong>
               <span>Partly Cloudy</span>
             </div>
+
           </div>
 
+
           <div className="weather-details">
+
             <div>
-              <small>Humidity</small>
+              <span>Humidity</span>
               <strong>60%</strong>
             </div>
 
             <div>
-              <small>Wind</small>
+              <span>Wind</span>
               <strong>12 km/h</strong>
             </div>
 
             <div>
-              <small>Feels like</small>
+              <span>Feels like</span>
               <strong>30°C</strong>
             </div>
+
           </div>
 
         </div>
 
-        {/* Mini map */}
-        <div className="bottom-card mini-map-card">
+
+        {/* Campus Map Overview */}
+
+        <div className="bottom-panel overview-panel">
 
           <h3>CAMPUS MAP OVERVIEW</h3>
 
           <div className="mini-map">
-            <div className="mini-road mini-road-one"></div>
-            <div className="mini-road mini-road-two"></div>
-            <div className="mini-campus-zone"></div>
+
+            <img
+              src={campusMap}
+              alt="Campus overview"
+            />
+
+            <div className="mini-map-focus"></div>
+
           </div>
 
         </div>
@@ -520,77 +686,67 @@ function Dashboard() {
   );
 }
 
-/* ---------- Small Components ---------- */
 
-function StatusBox({
+/* =========================================
+   ACTIVITY ICON
+========================================= */
+
+function ActivityIcon() {
+  return (
+    <svg
+      width="19"
+      height="19"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <path d="M3 12h4l3-8 4 16 3-8h4" />
+    </svg>
+  );
+}
+
+
+/* =========================================
+   STATUS CARD
+========================================= */
+
+function StatusCard({
   icon,
-  title,
   value,
-  sub,
+  label,
+  note,
   type,
 }: {
   icon: React.ReactNode;
-  title: string;
   value: string;
-  sub: string;
+  label: string;
+  note: string;
   type: string;
 }) {
   return (
-    <div className="status-box">
+    <div className="status-card">
+
       <div className={`status-icon ${type}`}>
         {icon}
       </div>
 
       <div>
-        <small>{title}</small>
+        <span>{label}</span>
         <strong>{value}</strong>
-        <span className={type}>{sub}</span>
+        <small className={type}>
+          {note}
+        </small>
       </div>
+
     </div>
   );
 }
 
-function EventItem({
-  icon,
-  title,
-  date,
-  place,
-  color,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  date: string;
-  place: string;
-  color: string;
-}) {
-  return (
-    <div className="event-item">
 
-      <div className={`event-icon ${color}`}>
-        {icon}
-      </div>
-
-      <div className="event-info">
-        <strong>{title}</strong>
-
-        <span>
-          <CalendarDays size={12} />
-          {date}
-        </span>
-
-        <span>
-          <MapPin size={12} />
-          {place}
-        </span>
-      </div>
-
-      <span className={`event-badge ${color}`}>
-        UPCOMING
-      </span>
-
-    </div>
-  );
-}
+/* =========================================
+   QUICK ACTION
+========================================= */
 
 function QuickAction({
   icon,
@@ -603,37 +759,46 @@ function QuickAction({
 }) {
   return (
     <button className={`quick-action ${type}`}>
-      {icon}
-      <span>{title}</span>
+
+      <div>
+        {icon}
+      </div>
+
+      <span>
+        {title}
+      </span>
+
     </button>
   );
 }
+
+
+/* =========================================
+   SHORTCUT
+========================================= */
 
 function Shortcut({
   icon,
-  name,
+  label,
+  type,
 }: {
   icon: React.ReactNode;
-  name: string;
+  label: string;
+  type: string;
 }) {
   return (
-    <button className="shortcut-item">
-      <div>{icon}</div>
-      <span>{name}</span>
+    <button className="shortcut">
+
+      <div className={`shortcut-icon ${type}`}>
+        {icon}
+      </div>
+
+      <span>
+        {label}
+      </span>
+
     </button>
   );
-}
-
-function CompassIcon() {
-  return <Compass size={21} />;
-}
-
-function NavigationIcon() {
-  return <Navigation size={21} />;
-}
-
-function ActivityIcon() {
-  return <Activity size={21} />;
 }
 
 export default Dashboard;
