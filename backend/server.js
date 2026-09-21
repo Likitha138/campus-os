@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 require("dotenv").config();
+const usersRoutes = require("./routes/usersRoutes");
 
 const { testDatabaseConnection } = require("./config/db");
 
@@ -23,6 +24,7 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use("/api/users", usersRoutes);
 
 app.use(morgan("dev"));
 
