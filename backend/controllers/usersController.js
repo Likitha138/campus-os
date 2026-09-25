@@ -1,38 +1,57 @@
 const { pool } = require("../config/db");
 
-// GET all users
+// GET ALL USERS
 const getUsers = async (req, res) => {
   try {
-    const [rows] = await pool.query(
-      `SELECT id, name, email, role, student_id, department, semester
-       FROM users
-       ORDER BY id DESC`
-    );
+    const [rows] = await pool.query(`
+      SELECT
+        id,
+        name,
+        email,
+        role,
+        student_id,
+        department,
+        semester
+      FROM users
+      ORDER BY id DESC
+    `);
 
-    res.json({
+    res.status(200).json({
       success: true,
       count: rows.length,
       data: rows
     });
   } catch (error) {
-    console.error("Get users error:", error);
+    console.error("GET USERS ERROR:", error);
 
     res.status(500).json({
       success: false,
-      message: "Failed to fetch users"
+      message: "Failed to fetch users",
+      errorCode: error.code || null,
+      errorMessage: error.sqlMessage || error.message || null
     });
   }
 };
 
-// GET user by ID
+
+// GET USER BY ID
 const getUserById = async (req, res) => {
   try {
     const { id } = req.params;
 
     const [rows] = await pool.query(
-      `SELECT id, name, email, role, student_id, department, semester
-       FROM users
-       WHERE id = ?`,
+      `
+      SELECT
+        id,
+        name,
+        email,
+        role,
+        student_id,
+        department,
+        semester
+      FROM users
+      WHERE id = ?
+      `,
       [id]
     );
 
@@ -43,21 +62,24 @@ const getUserById = async (req, res) => {
       });
     }
 
-    res.json({
+    res.status(200).json({
       success: true,
       data: rows[0]
     });
   } catch (error) {
-    console.error("Get user error:", error);
+    console.error("GET USER BY ID ERROR:", error);
 
     res.status(500).json({
       success: false,
-      message: "Failed to fetch user"
+      message: "Failed to fetch user",
+      errorCode: error.code || null,
+      errorMessage: error.sqlMessage || error.message || null
     });
   }
 };
 
-// CREATE user
+
+// CREATE USER
 const createUser = async (req, res) => {
   try {
     const {
@@ -76,10 +98,31 @@ const createUser = async (req, res) => {
       });
     }
 
+    const [existingUsers] = await pool.query(
+      "SELECT id FROM users WHERE email = ?",
+      [email]
+    );
+
+    if (existingUsers.length > 0) {
+      return res.status(409).json({
+        success: false,
+        message: "User with this email already exists"
+      });
+    }
+
     const [result] = await pool.query(
-      `INSERT INTO users
-       (name, email, role, student_id, department, semester)
-       VALUES (?, ?, ?, ?, ?, ?)`,
+      `
+      INSERT INTO users
+      (
+        name,
+        email,
+        role,
+        student_id,
+        department,
+        semester
+      )
+      VALUES (?, ?, ?, ?, ?, ?)
+      `,
       [
         name,
         email,
@@ -96,16 +139,26 @@ const createUser = async (req, res) => {
       userId: result.insertId
     });
   } catch (error) {
-    console.error("Create user error:", error);
+    console.error("=================================");
+    console.error("CREATE USER ERROR");
+    console.error("Error Code:", error.code);
+    console.error("SQL State:", error.sqlState);
+    console.error("SQL Message:", error.sqlMessage);
+    console.error("Message:", error.message);
+    console.error("=================================");
 
     res.status(500).json({
       success: false,
-      message: "Failed to create user"
+      message: "Failed to create user",
+      errorCode: error.code || null,
+      sqlState: error.sqlState || null,
+      errorMessage: error.sqlMessage || error.message || null
     });
   }
 };
 
-// UPDATE user
+
+// UPDATE USER
 const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -119,15 +172,49 @@ const updateUser = async (req, res) => {
       semester
     } = req.body;
 
+    if (!name || !email || !role) {
+      return res.status(400).json({
+        success: false,
+        message: "Name, email and role are required"
+      });
+    }
+
+    const [existingUser] = await pool.query(
+      "SELECT id FROM users WHERE id = ?",
+      [id]
+    );
+
+    if (existingUser.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    const [emailUser] = await pool.query(
+      "SELECT id FROM users WHERE email = ? AND id != ?",
+      [email, id]
+    );
+
+    if (emailUser.length > 0) {
+      return res.status(409).json({
+        success: false,
+        message: "Another user already uses this email"
+      });
+    }
+
     const [result] = await pool.query(
-      `UPDATE users
-       SET name = ?,
-           email = ?,
-           role = ?,
-           student_id = ?,
-           department = ?,
-           semester = ?
-       WHERE id = ?`,
+      `
+      UPDATE users
+      SET
+        name = ?,
+        email = ?,
+        role = ?,
+        student_id = ?,
+        department = ?,
+        semester = ?
+      WHERE id = ?
+      `,
       [
         name,
         email,
@@ -139,58 +226,65 @@ const updateUser = async (req, res) => {
       ]
     );
 
-    if (result.affectedRows === 0) {
+    res.status(200).json({
+      success: true,
+      message: "User updated successfully",
+      affectedRows: result.affectedRows
+    });
+  } catch (error) {
+    console.error("UPDATE USER ERROR:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to update user",
+      errorCode: error.code || null,
+      errorMessage: error.sqlMessage || error.message || null
+    });
+  }
+};
+
+
+// DELETE USER
+const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const [existingUser] = await pool.query(
+      "SELECT id FROM users WHERE id = ?",
+      [id]
+    );
+
+    if (existingUser.length === 0) {
       return res.status(404).json({
         success: false,
         message: "User not found"
       });
     }
-
-    res.json({
-      success: true,
-      message: "User updated successfully"
-    });
-  } catch (error) {
-    console.error("Update user error:", error);
-
-    res.status(500).json({
-      success: false,
-      message: "Failed to update user"
-    });
-  }
-};
-
-// DELETE user
-const deleteUser = async (req, res) => {
-  try {
-    const { id } = req.params;
 
     const [result] = await pool.query(
       "DELETE FROM users WHERE id = ?",
       [id]
     );
 
-    if (result.affectedRows === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found"
-      });
-    }
-
-    res.json({
+    res.status(200).json({
       success: true,
-      message: "User deleted successfully"
+      message: "User deleted successfully",
+      affectedRows: result.affectedRows
     });
   } catch (error) {
-    console.error("Delete user error:", error);
+    console.error("DELETE USER ERROR:", error);
 
     res.status(500).json({
       success: false,
-      message: "Failed to delete user"
+      message: "Failed to delete user",
+      errorCode: error.code || null,
+      errorMessage: error.sqlMessage || error.message || null
     });
   }
 };
 
+
+// EXPORT CONTROLLERS
 module.exports = {
   getUsers,
   getUserById,
