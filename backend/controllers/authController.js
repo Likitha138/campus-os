@@ -1,104 +1,27 @@
-const bcrypt = require("bcryptjs");
 const { pool } = require("../config/db");
-const generateToken = require("../utils/generateToken");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
-// ==========================================
-// REGISTER USER
-// ==========================================
-
-const registerUser = async (req, res) => {
-  try {
-    const {
-      name,
-      email,
-      password,
-      role,
-      student_id,
-      department,
-      semester,
-    } = req.body;
-
-    if (!name || !email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Name, email and password are required",
-      });
-    }
-
-    // Check existing email
-    const [existingUsers] = await pool.query(
-      "SELECT id FROM users WHERE email = ?",
-      [email]
-    );
-
-    if (existingUsers.length > 0) {
-      return res.status(409).json({
-        success: false,
-        message: "Email already registered",
-      });
-    }
-
-    // Encrypt password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const [result] = await pool.query(
-      `INSERT INTO users
-      (name, email, password, role, student_id, department, semester)
-      VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [
-        name,
-        email,
-        hashedPassword,
-        role || "student",
-        student_id || null,
-        department || null,
-        semester || null,
-      ]
-    );
-
-    const token = generateToken(result.insertId);
-
-    res.status(201).json({
-      success: true,
-      message: "User registered successfully",
-      token,
-      user: {
-        id: result.insertId,
-        name,
-        email,
-        role: role || "student",
-        student_id: student_id || null,
-        department: department || null,
-        semester: semester || null,
-      },
-    });
-  } catch (error) {
-    console.error("Register error:", error.message);
-
-    res.status(500).json({
-      success: false,
-      message: "Server error while registering user",
-    });
-  }
-};
-
-// ==========================================
+// =====================================================
 // LOGIN USER
-// ==========================================
-
+// POST /api/auth/login
+// =====================================================
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    // Validate input
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: "Email and password are required",
+        message: "Email and password are required"
       });
     }
 
-    const [users] = await pool.query(
-      `SELECT
+    // Find user
+    const [rows] = await pool.query(
+      `
+      SELECT
         id,
         name,
         email,
@@ -107,20 +30,23 @@ const loginUser = async (req, res) => {
         student_id,
         department,
         semester
-       FROM users
-       WHERE email = ?`,
+      FROM users
+      WHERE email = ?
+      LIMIT 1
+      `,
       [email]
     );
 
-    if (users.length === 0) {
+    if (rows.length === 0) {
       return res.status(401).json({
         success: false,
-        message: "Invalid email or password",
+        message: "Invalid email or password"
       });
     }
 
-    const user = users[0];
+    const user = rows[0];
 
+    // Compare password
     const passwordMatch = await bcrypt.compare(
       password,
       user.password
@@ -129,44 +55,66 @@ const loginUser = async (req, res) => {
     if (!passwordMatch) {
       return res.status(401).json({
         success: false,
-        message: "Invalid email or password",
+        message: "Invalid email or password"
       });
     }
 
-    const token = generateToken(user.id);
+    // JWT secret
+    const secret = process.env.JWT_SECRET;
 
-    res.json({
+    if (!secret) {
+      console.error("JWT_SECRET is missing in .env");
+
+      return res.status(500).json({
+        success: false,
+        message: "Authentication configuration is missing"
+      });
+    }
+
+    // Create token
+    const token = jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+        role: user.role
+      },
+      secret,
+      {
+        expiresIn: "7d"
+      }
+    );
+
+    // Never send password to frontend
+    delete user.password;
+
+    res.status(200).json({
       success: true,
       message: "Login successful",
       token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        student_id: user.student_id,
-        department: user.department,
-        semester: user.semester,
-      },
+      user
     });
+
   } catch (error) {
-    console.error("Login error:", error.message);
+    console.error("LOGIN ERROR:", error);
 
     res.status(500).json({
       success: false,
-      message: "Server error while logging in",
+      message: "Login failed",
+      error: error.message
     });
   }
 };
 
-// ==========================================
-// GET CURRENT USER
-// ==========================================
 
+// =====================================================
+// GET CURRENT USER
+// GET /api/auth/me
+// =====================================================
 const getCurrentUser = async (req, res) => {
   try {
-    const [users] = await pool.query(
-      `SELECT
+    const [rows] = await pool.query(
+      `
+      SELECT
         id,
         name,
         email,
@@ -175,34 +123,38 @@ const getCurrentUser = async (req, res) => {
         department,
         semester,
         created_at
-       FROM users
-       WHERE id = ?`,
+      FROM users
+      WHERE id = ?
+      LIMIT 1
+      `,
       [req.user.id]
     );
 
-    if (users.length === 0) {
+    if (rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "User not found",
+        message: "User not found"
       });
     }
 
-    res.json({
+    res.status(200).json({
       success: true,
-      user: users[0],
+      data: rows[0]
     });
+
   } catch (error) {
-    console.error("Current user error:", error.message);
+    console.error("GET CURRENT USER ERROR:", error);
 
     res.status(500).json({
       success: false,
-      message: "Server error",
+      message: "Failed to fetch current user",
+      error: error.message
     });
   }
 };
 
+
 module.exports = {
-  registerUser,
   loginUser,
-  getCurrentUser,
+  getCurrentUser
 };
