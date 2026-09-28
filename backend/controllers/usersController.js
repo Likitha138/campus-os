@@ -1,14 +1,15 @@
 const { pool } = require("../config/db");
+const bcrypt = require("bcryptjs");
 
 // =====================================================
 // GET ALL USERS
 // GET /api/users
 // =====================================================
+
 const getUsers = async (req, res) => {
   try {
     const [rows] = await pool.query(
-      `
-      SELECT
+      `SELECT
         id,
         name,
         email,
@@ -17,9 +18,8 @@ const getUsers = async (req, res) => {
         department,
         semester,
         created_at
-      FROM users
-      ORDER BY id DESC
-      `
+       FROM users
+       ORDER BY id DESC`
     );
 
     res.status(200).json({
@@ -28,28 +28,26 @@ const getUsers = async (req, res) => {
       data: rows
     });
   } catch (error) {
-    console.error("GET USERS ERROR:", error);
+    console.error("Get users error:", error);
 
     res.status(500).json({
       success: false,
-      message: "Failed to fetch users",
-      error: error.message
+      message: "Failed to fetch users"
     });
   }
 };
-
 
 // =====================================================
 // GET USER BY ID
 // GET /api/users/:id
 // =====================================================
+
 const getUserById = async (req, res) => {
   try {
     const { id } = req.params;
 
     const [rows] = await pool.query(
-      `
-      SELECT
+      `SELECT
         id,
         name,
         email,
@@ -58,9 +56,8 @@ const getUserById = async (req, res) => {
         department,
         semester,
         created_at
-      FROM users
-      WHERE id = ?
-      `,
+       FROM users
+       WHERE id = ?`,
       [id]
     );
 
@@ -76,21 +73,20 @@ const getUserById = async (req, res) => {
       data: rows[0]
     });
   } catch (error) {
-    console.error("GET USER BY ID ERROR:", error);
+    console.error("Get user by ID error:", error);
 
     res.status(500).json({
       success: false,
-      message: "Failed to fetch user",
-      error: error.message
+      message: "Failed to fetch user"
     });
   }
 };
-
 
 // =====================================================
 // CREATE USER
 // POST /api/users
 // =====================================================
+
 const createUser = async (req, res) => {
   try {
     const {
@@ -103,21 +99,11 @@ const createUser = async (req, res) => {
       semester
     } = req.body;
 
-    // Validate required fields
+    // Required fields
     if (!name || !email || !password || !role) {
       return res.status(400).json({
         success: false,
         message: "Name, email, password and role are required"
-      });
-    }
-
-    // Validate role
-    const allowedRoles = ["student", "faculty", "admin"];
-
-    if (!allowedRoles.includes(role)) {
-      return res.status(400).json({
-        success: false,
-        message: "Role must be student, faculty or admin"
       });
     }
 
@@ -134,40 +120,26 @@ const createUser = async (req, res) => {
       });
     }
 
-    // Check duplicate student ID if provided
-    if (student_id) {
-      const [existingStudent] = await pool.query(
-        "SELECT id FROM users WHERE student_id = ?",
-        [student_id]
-      );
-
-      if (existingStudent.length > 0) {
-        return res.status(409).json({
-          success: false,
-          message: "User with this student ID already exists"
-        });
-      }
-    }
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     // Insert user
     const [result] = await pool.query(
-      `
-      INSERT INTO users
-      (
-        name,
-        email,
-        password,
-        role,
-        student_id,
-        department,
-        semester
-      )
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-      `,
+      `INSERT INTO users
+       (
+         name,
+         email,
+         password,
+         role,
+         student_id,
+         department,
+         semester
+       )
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [
         name,
         email,
-        password,
+        hashedPassword,
         role,
         student_id || null,
         department || null,
@@ -180,30 +152,21 @@ const createUser = async (req, res) => {
       message: "User created successfully",
       userId: result.insertId
     });
-
   } catch (error) {
-    console.error("====================================");
-    console.error("CREATE USER ERROR");
-    console.error("Error Code:", error.code);
-    console.error("SQL State:", error.sqlState);
-    console.error("SQL Message:", error.sqlMessage);
-    console.error("Message:", error.message);
-    console.error("====================================");
+    console.error("Create user error:", error);
 
     res.status(500).json({
       success: false,
-      message: "Failed to create user",
-      errorCode: error.code || null,
-      errorMessage: error.sqlMessage || error.message || null
+      message: "Failed to create user"
     });
   }
 };
-
 
 // =====================================================
 // UPDATE USER
 // PUT /api/users/:id
 // =====================================================
+
 const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -218,7 +181,6 @@ const updateUser = async (req, res) => {
       semester
     } = req.body;
 
-    // Validate required fields
     if (!name || !email || !role) {
       return res.status(400).json({
         success: false,
@@ -226,17 +188,6 @@ const updateUser = async (req, res) => {
       });
     }
 
-    // Validate role
-    const allowedRoles = ["student", "faculty", "admin"];
-
-    if (!allowedRoles.includes(role)) {
-      return res.status(400).json({
-        success: false,
-        message: "Role must be student, faculty or admin"
-      });
-    }
-
-    // Check user exists
     const [existingUser] = await pool.query(
       "SELECT id FROM users WHERE id = ?",
       [id]
@@ -249,7 +200,6 @@ const updateUser = async (req, res) => {
       });
     }
 
-    // Check duplicate email
     const [emailUser] = await pool.query(
       "SELECT id FROM users WHERE email = ? AND id != ?",
       [email, id]
@@ -262,42 +212,24 @@ const updateUser = async (req, res) => {
       });
     }
 
-    // Check duplicate student ID
-    if (student_id) {
-      const [studentUser] = await pool.query(
-        "SELECT id FROM users WHERE student_id = ? AND id != ?",
-        [student_id, id]
-      );
-
-      if (studentUser.length > 0) {
-        return res.status(409).json({
-          success: false,
-          message: "Another user already uses this student ID"
-        });
-      }
-    }
-
-    let result;
-
-    // If password is provided, update password too
     if (password) {
-      [result] = await pool.query(
-        `
-        UPDATE users
-        SET
-          name = ?,
-          email = ?,
-          password = ?,
-          role = ?,
-          student_id = ?,
-          department = ?,
-          semester = ?
-        WHERE id = ?
-        `,
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      await pool.query(
+        `UPDATE users
+         SET
+           name = ?,
+           email = ?,
+           password = ?,
+           role = ?,
+           student_id = ?,
+           department = ?,
+           semester = ?
+         WHERE id = ?`,
         [
           name,
           email,
-          password,
+          hashedPassword,
           role,
           student_id || null,
           department || null,
@@ -306,19 +238,16 @@ const updateUser = async (req, res) => {
         ]
       );
     } else {
-      // Keep existing password
-      [result] = await pool.query(
-        `
-        UPDATE users
-        SET
-          name = ?,
-          email = ?,
-          role = ?,
-          student_id = ?,
-          department = ?,
-          semester = ?
-        WHERE id = ?
-        `,
+      await pool.query(
+        `UPDATE users
+         SET
+           name = ?,
+           email = ?,
+           role = ?,
+           student_id = ?,
+           department = ?,
+           semester = ?
+         WHERE id = ?`,
         [
           name,
           email,
@@ -333,32 +262,27 @@ const updateUser = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "User updated successfully",
-      affectedRows: result.affectedRows
+      message: "User updated successfully"
     });
-
   } catch (error) {
-    console.error("UPDATE USER ERROR:", error);
+    console.error("Update user error:", error);
 
     res.status(500).json({
       success: false,
-      message: "Failed to update user",
-      errorCode: error.code || null,
-      errorMessage: error.sqlMessage || error.message || null
+      message: "Failed to update user"
     });
   }
 };
-
 
 // =====================================================
 // DELETE USER
 // DELETE /api/users/:id
 // =====================================================
+
 const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Check user exists
     const [existingUser] = await pool.query(
       "SELECT id FROM users WHERE id = ?",
       [id]
@@ -371,7 +295,6 @@ const deleteUser = async (req, res) => {
       });
     }
 
-    // Delete user
     const [result] = await pool.query(
       "DELETE FROM users WHERE id = ?",
       [id]
@@ -382,23 +305,20 @@ const deleteUser = async (req, res) => {
       message: "User deleted successfully",
       affectedRows: result.affectedRows
     });
-
   } catch (error) {
-    console.error("DELETE USER ERROR:", error);
+    console.error("Delete user error:", error);
 
     res.status(500).json({
       success: false,
-      message: "Failed to delete user",
-      errorCode: error.code || null,
-      errorMessage: error.sqlMessage || error.message || null
+      message: "Failed to delete user"
     });
   }
 };
 
+// =====================================================
+// EXPORT
+// =====================================================
 
-// =====================================================
-// EXPORT ALL CONTROLLERS
-// =====================================================
 module.exports = {
   getUsers,
   getUserById,
