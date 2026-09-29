@@ -1,48 +1,48 @@
 const express = require("express");
 
 const {
-  getAttendance,
-  getAttendanceByUser,
-  getAttendanceSummary,
-  createAttendance,
-  updateAttendance,
-  deleteAttendance
-} = require("../controllers/attendanceController");
+  getMarks,
+  getMarksByUser,
+  getMarksSummary,
+  createMarks,
+  updateMarks,
+  deleteMarks
+} = require("../controllers/marksController");
 
 const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-router.get("/", authMiddleware, getAttendance);
+router.get("/", authMiddleware, getMarks);
 
 router.get(
   "/user/:userId",
   authMiddleware,
-  getAttendanceByUser
+  getMarksByUser
 );
 
 router.get(
   "/summary/:userId",
   authMiddleware,
-  getAttendanceSummary
+  getMarksSummary
 );
 
 router.post(
   "/",
   authMiddleware,
-  createAttendance
+  createMarks
 );
 
 router.put(
   "/:id",
   authMiddleware,
-  updateAttendance
+  updateMarks
 );
 
 router.delete(
   "/:id",
   authMiddleware,
-  deleteAttendance
+  deleteMarks
 );
 
 module.exports = router;

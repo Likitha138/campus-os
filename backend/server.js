@@ -5,6 +5,9 @@ require("dotenv").config();
 
 const usersRoutes = require("./routes/usersRoutes");
 const authRoutes = require("./routes/authRoutes");
+const attendanceRoutes = require("./routes/attendanceRoutes");
+const marksRoutes = require("./routes/marksRoutes");
+
 const { testDatabaseConnection } = require("./config/db");
 
 const app = express();
@@ -58,6 +61,18 @@ app.get("/api/health", (req, res) => {
 app.use("/api/users", usersRoutes);
 
 // ======================================
+// ATTENDANCE ROUTES
+// ======================================
+
+app.use("/api/attendance", attendanceRoutes);
+
+// ======================================
+// MARKS ROUTES
+// ======================================
+
+app.use("/api/marks", marksRoutes);
+
+// ======================================
 // AUTH ROUTES
 // ======================================
 
@@ -106,6 +121,8 @@ const startServer = async () => {
       console.log(`❤️  http://localhost:${PORT}/api/health`);
       console.log(`👥 http://localhost:${PORT}/api/users`);
       console.log(`🔐 http://localhost:${PORT}/api/auth`);
+      console.log(`📅 http://localhost:${PORT}/api/attendance`);
+      console.log(`📊 http://localhost:${PORT}/api/marks`);
       console.log("======================================");
       console.log("");
     });
