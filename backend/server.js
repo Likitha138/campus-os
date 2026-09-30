@@ -7,6 +7,7 @@ const usersRoutes = require("./routes/usersRoutes");
 const authRoutes = require("./routes/authRoutes");
 const attendanceRoutes = require("./routes/attendanceRoutes");
 const marksRoutes = require("./routes/marksRoutes");
+const assignmentsRoutes = require("./routes/assignmentsRoutes");
 
 const { testDatabaseConnection } = require("./config/db");
 
@@ -81,6 +82,8 @@ app.use("/api/auth", authRoutes);
 // ======================================
 // 404 ROUTE
 // ======================================
+
+app.use("/api/assignments", assignmentsRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
