@@ -1,36 +1,52 @@
-
 const express = require("express");
+
 const router = express.Router();
-const { pool } = require("../config/db");
 
-// GET all campus activities
-router.get("/", async (req, res, next) => {
-  try {
-    const [tables] = await pool.query(
-      "SHOW TABLES LIKE 'activities'"
-    );
+const activities = [
+  {
+    time: "6 AM",
+    students: 800,
+    faculty: 500,
+    visitors: 300,
+  },
+  {
+    time: "9 AM",
+    students: 1800,
+    faculty: 1000,
+    visitors: 650,
+  },
+  {
+    time: "12 PM",
+    students: 2400,
+    faculty: 1400,
+    visitors: 1100,
+  },
+  {
+    time: "3 PM",
+    students: 2200,
+    faculty: 1800,
+    visitors: 1400,
+  },
+  {
+    time: "6 PM",
+    students: 1500,
+    faculty: 1000,
+    visitors: 1100,
+  },
+  {
+    time: "9 PM",
+    students: 1200,
+    faculty: 900,
+    visitors: 700,
+  },
+];
 
-    if (tables.length === 0) {
-      return res.status(200).json({
-        success: true,
-        message: "Activities table is not configured yet",
-        count: 0,
-        data: [],
-      });
-    }
-
-    const [activities] = await pool.query(
-      "SELECT * FROM activities ORDER BY id DESC LIMIT 100"
-    );
-
-    res.status(200).json({
-      success: true,
-      count: activities.length,
-      data: activities,
-    });
-  } catch (error) {
-    next(error);
-  }
+router.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    count: activities.length,
+    data: activities,
+  });
 });
 
 module.exports = router;

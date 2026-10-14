@@ -1,25 +1,23 @@
-
 const express = require("express");
+
 const router = express.Router();
-const { pool } = require("../config/db");
 
-// GET /api/dashboard
-router.get("/", async (req, res, next) => {
-  try {
-    const [users] = await pool.query(
-      "SELECT COUNT(*) AS total FROM users"
-    );
-
-    res.status(200).json({
-      success: true,
-      message: "Dashboard data retrieved successfully",
-      data: {
-        totalUsers: Number(users[0].total),
+router.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    data: {
+      buildings: 24,
+      rooms: 215,
+      students: 3248,
+      occupancy: 63,
+      traffic: "Moderate",
+      eventsToday: 2,
+      airQuality: {
+        value: 42,
+        status: "Good",
       },
-    });
-  } catch (error) {
-    next(error);
-  }
+    },
+  });
 });
 
 module.exports = router;

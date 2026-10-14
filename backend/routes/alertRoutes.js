@@ -1,36 +1,37 @@
-
 const express = require("express");
+
 const router = express.Router();
-const { pool } = require("../config/db");
 
-// GET all campus alerts
-router.get("/", async (req, res, next) => {
-  try {
-    const [tables] = await pool.query(
-      "SHOW TABLES LIKE 'alerts'"
-    );
+const alerts = [
+  {
+    id: 1,
+    title: "Low Attendance",
+    message: "DBMS attendance is below the recommended level.",
+    type: "warning",
+    isRead: false,
+  },
+  {
+    id: 2,
+    title: "New Event",
+    message: "Placement Drive is scheduled for the campus.",
+    type: "info",
+    isRead: false,
+  },
+  {
+    id: 3,
+    title: "Performance Improved",
+    message: "Academic performance improved this month.",
+    type: "success",
+    isRead: true,
+  },
+];
 
-    if (tables.length === 0) {
-      return res.status(200).json({
-        success: true,
-        message: "Alerts table is not configured yet",
-        count: 0,
-        data: [],
-      });
-    }
-
-    const [alerts] = await pool.query(
-      "SELECT * FROM alerts ORDER BY id DESC LIMIT 100"
-    );
-
-    res.status(200).json({
-      success: true,
-      count: alerts.length,
-      data: alerts,
-    });
-  } catch (error) {
-    next(error);
-  }
+router.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    count: alerts.length,
+    data: alerts,
+  });
 });
 
 module.exports = router;

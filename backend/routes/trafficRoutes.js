@@ -1,35 +1,48 @@
-
 const express = require("express");
+
 const router = express.Router();
-const { pool } = require("../config/db");
 
-// GET /api/traffic
-router.get("/", async (req, res, next) => {
-  try {
-    const [tables] = await pool.query(
-      "SHOW TABLES LIKE 'traffic'"
-    );
+const traffic = [
+  {
+    id: 1,
+    zone: "Main Gate",
+    vehicles: 84,
+    averageSpeed: 18,
+    congestion: "Moderate",
+    status: "Moving",
+  },
+  {
+    id: 2,
+    zone: "Academic Block",
+    vehicles: 52,
+    averageSpeed: 24,
+    congestion: "Low",
+    status: "Moving",
+  },
+  {
+    id: 3,
+    zone: "Parking Area",
+    vehicles: 118,
+    averageSpeed: 8,
+    congestion: "High",
+    status: "Slow",
+  },
+  {
+    id: 4,
+    zone: "Canteen Road",
+    vehicles: 67,
+    averageSpeed: 16,
+    congestion: "Moderate",
+    status: "Moving",
+  },
+];
 
-    if (tables.length === 0) {
-      return res.status(200).json({
-        success: true,
-        message: "Traffic table is not configured yet",
-        data: [],
-      });
-    }
-
-    const [traffic] = await pool.query(
-      "SELECT * FROM traffic LIMIT 100"
-    );
-
-    res.status(200).json({
-      success: true,
-      count: traffic.length,
-      data: traffic,
-    });
-  } catch (error) {
-    next(error);
-  }
+router.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    count: traffic.length,
+    data: traffic,
+  });
 });
 
 module.exports = router;

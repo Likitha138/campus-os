@@ -1,4 +1,3 @@
-
 const API_BASE_URL = "http://localhost:5000/api";
 
 export async function apiRequest<T>(
@@ -18,13 +17,40 @@ export async function apiRequest<T>(
 
     try {
       const errorData = await response.json();
-      message = errorData.message || message;
+
+      if (errorData?.message) {
+        message = errorData.message;
+      }
     } catch {
-      // Keep the default error message if the response isn't JSON.
+      // Ignore JSON parsing error
     }
 
     throw new Error(message);
   }
 
-  return response.json() as Promise<T>;
+  return response.json();
 }
+
+export const getDashboard = () =>
+  apiRequest("/dashboard");
+
+export const getEvents = () =>
+  apiRequest("/events");
+
+export const getBuildings = () =>
+  apiRequest("/buildings");
+
+export const getRooms = () =>
+  apiRequest("/rooms");
+
+export const getTraffic = () =>
+  apiRequest("/traffic");
+
+export const getActivities = () =>
+  apiRequest("/activities");
+
+export const getAlerts = () =>
+  apiRequest("/alerts");
+
+export const getBookings = () =>
+  apiRequest("/bookings");

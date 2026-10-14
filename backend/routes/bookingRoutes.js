@@ -1,36 +1,60 @@
-
 const express = require("express");
+
 const router = express.Router();
-const { pool } = require("../config/db");
 
-// GET all campus bookings
-router.get("/", async (req, res, next) => {
-  try {
-    const [tables] = await pool.query(
-      "SHOW TABLES LIKE 'bookings'"
-    );
+const bookings = [
+  {
+    id: 1,
+    facility: "Seminar Hall",
+    date: "2026-10-16",
+    time: "10:00 AM - 12:00 PM",
+    purpose: "Project Presentation",
+    status: "Confirmed",
+  },
+  {
+    id: 2,
+    facility: "Computer Lab",
+    date: "2026-10-18",
+    time: "2:00 PM - 4:00 PM",
+    purpose: "Workshop",
+    status: "Pending",
+  },
+];
 
-    if (tables.length === 0) {
-      return res.status(200).json({
-        success: true,
-        message: "Bookings table is not configured yet",
-        count: 0,
-        data: [],
-      });
-    }
+router.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    count: bookings.length,
+    data: bookings,
+  });
+});
 
-    const [bookings] = await pool.query(
-      "SELECT * FROM bookings ORDER BY id DESC LIMIT 100"
-    );
+router.post("/", (req, res) => {
+  const { facility, date, time, purpose } = req.body;
 
-    res.status(200).json({
-      success: true,
-      count: bookings.length,
-      data: bookings,
+  if (!facility || !date || !time || !purpose) {
+    return res.status(400).json({
+      success: false,
+      message: "Facility, date, time and purpose are required",
     });
-  } catch (error) {
-    next(error);
   }
+
+  const booking = {
+    id: bookings.length + 1,
+    facility,
+    date,
+    time,
+    purpose,
+    status: "Pending",
+  };
+
+  bookings.push(booking);
+
+  res.status(201).json({
+    success: true,
+    message: "Booking created successfully",
+    data: booking,
+  });
 });
 
 module.exports = router;
