@@ -1,7 +1,14 @@
+
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 require("dotenv").config();
+
+const { testDatabaseConnection } = require("./config/db");
+
+// ======================================
+// ROUTE IMPORTS
+// ======================================
 
 const usersRoutes = require("./routes/usersRoutes");
 const authRoutes = require("./routes/authRoutes");
@@ -9,10 +16,20 @@ const attendanceRoutes = require("./routes/attendanceRoutes");
 const marksRoutes = require("./routes/marksRoutes");
 const assignmentsRoutes = require("./routes/assignmentsRoutes");
 
-const { testDatabaseConnection } = require("./config/db");
+const dashboardRoutes = require("./routes/dashboardRoutes");
+const eventRoutes = require("./routes/eventRoutes");
+const buildingRoutes = require("./routes/buildingRoutes");
+const roomRoutes = require("./routes/roomRoutes");
+const trafficRoutes = require("./routes/trafficRoutes");
+const activityRoutes = require("./routes/activityRoutes");
+const alertRoutes = require("./routes/alertRoutes");
+const bookingRoutes = require("./routes/bookingRoutes");
+
+// ======================================
+// APP CONFIGURATION
+// ======================================
 
 const app = express();
-
 const PORT = process.env.PORT || 5000;
 
 // ======================================
@@ -28,7 +45,6 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 app.use(morgan("dev"));
 
 // ======================================
@@ -56,34 +72,28 @@ app.get("/api/health", (req, res) => {
 });
 
 // ======================================
-// USER ROUTES
+// API ROUTES
+// Keep these BEFORE the 404 handler
 // ======================================
 
 app.use("/api/users", usersRoutes);
-
-// ======================================
-// ATTENDANCE ROUTES
-// ======================================
-
-app.use("/api/attendance", attendanceRoutes);
-
-// ======================================
-// MARKS ROUTES
-// ======================================
-
-app.use("/api/marks", marksRoutes);
-
-// ======================================
-// AUTH ROUTES
-// ======================================
-
 app.use("/api/auth", authRoutes);
-
-// ======================================
-// 404 ROUTE
-// ======================================
-
+app.use("/api/attendance", attendanceRoutes);
+app.use("/api/marks", marksRoutes);
 app.use("/api/assignments", assignmentsRoutes);
+
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/events", eventRoutes);
+app.use("/api/buildings", buildingRoutes);
+app.use("/api/rooms", roomRoutes);
+app.use("/api/traffic", trafficRoutes);
+app.use("/api/activities", activityRoutes);
+app.use("/api/alerts", alertRoutes);
+app.use("/api/bookings", bookingRoutes);
+
+// ======================================
+// 404 HANDLER
+// ======================================
 
 app.use((req, res) => {
   res.status(404).json({
@@ -100,6 +110,10 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error("Server error:", err);
 
+  if (res.headersSent) {
+    return next(err);
+  }
+
   res.status(500).json({
     success: false,
     message: "Internal server error",
@@ -110,7 +124,7 @@ app.use((err, req, res, next) => {
 // START SERVER
 // ======================================
 
-const startServer = async () => {
+async function startServer() {
   try {
     await testDatabaseConnection();
 
@@ -119,24 +133,25 @@ const startServer = async () => {
       console.log("======================================");
       console.log("          CAMPUS OS BACKEND");
       console.log("======================================");
-      console.log(`🚀 Server running on port ${PORT}`);
-      console.log(`🌐 http://localhost:${PORT}`);
-      console.log(`❤️  http://localhost:${PORT}/api/health`);
-      console.log(`👥 http://localhost:${PORT}/api/users`);
-      console.log(`🔐 http://localhost:${PORT}/api/auth`);
-      console.log(`📅 http://localhost:${PORT}/api/attendance`);
-      console.log(`📊 http://localhost:${PORT}/api/marks`);
+      console.log(`Server:     http://localhost:${PORT}`);
+      console.log(`Health:     http://localhost:${PORT}/api/health`);
+      console.log(`Users:      http://localhost:${PORT}/api/users`);
+      console.log(`Auth:       http://localhost:${PORT}/api/auth`);
+      console.log(`Attendance: http://localhost:${PORT}/api/attendance`);
+      console.log(`Marks:      http://localhost:${PORT}/api/marks`);
+      console.log(`Assignments: http://localhost:${PORT}/api/assignments`);
+      console.log(`Dashboard:  http://localhost:${PORT}/api/dashboard`);
+      console.log(`Events:     http://localhost:${PORT}/api/events`);
+      console.log(`Buildings:  http://localhost:${PORT}/api/buildings`);
+      console.log(`Rooms:      http://localhost:${PORT}/api/rooms`);
+      console.log(`Traffic:    http://localhost:${PORT}/api/traffic`);
       console.log("======================================");
       console.log("");
     });
   } catch (error) {
-    console.error("");
-    console.error("======================================");
-    console.error("❌ FAILED TO START CAMPUS OS BACKEND");
-    console.error("======================================");
-    console.error(error);
-    console.error("======================================");
+    console.error("Failed to start Campus OS backend:", error);
+    process.exitCode = 1;
   }
-};
+}
 
 startServer();
