@@ -79,7 +79,6 @@ function Sidebar() {
 
       {/* LOGO */}
       <div className="sidebar-logo">
-
         <div className="logo-mark">
           <Compass size={25} />
         </div>
@@ -88,14 +87,12 @@ function Sidebar() {
           <strong>CAMPUS OS</strong>
           <span>Smart Campus Operating System</span>
         </div>
-
       </div>
 
       {/* NAVIGATION */}
       <nav className="sidebar-navigation">
 
         {menuItems.map((item) => {
-
           const Icon = item.icon;
 
           return (
@@ -107,7 +104,6 @@ function Sidebar() {
                 `sidebar-item ${isActive ? "active" : ""}`
               }
             >
-
               <div className="sidebar-item-left">
 
                 <Icon
@@ -124,10 +120,8 @@ function Sidebar() {
                 size={17}
                 strokeWidth={1.8}
               />
-
             </NavLink>
           );
-
         })}
 
       </nav>
@@ -135,15 +129,11 @@ function Sidebar() {
       {/* AI ASSISTANT */}
       <div className="ai-assistant-box">
 
-        <div className="ai-glow"></div>
-
         <div className="ai-robot">
-
           <Bot
-            size={42}
+            size={28}
             strokeWidth={1.5}
           />
-
         </div>
 
         <div className="ai-title">
@@ -154,17 +144,18 @@ function Sidebar() {
           Ask anything about campus...
         </div>
 
-        <div className="ai-input">
-
+        <NavLink
+          to="/ai-assistant"
+          className="ai-input"
+        >
           <span>
             Ask anything about campus...
           </span>
 
-          <button>
+          <span className="ai-arrow">
             →
-          </button>
-
-        </div>
+          </span>
+        </NavLink>
 
       </div>
 

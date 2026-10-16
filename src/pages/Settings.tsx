@@ -1,196 +1,380 @@
-import { Save, User } from "lucide-react";
-
-import PageHeader from "../components/PageHeader";
-import { student } from "../services/data";
+import { useState } from "react";
+import {
+  User,
+  Bell,
+  Shield,
+  Save,
+  CheckCircle2,
+} from "lucide-react";
 
 function Settings() {
+  const [name, setName] = useState("Likitha");
+  const [email, setEmail] = useState("student@campusos.edu");
+  const [course, setCourse] = useState("BCA");
+  const [semester, setSemester] = useState("6th Semester");
+  const [notifications, setNotifications] =
+    useState("All Notifications");
+
+  const [saved, setSaved] = useState(false);
+
   const handleSave = () => {
-    alert("Profile changes saved successfully!");
+    setSaved(true);
+
+    setTimeout(() => {
+      setSaved(false);
+    }, 2500);
   };
 
   return (
-    <div>
-      {/* Page Header */}
-      <PageHeader
-        title="Settings"
-        description="Manage your Campus OS profile and preferences."
-      />
+    <div className="settings-page">
 
-      {/* Student Profile Card */}
-      <div className="glass-card chart-card">
+      {/* HEADER */}
 
-        {/* Card Header */}
-        <div className="stat-top">
-          <div>
-            <h2 className="section-title">
-              Student Profile
-            </h2>
-
-            <p className="stat-label">
-              Update your academic profile information.
-            </p>
+      <div className="settings-header">
+        <div>
+          <div className="settings-eyebrow">
+            CAMPUS OS
           </div>
 
-          <div className="stat-icon">
-            <User size={21} />
-          </div>
+          <h1>Settings</h1>
+
+          <p>
+            Manage your Campus OS profile and preferences.
+          </p>
         </div>
+      </div>
 
-        {/* Form */}
-        <div className="form-grid">
 
-          {/* Full Name */}
-          <div className="form-group">
-            <label htmlFor="student-name">
-              Full Name
-            </label>
+      {/* SETTINGS GRID */}
 
-            <input
-              id="student-name"
-              type="text"
-              defaultValue={student.name}
-              placeholder="Enter your full name"
-            />
+      <div className="settings-grid">
+
+        {/* PROFILE */}
+
+        <section className="settings-card">
+
+          <div className="settings-card-header">
+
+            <div className="settings-icon">
+              <User size={22} />
+            </div>
+
+            <div>
+              <h2>Student Profile</h2>
+
+              <p>
+                Update your academic profile information.
+              </p>
+            </div>
+
           </div>
 
-          {/* Student ID */}
-          <div className="form-group">
-            <label htmlFor="student-id">
-              Student ID
-            </label>
 
-            <input
-              id="student-id"
-              type="text"
-              defaultValue={student.id}
-              disabled
-            />
+          <div className="settings-form">
+
+            <div className="settings-field">
+
+              <label>Full Name</label>
+
+              <input
+                type="text"
+                value={name}
+                onChange={(e) =>
+                  setName(e.target.value)
+                }
+              />
+
+            </div>
+
+
+            <div className="settings-field">
+
+              <label>Student ID</label>
+
+              <input
+                type="text"
+                value="STU2026001"
+                disabled
+              />
+
+            </div>
+
+
+            <div className="settings-field">
+
+              <label>Course</label>
+
+              <input
+                type="text"
+                value={course}
+                onChange={(e) =>
+                  setCourse(e.target.value)
+                }
+              />
+
+            </div>
+
+
+            <div className="settings-field">
+
+              <label>Semester</label>
+
+              <input
+                type="text"
+                value={semester}
+                onChange={(e) =>
+                  setSemester(e.target.value)
+                }
+              />
+
+            </div>
+
+
+            <div className="settings-field">
+
+              <label>Email</label>
+
+              <input
+                type="email"
+                value={email}
+                onChange={(e) =>
+                  setEmail(e.target.value)
+                }
+              />
+
+            </div>
+
+
+            <div className="settings-field">
+
+              <label>
+                Notification Preference
+              </label>
+
+              <select
+                value={notifications}
+                onChange={(e) =>
+                  setNotifications(e.target.value)
+                }
+              >
+
+                <option>
+                  All Notifications
+                </option>
+
+                <option>
+                  Important Only
+                </option>
+
+                <option>
+                  Attendance Alerts
+                </option>
+
+                <option>
+                  No Notifications
+                </option>
+
+              </select>
+
+            </div>
+
           </div>
 
-          {/* Course */}
-          <div className="form-group">
-            <label htmlFor="course">
-              Course
-            </label>
+        </section>
 
-            <input
-              id="course"
-              type="text"
-              defaultValue={student.course}
-              placeholder="Enter your course"
-            />
+
+        {/* ACCOUNT */}
+
+        <section className="settings-card">
+
+          <div className="settings-card-header">
+
+            <div className="settings-icon">
+              <Shield size={22} />
+            </div>
+
+            <div>
+              <h2>Account Information</h2>
+
+              <p>
+                Your Campus OS account details.
+              </p>
+            </div>
+
           </div>
 
-          {/* Semester */}
-          <div className="form-group">
-            <label htmlFor="semester">
-              Semester
-            </label>
 
-            <input
-              id="semester"
-              type="text"
-              defaultValue={student.semester}
-              placeholder="Enter your semester"
-            />
+          <div className="account-details">
+
+            <div className="account-row">
+
+              <span>Account Status</span>
+
+              <strong className="status-active">
+                Active
+              </strong>
+
+            </div>
+
+
+            <div className="account-row">
+
+              <span>User Role</span>
+
+              <strong>
+                Student
+              </strong>
+
+            </div>
+
+
+            <div className="account-row">
+
+              <span>Access Level</span>
+
+              <strong>
+                Standard
+              </strong>
+
+            </div>
+
+
+            <div className="account-row">
+
+              <span>Campus</span>
+
+              <strong>
+                Campus OS
+              </strong>
+
+            </div>
+
           </div>
 
-          {/* Email */}
-          <div className="form-group">
-            <label htmlFor="email">
-              Email
-            </label>
+        </section>
 
-            <input
-              id="email"
-              type="email"
-              defaultValue={student.email}
-              placeholder="Enter your email"
-            />
+
+        {/* NOTIFICATIONS */}
+
+        <section className="settings-card">
+
+          <div className="settings-card-header">
+
+            <div className="settings-icon">
+              <Bell size={22} />
+            </div>
+
+            <div>
+              <h2>Notification Settings</h2>
+
+              <p>
+                Control how Campus OS notifies you.
+              </p>
+            </div>
+
           </div>
 
-          {/* Notification Preference */}
-          <div className="form-group">
-            <label htmlFor="notifications">
-              Notification Preference
+
+          <div className="notification-options">
+
+            <label className="notification-option">
+
+              <div>
+                <strong>
+                  Attendance Alerts
+                </strong>
+
+                <span>
+                  Get notified when attendance
+                  falls below the required percentage.
+                </span>
+              </div>
+
+              <input
+                type="checkbox"
+                defaultChecked
+              />
+
             </label>
 
-            <select
-              id="notifications"
-              defaultValue="all"
-            >
-              <option value="all">
-                All Notifications
-              </option>
 
-              <option value="important">
-                Important Only
-              </option>
+            <label className="notification-option">
 
-              <option value="none">
-                Disable Notifications
-              </option>
-            </select>
+              <div>
+                <strong>
+                  Assignment Reminders
+                </strong>
+
+                <span>
+                  Receive reminders about upcoming
+                  assignments.
+                </span>
+              </div>
+
+              <input
+                type="checkbox"
+                defaultChecked
+              />
+
+            </label>
+
+
+            <label className="notification-option">
+
+              <div>
+                <strong>
+                  Campus Events
+                </strong>
+
+                <span>
+                  Receive notifications about
+                  campus events.
+                </span>
+              </div>
+
+              <input
+                type="checkbox"
+                defaultChecked
+              />
+
+            </label>
+
           </div>
-        </div>
 
-        {/* Save Button */}
-        <div
-          style={{
-            marginTop: "24px",
-            display: "flex",
-            justifyContent: "flex-end",
-          }}
+        </section>
+
+      </div>
+
+
+      {/* SAVE AREA */}
+
+      <div className="settings-actions">
+
+        {saved && (
+          <div className="settings-saved">
+
+            <CheckCircle2 size={18} />
+
+            Changes saved successfully.
+
+          </div>
+        )}
+
+
+        <button
+          type="button"
+          className="settings-save-button"
+          onClick={handleSave}
         >
-          <button
-            className="primary-btn"
-            onClick={handleSave}
-          >
-            <Save size={16} />
-            Save Changes
-          </button>
-        </div>
+
+          <Save size={18} />
+
+          Save Changes
+
+        </button>
+
       </div>
 
-      {/* Account Information */}
-      <div
-        className="glass-card chart-card"
-        style={{ marginTop: "24px" }}
-      >
-        <h2 className="section-title">
-          Account Information
-        </h2>
-
-        <div className="form-grid">
-
-          <div className="form-group">
-            <label>
-              Account Status
-            </label>
-
-            <input
-              type="text"
-              value="Active"
-              disabled
-              readOnly
-            />
-          </div>
-
-          <div className="form-group">
-            <label>
-              User Role
-            </label>
-
-            <input
-              type="text"
-              value="Student"
-              disabled
-              readOnly
-            />
-          </div>
-
-        </div>
-      </div>
     </div>
   );
 }
