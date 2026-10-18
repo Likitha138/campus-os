@@ -1,166 +1,126 @@
-import { useState } from "react";
+// ============================================================
+// src/pages/Emergency.tsx
+// ============================================================
+
 import {
-  TriangleAlert,
-  Flame,
-  HeartPulse,
-  ShieldAlert,
-  CheckCircle,
+  AlertOctagon,
+  CheckCircle2,
   Radio,
+  ShieldAlert,
+  Siren,
+  Users,
 } from "lucide-react";
 import PageHeader from "../components/PageHeader";
+import StatCard from "../components/StatCard";
 
 function Emergency() {
-  const [type, setType] = useState("Fire");
-  const [location, setLocation] =
-    useState("Block A");
-  const [active, setActive] = useState(false);
-
-  const activateEmergency = () => {
-    setActive(true);
-  };
-
-  const resolveEmergency = () => {
-    setActive(false);
-  };
-
   return (
     <div className="page-container">
       <PageHeader
-        title="Emergency Management"
-        subtitle="Simulate and manage campus emergency situations"
+        eyebrow="CAMPUS SAFETY"
+        title="Emergency Command"
+        description="Monitor simulated safety incidents and emergency response readiness."
+        icon={<ShieldAlert size={22} />}
       />
 
-      <div className="page-grid">
-        <div className="feature-card">
-          <TriangleAlert size={30} />
+      <div className="stat-grid">
+        <StatCard
+          label="Active Incidents"
+          value="01"
+          detail="Requires monitoring"
+          icon={<AlertOctagon size={18} />}
+          tone="orange"
+        />
 
-          <h2>Emergency Type</h2>
+        <StatCard
+          label="Response Units"
+          value="06"
+          detail="Available"
+          icon={<Siren size={18} />}
+          tone="blue"
+        />
 
-          <select
-            className="feature-input"
-            value={type}
-            onChange={(e) =>
-              setType(e.target.value)
-            }
-            style={{
-              marginTop: 18,
-            }}
-          >
-            <option>Fire</option>
-            <option>Medical Emergency</option>
-            <option>Security Threat</option>
-            <option>Natural Disaster</option>
-          </select>
+        <StatCard
+          label="Campus Safety"
+          value="96%"
+          detail="Readiness score"
+          icon={<CheckCircle2 size={18} />}
+          tone="green"
+        />
+
+        <StatCard
+          label="People Protected"
+          value="3,248"
+          detail="Registered population"
+          icon={<Users size={18} />}
+          tone="purple"
+        />
+      </div>
+
+      <section className="emergency-layout">
+        <div className="emergency-map">
+          <div className="emergency-radar">
+            <span />
+            <span />
+            <span />
+          </div>
+
+          <div className="emergency-center">
+            <Siren size={28} />
+            <strong>INCIDENT</strong>
+            <span>ZONE C</span>
+          </div>
+
+          <div className="emergency-node node-1">
+            <Radio size={14} />
+          </div>
+
+          <div className="emergency-node node-2">
+            <Radio size={14} />
+          </div>
+
+          <div className="emergency-node node-3">
+            <Radio size={14} />
+          </div>
         </div>
 
-        <div className="feature-card">
-          <Radio size={30} />
+        <div className="content-card emergency-details">
+          <span className="danger-label">
+            ACTIVE INCIDENT
+          </span>
 
-          <h2>Affected Location</h2>
-
-          <select
-            className="feature-input"
-            value={location}
-            onChange={(e) =>
-              setLocation(e.target.value)
-            }
-            style={{
-              marginTop: 18,
-            }}
-          >
-            <option>Block A</option>
-            <option>Block B</option>
-            <option>Block C</option>
-            <option>Library</option>
-            <option>Auditorium</option>
-            <option>Parking Area</option>
-          </select>
-        </div>
-
-        <div className="feature-card">
-          <ShieldAlert size={30} />
-
-          <h2>Emergency Status</h2>
-
-          <strong
-            style={{
-              display: "block",
-              marginTop: 15,
-              fontSize: 28,
-            }}
-          >
-            {active
-              ? "ACTIVE"
-              : "SAFE"}
-          </strong>
+          <h2>Traffic obstruction</h2>
 
           <p>
-            {active
-              ? `${type} reported at ${location}.`
-              : "No active emergency."}
+            Simulated vehicle density has exceeded
+            the emergency threshold in Zone C.
           </p>
+
+          <div className="incident-detail">
+            <span>Location</span>
+            <strong>Zone C · North Road</strong>
+          </div>
+
+          <div className="incident-detail">
+            <span>Severity</span>
+            <strong className="danger-text">
+              High
+            </strong>
+          </div>
+
+          <div className="incident-detail">
+            <span>Response</span>
+            <strong>Unit 04 dispatched</strong>
+          </div>
+
+          <button
+            type="button"
+            className="danger-button"
+          >
+            Acknowledge Incident
+          </button>
         </div>
-      </div>
-
-      <div className="campus-workspace">
-        {active ? (
-          <>
-            <TriangleAlert
-              size={55}
-              style={{
-                color: "#ff5757",
-              }}
-            />
-
-            <h2
-              style={{
-                color: "#ff5757",
-              }}
-            >
-              EMERGENCY ACTIVE
-            </h2>
-
-            <p>
-              {type} detected at{" "}
-              <strong>{location}</strong>.
-            </p>
-
-            <p>
-              Emergency response teams have been
-              notified in the simulation.
-            </p>
-
-            <button
-              className="feature-button"
-              onClick={resolveEmergency}
-            >
-              <CheckCircle size={17} />
-              Resolve Emergency
-            </button>
-          </>
-        ) : (
-          <>
-            <ShieldAlert size={50} />
-
-            <h2>
-              Emergency Simulation
-            </h2>
-
-            <p>
-              Select an emergency type and location
-              to simulate an incident.
-            </p>
-
-            <button
-              className="feature-button"
-              onClick={activateEmergency}
-            >
-              <TriangleAlert size={17} />
-              Activate Emergency
-            </button>
-          </>
-        )}
-      </div>
+      </section>
     </div>
   );
 }

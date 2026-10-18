@@ -1,36 +1,46 @@
-import type { ReactNode } from "react";
+// ============================================================
+// src/components/PageHeader.tsx
+// ============================================================
 
-interface PageHeaderProps {
+import { ReactNode } from "react";
+
+type PageHeaderProps = {
+  eyebrow: string;
   title: string;
-  subtitle?: string;
-  description?: string;
+  description: string;
+  icon?: ReactNode;
   action?: ReactNode;
-}
+};
 
 function PageHeader({
+  eyebrow,
   title,
-  subtitle,
   description,
+  icon,
   action,
 }: PageHeaderProps) {
-  const supportingText = subtitle || description;
-
   return (
-    <div className="page-header">
-      <div>
-        <h1>{title}</h1>
-
-        {supportingText && (
-          <p>{supportingText}</p>
+    <section className="page-header">
+      <div className="page-header-main">
+        {icon && (
+          <div className="page-header-icon">
+            {icon}
+          </div>
         )}
+
+        <div>
+          <span className="page-eyebrow">{eyebrow}</span>
+          <h1>{title}</h1>
+          <p>{description}</p>
+        </div>
       </div>
 
       {action && (
-        <div>
+        <div className="page-header-action">
           {action}
         </div>
       )}
-    </div>
+    </section>
   );
 }
 

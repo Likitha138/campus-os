@@ -1,72 +1,131 @@
-import { Network, Save, GitCompare } from "lucide-react";
+// ============================================================
+// src/pages/Scenarios.tsx
+// ============================================================
+
+import { useState } from "react";
+import {
+  Car,
+  CloudRain,
+  Play,
+  RotateCcw,
+  Sparkles,
+  Users,
+  Zap,
+} from "lucide-react";
 import PageHeader from "../components/PageHeader";
 
-function ScenariosPage() {
+function Scenarios() {
+  const [running, setRunning] = useState(false);
+
+  const scenarios = [
+    {
+      title: "Peak Traffic",
+      description:
+        "Simulate increased vehicle density.",
+      icon: <Car size={19} />,
+    },
+    {
+      title: "Campus Event",
+      description:
+        "Model high student movement.",
+      icon: <Users size={19} />,
+    },
+    {
+      title: "Heavy Rain",
+      description:
+        "Simulate environmental disruption.",
+      icon: <CloudRain size={19} />,
+    },
+    {
+      title: "Power Demand",
+      description:
+        "Simulate increased energy consumption.",
+      icon: <Zap size={19} />,
+    },
+  ];
+
   return (
     <div className="page-container">
-
       <PageHeader
-        title="Campus Scenarios"
-        subtitle="Save and compare different campus configurations"
+        eyebrow="SIMULATION ENGINE"
+        title="What-If Scenarios"
+        description="Experiment with simulated campus conditions without affecting the real environment."
+        icon={<Sparkles size={22} />}
       />
 
-      <div className="page-grid">
-
-        <div className="feature-card">
-          <Save size={28} />
-
-          <h2>Save Scenario</h2>
-
+      <section className="scenario-hero">
+        <div>
+          <span>SIMULATION ENGINE</span>
+          <h2>
+            Test the campus before it happens.
+          </h2>
           <p>
-            Save the current campus configuration.
+            Change conditions, observe predicted
+            impact and compare operational outcomes.
           </p>
+        </div>
 
-          <button className="feature-button">
-            Save Scenario
+        <button
+          type="button"
+          className="primary-button"
+          onClick={() => setRunning(!running)}
+        >
+          {running ? (
+            <>
+              <RotateCcw size={16} />
+              Reset Simulation
+            </>
+          ) : (
+            <>
+              <Play size={16} />
+              Run Scenario
+            </>
+          )}
+        </button>
+      </section>
+
+      <section className="scenario-grid">
+        {scenarios.map((scenario) => (
+          <button
+            type="button"
+            className="scenario-card"
+            key={scenario.title}
+          >
+            <div className="scenario-icon">
+              {scenario.icon}
+            </div>
+
+            <strong>{scenario.title}</strong>
+            <span>{scenario.description}</span>
+
+            <div className="scenario-action">
+              Configure
+              <Play size={13} />
+            </div>
           </button>
-        </div>
+        ))}
+      </section>
 
-        <div className="feature-card">
-          <GitCompare size={28} />
+      {running && (
+        <section className="simulation-running">
+          <div className="simulation-orb">
+            <Sparkles size={24} />
+          </div>
 
-          <h2>Compare</h2>
+          <div>
+            <span>SIMULATION RUNNING</span>
+            <h2>Processing campus response...</h2>
+            <p>
+              The digital twin is calculating
+              movement, occupancy and traffic impact.
+            </p>
+          </div>
 
-          <p>
-            Compare two campus planning scenarios.
-          </p>
-
-          <button className="feature-button">
-            Compare Scenarios
-          </button>
-        </div>
-
-        <div className="feature-card">
-          <Network size={28} />
-
-          <h2>Scenario Planning</h2>
-
-          <p>
-            Evaluate changes before applying them to the campus.
-          </p>
-
-        </div>
-
-      </div>
-
-      <div className="campus-workspace">
-
-        <Network size={40} />
-
-        <h2>Scenario Workspace</h2>
-
-        <p>
-          Saved campus scenarios will appear here.
-        </p>
-
-      </div>
-
+          <strong>74%</strong>
+        </section>
+      )}
     </div>
   );
 }
 
-export default ScenariosPage;
+export default Scenarios;

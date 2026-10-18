@@ -1,125 +1,144 @@
+// ============================================================
+// src/pages/AIPerformance.tsx
+// ============================================================
+
 import {
-  Brain,
+  BrainCircuit,
+  CheckCircle2,
   Lightbulb,
-  ShieldCheck,
   Target,
   TrendingUp,
 } from "lucide-react";
-
 import PageHeader from "../components/PageHeader";
-import { skills } from "../services/data";
+import StatCard from "../components/StatCard";
 
 function AIPerformance() {
   return (
-    <div>
+    <div className="page-container">
       <PageHeader
-        title="AI Performance Intelligence"
-        description="AI-powered analysis of your academic performance."
+        eyebrow="ARTIFICIAL INTELLIGENCE"
+        title="AI Performance"
+        description="Predict academic trends and identify areas requiring attention."
+        icon={<BrainCircuit size={22} />}
       />
 
-      <div className="dashboard-grid">
-        <div className="glass-card ai-card">
-          <div className="stat-icon">
-            <Brain size={23} />
-          </div>
-
-          <div className="stat-label" style={{ marginTop: 18 }}>
-            AI Academic Score
-          </div>
-
-          <div className="ai-score">87</div>
-
-          <div className="ai-description">
-            Your current academic performance is strong. Your
-            attendance, marks and assignment completion indicate
-            a positive learning trend.
+      <div className="ai-performance-hero">
+        <div className="ai-score-orb">
+          <div>
+            <strong>88</strong>
+            <span>/100</span>
           </div>
         </div>
 
-        <div className="glass-card chart-card">
-          <div className="stat-icon">
-            <ShieldCheck size={22} />
-          </div>
+        <div>
+          <span>AI PERFORMANCE SCORE</span>
 
-          <h2 className="section-title" style={{ marginTop: 16 }}>
-            Risk Assessment
+          <h2>
+            Excellent academic trajectory
           </h2>
 
-          <div className="ai-score" style={{ fontSize: 38 }}>
-            Low
-          </div>
-
-          <p className="ai-description">
-            Current academic risk is low based on the available
-            performance indicators.
+          <p>
+            Current performance indicates a
+            strong probability of maintaining
+            above-average results.
           </p>
+
+          <div className="ai-confidence">
+            <span>Prediction confidence</span>
+            <strong>91%</strong>
+          </div>
         </div>
       </div>
 
-      <div className="glass-card chart-card">
-        <div className="stat-top">
-          <div>
-            <h2 className="section-title">Skill Intelligence</h2>
-            <p className="stat-label">
-              Estimated proficiency based on academic activity
-            </p>
+      <div className="stat-grid">
+        <StatCard
+          label="Predicted Grade"
+          value="A+"
+          detail="End-semester estimate"
+          icon={<TrendingUp size={18} />}
+          tone="green"
+        />
+
+        <StatCard
+          label="Risk Level"
+          value="Low"
+          detail="Academic risk"
+          icon={<CheckCircle2 size={18} />}
+          tone="blue"
+        />
+
+        <StatCard
+          label="Strong Areas"
+          value="04"
+          detail="Subjects"
+          icon={<Target size={18} />}
+          tone="purple"
+        />
+
+        <StatCard
+          label="AI Recommendations"
+          value="06"
+          detail="Personalized actions"
+          icon={<Lightbulb size={18} />}
+          tone="orange"
+        />
+      </div>
+
+      <section className="content-grid two-column">
+        <div className="content-card">
+          <div className="card-header">
+            <div>
+              <span>MODEL ANALYSIS</span>
+              <h2>Performance Signals</h2>
+            </div>
           </div>
 
-          <Target size={20} />
+          <div className="signal-list">
+            {[
+              ["Attendance consistency", 94],
+              ["Assessment performance", 88],
+              ["Assignment completion", 91],
+              ["Learning activity", 84],
+            ].map(([label, value]) => (
+              <div className="signal-row" key={label}>
+                <div>
+                  <strong>{label}</strong>
+                  <span>{value}% confidence</span>
+                </div>
+
+                <div className="signal-bar">
+                  <span
+                    style={{
+                      width: `${value}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="skill-list">
-          {skills.map((skill) => (
-            <div className="skill-row" key={skill.name}>
-              <span>{skill.name}</span>
+        <div className="content-card ai-recommendation-card">
+          <div className="card-header">
+            <div>
+              <span>AI RECOMMENDATION</span>
+              <h2>Next Best Actions</h2>
+            </div>
+          </div>
 
-              <div className="progress-bar">
-                <div
-                  className="progress-fill"
-                  style={{ width: `${skill.value}%` }}
-                />
-              </div>
-
-              <strong>{skill.value}%</strong>
+          {[
+            "Maintain attendance above 90%.",
+            "Revise Machine Learning concepts.",
+            "Complete pending assignment early.",
+            "Increase project documentation quality.",
+          ].map((item) => (
+            <div className="recommendation-row" key={item}>
+              <CheckCircle2 size={17} />
+              <span>{item}</span>
             </div>
           ))}
         </div>
-      </div>
-
-      <div className="career-grid" style={{ marginTop: 24 }}>
-        <div className="glass-card career-card">
-          <TrendingUp size={23} />
-
-          <h3>Performance Trend</h3>
-
-          <p>
-            Your academic performance shows a positive upward
-            trend over recent months.
-          </p>
-        </div>
-
-        <div className="glass-card career-card">
-          <Lightbulb size={23} />
-
-          <h3>AI Recommendation</h3>
-
-          <p>
-            Focus more on DBMS and Cloud Computing to improve
-            your overall academic score.
-          </p>
-        </div>
-
-        <div className="glass-card career-card">
-          <Brain size={23} />
-
-          <h3>Learning Pattern</h3>
-
-          <p>
-            Your strongest performance is currently observed in
-            programming and web technologies.
-          </p>
-        </div>
-      </div>
+      </section>
     </div>
   );
 }

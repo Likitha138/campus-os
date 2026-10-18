@@ -1,164 +1,263 @@
-import {
-  Compass,
-  Navigation,
-  Activity,
-  Car,
-  CalendarDays,
-  TriangleAlert,
-  Boxes,
-  Leaf,
-  Bot,
-  Network,
-  Settings,
-  ChevronRight,
-} from "lucide-react";
+// ============================================================
+// src/components/Sidebar.tsx
+// ============================================================
 
+import {
+  Activity,
+  AlertTriangle,
+  BarChart3,
+  Bot,
+  Building2,
+  CalendarDays,
+  Car,
+  ChevronRight,
+  ClipboardCheck,
+  Compass,
+  FileBarChart,
+  GraduationCap,
+  LayoutDashboard,
+  Leaf,
+  Map,
+  Navigation,
+  Settings,
+  ShieldAlert,
+  Sparkles,
+  Target,
+  Users,
+  X,
+  Zap,
+} from "lucide-react";
 import { NavLink } from "react-router-dom";
 
-const menuItems = [
+type SidebarProps = {
+  onNavigate?: () => void;
+};
+
+const primaryItems = [
   {
     label: "Explore",
-    icon: Compass,
     path: "/",
+    icon: Map,
   },
   {
-    label: "Navigation",
-    icon: Navigation,
+    label: "Navigate",
     path: "/navigation",
+    icon: Navigation,
   },
   {
-    label: "Campus Activity",
-    icon: Activity,
+    label: "Activity",
     path: "/activity",
+    icon: Activity,
   },
   {
     label: "Traffic",
-    icon: Car,
     path: "/traffic",
+    icon: Car,
   },
   {
     label: "Events",
-    icon: CalendarDays,
     path: "/events",
-  },
-  {
-    label: "Emergency",
-    icon: TriangleAlert,
-    path: "/emergency",
-  },
-  {
-    label: "Build (Future)",
-    icon: Boxes,
-    path: "/build",
-  },
-  {
-    label: "Environment",
-    icon: Leaf,
-    path: "/environment",
-  },
-  {
-    label: "AI Assistant",
-    icon: Bot,
-    path: "/ai-assistant",
-  },
-  {
-    label: "Scenarios",
-    icon: Network,
-    path: "/scenarios",
-  },
-  {
-    label: "Settings",
-    icon: Settings,
-    path: "/settings",
+    icon: CalendarDays,
   },
 ];
 
-function Sidebar() {
+const academicItems = [
+  {
+    label: "Attendance",
+    path: "/attendance",
+    icon: ClipboardCheck,
+  },
+  {
+    label: "Marks",
+    path: "/marks",
+    icon: BarChart3,
+  },
+  {
+    label: "Assignments",
+    path: "/assignments",
+    icon: Target,
+  },
+  {
+    label: "Reports",
+    path: "/reports",
+    icon: FileBarChart,
+  },
+];
+
+const intelligenceItems = [
+  {
+    label: "AI Performance",
+    path: "/ai-performance",
+    icon: Sparkles,
+  },
+  {
+    label: "Career Intelligence",
+    path: "/career",
+    icon: GraduationCap,
+  },
+  {
+    label: "Campus AI",
+    path: "/ai-assistant",
+    icon: Bot,
+  },
+];
+
+const systemItems = [
+  {
+    label: "Emergency",
+    path: "/emergency",
+    icon: ShieldAlert,
+  },
+  {
+    label: "Environment",
+    path: "/environment",
+    icon: Leaf,
+  },
+  {
+    label: "Scenarios",
+    path: "/scenarios",
+    icon: Zap,
+  },
+  {
+    label: "Build",
+    path: "/build",
+    icon: Building2,
+  },
+  {
+    label: "Alerts",
+    path: "/alerts",
+    icon: AlertTriangle,
+  },
+];
+
+function Sidebar({ onNavigate }: SidebarProps) {
+  const renderItem = (
+    item: {
+      label: string;
+      path: string;
+      icon: React.ComponentType<{ size?: number }>;
+    },
+  ) => {
+    const Icon = item.icon;
+
+    return (
+      <NavLink
+        key={item.path}
+        to={item.path}
+        end={item.path === "/"}
+        onClick={onNavigate}
+        className={({ isActive }) =>
+          `sidebar-item ${isActive ? "active" : ""}`
+        }
+      >
+        <span className="sidebar-item-icon">
+          <Icon size={17} />
+        </span>
+
+        <span className="sidebar-item-label">{item.label}</span>
+
+        <ChevronRight
+          className="sidebar-item-arrow"
+          size={14}
+        />
+      </NavLink>
+    );
+  };
+
   return (
     <aside className="sidebar">
-
-      {/* LOGO */}
-      <div className="sidebar-logo">
-        <div className="logo-mark">
-          <Compass size={25} />
+      <div className="sidebar-brand">
+        <div className="brand-mark">
+          <div className="brand-core" />
+          <div className="brand-ring ring-one" />
+          <div className="brand-ring ring-two" />
         </div>
 
-        <div className="logo-text">
+        <div className="brand-copy">
           <strong>CAMPUS OS</strong>
-          <span>Smart Campus Operating System</span>
+          <span>DIGITAL TWIN</span>
+        </div>
+
+        <button
+          type="button"
+          className="mobile-sidebar-close"
+          onClick={onNavigate}
+          aria-label="Close menu"
+        >
+          <X size={18} />
+        </button>
+      </div>
+
+      <div className="sidebar-system-status">
+        <span className="status-pulse" />
+
+        <div>
+          <strong>LIVE SYSTEM</strong>
+          <small>All systems operational</small>
         </div>
       </div>
 
-      {/* NAVIGATION */}
       <nav className="sidebar-navigation">
+        <div className="sidebar-section-title">
+          <span>COMMAND CENTER</span>
+        </div>
 
-        {menuItems.map((item) => {
-          const Icon = item.icon;
+        {primaryItems.map(renderItem)}
 
-          return (
-            <NavLink
-              key={item.label}
-              to={item.path}
-              end={item.path === "/"}
-              className={({ isActive }) =>
-                `sidebar-item ${isActive ? "active" : ""}`
-              }
-            >
-              <div className="sidebar-item-left">
+        <div className="sidebar-section-title">
+          <span>ACADEMIC INTELLIGENCE</span>
+        </div>
 
-                <Icon
-                  size={20}
-                  strokeWidth={1.8}
-                />
+        {academicItems.map(renderItem)}
 
-                <span>{item.label}</span>
+        <div className="sidebar-section-title">
+          <span>AI & INTELLIGENCE</span>
+        </div>
 
-              </div>
+        {intelligenceItems.map(renderItem)}
 
-              <ChevronRight
-                className="sidebar-chevron"
-                size={17}
-                strokeWidth={1.8}
-              />
-            </NavLink>
-          );
+        <div className="sidebar-section-title">
+          <span>CAMPUS OPERATIONS</span>
+        </div>
+
+        {systemItems.map(renderItem)}
+
+        <div className="sidebar-section-title">
+          <span>ADMINISTRATION</span>
+        </div>
+
+        {renderItem({
+          label: "Settings",
+          path: "/settings",
+          icon: Settings,
         })}
-
       </nav>
 
-      {/* AI ASSISTANT */}
-      <div className="ai-assistant-box">
-
-        <div className="ai-robot">
-          <Bot
-            size={28}
-            strokeWidth={1.5}
-          />
+      <div className="sidebar-bottom-card">
+        <div className="sidebar-bottom-icon">
+          <Compass size={18} />
         </div>
 
-        <div className="ai-title">
-          AI ASSISTANT
+        <div>
+          <strong>Campus AI</strong>
+          <span>Ready to assist</span>
         </div>
 
-        <div className="ai-description">
-          Ask anything about campus...
-        </div>
-
-        <NavLink
-          to="/ai-assistant"
-          className="ai-input"
-        >
-          <span>
-            Ask anything about campus...
-          </span>
-
-          <span className="ai-arrow">
-            →
-          </span>
-        </NavLink>
-
+        <div className="sidebar-ai-dot" />
       </div>
 
+      <div className="sidebar-profile">
+        <div className="profile-avatar">
+          L
+        </div>
+
+        <div className="profile-info">
+          <strong>Likitha</strong>
+          <span>Student</span>
+        </div>
+
+        <Users size={16} />
+      </div>
     </aside>
   );
 }

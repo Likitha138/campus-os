@@ -1,71 +1,83 @@
+// ============================================================
+// src/components/Topbar.tsx
+// ============================================================
+
 import {
+  Bell,
+  Menu,
   Search,
   Sun,
-  Bell,
-  ChevronDown,
+  UserRound,
 } from "lucide-react";
 
-function Topbar() {
-  return (
-    <header className="campus-topbar">
+type TopbarProps = {
+  onMenuClick?: () => void;
+};
 
-      {/* Search */}
-      <div className="top-search">
-        <Search size={20} />
+function Topbar({ onMenuClick }: TopbarProps) {
+  return (
+    <header className="topbar">
+      <button
+        type="button"
+        className="mobile-menu-button"
+        onClick={onMenuClick}
+        aria-label="Open navigation"
+      >
+        <Menu size={20} />
+      </button>
+
+      <div className="topbar-search">
+        <Search size={17} />
 
         <input
-          type="text"
-          placeholder="Search for buildings, rooms, labs..."
+          placeholder="Search campus, rooms, vehicles..."
+          aria-label="Search campus"
         />
 
-        <span className="search-key">
-          ⌘ K
-        </span>
+        <kbd>⌘ K</kbd>
       </div>
 
-      {/* Right side */}
-      <div className="topbar-right">
+      <div className="topbar-spacer" />
 
-        {/* Weather */}
-        <div className="top-weather">
-          <Sun size={22} />
+      <div className="topbar-weather">
+        <Sun size={17} />
+        <div>
           <strong>28°C</strong>
+          <span>Bengaluru</span>
         </div>
-
-        {/* Time */}
-        <div className="top-time">
-          12:45 PM
-        </div>
-
-        <div className="top-divider"></div>
-
-        {/* Notifications */}
-        <button className="notification-btn">
-          <Bell size={21} />
-
-          <span className="notification-count">
-            3
-          </span>
-        </button>
-
-        {/* Profile */}
-        <div className="top-profile">
-
-          <div className="profile-avatar">
-            L
-          </div>
-
-          <div className="profile-info">
-            <strong>Likitha</strong>
-            <span>Student</span>
-          </div>
-
-          <ChevronDown size={17} />
-
-        </div>
-
       </div>
 
+      <div className="topbar-time">
+        <strong>
+          {new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+        </strong>
+        <span>LIVE</span>
+      </div>
+
+      <button
+        type="button"
+        className="topbar-icon-button notification-button"
+        aria-label="Notifications"
+      >
+        <Bell size={18} />
+        <span />
+      </button>
+
+      <div className="topbar-user">
+        <div className="topbar-user-avatar">
+          L
+        </div>
+
+        <div>
+          <strong>Likitha</strong>
+          <span>Student</span>
+        </div>
+
+        <UserRound size={15} />
+      </div>
     </header>
   );
 }

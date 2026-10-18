@@ -1,143 +1,103 @@
+// ============================================================
+// src/pages/Attendance.tsx
+// ============================================================
+
 import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-
+  CheckCircle2,
+  ClipboardCheck,
+  Clock3,
+  TrendingUp,
+  Users,
+} from "lucide-react";
 import PageHeader from "../components/PageHeader";
-
-const attendance = [
-  { subject: "Python", percentage: 94 },
-  { subject: "Web Tech", percentage: 91 },
-  { subject: "DBMS", percentage: 78 },
-  { subject: "AI", percentage: 96 },
-  { subject: "Cloud", percentage: 89 },
-];
+import StatCard from "../components/StatCard";
+import { attendanceData } from "../services/data";
 
 function Attendance() {
   return (
-    <div>
+    <div className="page-container">
       <PageHeader
-        title="Attendance"
-        description="Track your attendance across all subjects."
+        eyebrow="ACADEMIC INTELLIGENCE"
+        title="Attendance Intelligence"
+        description="Monitor attendance patterns and identify academic risk early."
+        icon={<ClipboardCheck size={22} />}
       />
 
-      <div className="stats-grid">
-        <div className="glass-card stat-card">
-          <div className="stat-label">Overall Attendance</div>
-          <div className="stat-value">92%</div>
-          <div className="stat-change">Good standing</div>
-        </div>
+      <div className="stat-grid">
+        <StatCard
+          label="Overall Attendance"
+          value="89%"
+          detail="Current semester"
+          icon={<CheckCircle2 size={18} />}
+          trend="+3.2%"
+          tone="green"
+        />
 
-        <div className="glass-card stat-card">
-          <div className="stat-label">Best Attendance</div>
-          <div className="stat-value">96%</div>
-          <div className="stat-change">Artificial Intelligence</div>
-        </div>
+        <StatCard
+          label="Present Today"
+          value="2,914"
+          detail="Students"
+          icon={<Users size={18} />}
+          tone="blue"
+        />
 
-        <div className="glass-card stat-card">
-          <div className="stat-label">Lowest Attendance</div>
-          <div className="stat-value">78%</div>
-          <div className="stat-change">Database Management</div>
-        </div>
+        <StatCard
+          label="At Risk"
+          value="184"
+          detail="Below threshold"
+          icon={<TrendingUp size={18} />}
+          tone="orange"
+        />
 
-        <div className="glass-card stat-card">
-          <div className="stat-label">Classes Attended</div>
-          <div className="stat-value">138</div>
-          <div className="stat-change">Out of 150 classes</div>
-        </div>
+        <StatCard
+          label="Classes Today"
+          value="42"
+          detail="Scheduled sessions"
+          icon={<Clock3 size={18} />}
+          tone="purple"
+        />
       </div>
 
-      <div className="glass-card chart-card">
-        <h2 className="section-title">Subject-wise Attendance</h2>
-
-        <div className="chart-container">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={attendance}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="rgba(148,163,184,0.08)"
-              />
-
-              <XAxis
-                dataKey="subject"
-                stroke="#64748b"
-                fontSize={12}
-              />
-
-              <YAxis
-                domain={[0, 100]}
-                stroke="#64748b"
-                fontSize={12}
-              />
-
-              <Tooltip
-                contentStyle={{
-                  background: "#0f1b2d",
-                  border: "1px solid rgba(148,163,184,0.15)",
-                  borderRadius: "10px",
-                }}
-              />
-
-              <Bar
-                dataKey="percentage"
-                fill="#3b82f6"
-                radius={[8, 8, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
+      <section className="content-card">
+        <div className="card-header">
+          <div>
+            <span>SUBJECT ANALYSIS</span>
+            <h2>Attendance by Subject</h2>
+          </div>
         </div>
-      </div>
 
-      <div className="glass-card table-card">
-        <h2 className="section-title">Attendance Details</h2>
+        <div className="academic-list">
+          {attendanceData.map((item) => (
+            <div
+              className="academic-row"
+              key={item.subject}
+            >
+              <div>
+                <strong>{item.subject}</strong>
+                <span>
+                  Attendance performance
+                </span>
+              </div>
 
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Subject</th>
-              <th>Attendance</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {attendance.map((item) => (
-              <tr key={item.subject}>
-                <td>{item.subject}</td>
-
-                <td>
-                  <strong>{item.percentage}%</strong>
-                </td>
-
-                <td>
+              <div className="academic-progress">
+                <div>
                   <span
-                    className={`badge ${
-                      item.percentage >= 85
-                        ? "badge-success"
-                        : item.percentage >= 75
-                        ? "badge-warning"
-                        : "badge-danger"
-                    }`}
-                  >
-                    {item.percentage >= 85
-                      ? "Excellent"
-                      : item.percentage >= 75
-                      ? "Warning"
-                      : "Critical"}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                    style={{
+                      width: `${item.percentage}%`,
+                    }}
+                  />
+                </div>
+
+                <strong>
+                  {item.percentage}%
+                </strong>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
 
-export default Attendance;
+export default Attendance; 

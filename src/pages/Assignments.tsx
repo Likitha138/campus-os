@@ -1,99 +1,18 @@
-import { CheckCircle2, Clock3, FileText } from "lucide-react";
-
-import PageHeader from "../components/PageHeader";
-import { assignments } from "../services/data";
-
-function Assignments() {
-  const submitted = assignments.filter(
-    (item) => item.status === "Submitted"
-  ).length;
-
-  const pending = assignments.filter(
-    (item) => item.status === "Pending"
-  ).length;
-
-  return (
-    <div>
-      <PageHeader
-        title="Assignments"
-        description="Manage your assignments and submission deadlines."
-      />
-
-      <div className="stats-grid">
-        <div className="glass-card stat-card">
-          <div className="stat-label">Total Assignments</div>
-          <div className="stat-value">{assignments.length}</div>
-          <div className="stat-change">This semester</div>
-        </div>
-
-        <div className="glass-card stat-card">
-          <div className="stat-label">Submitted</div>
-          <div className="stat-value">{submitted}</div>
-          <div className="stat-change">Completed</div>
-        </div>
-
-        <div className="glass-card stat-card">
-          <div className="stat-label">Pending</div>
-          <div className="stat-value">{pending}</div>
-          <div className="stat-change">Needs attention</div>
-        </div>
-
-        <div className="glass-card stat-card">
-          <div className="stat-label">Completion Rate</div>
-          <div className="stat-value">
-            {Math.round((submitted / assignments.length) * 100)}%
-          </div>
-          <div className="stat-change">Overall</div>
-        </div>
+import { ArrowRight, CheckCircle2, CircleGauge, Sparkles } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
+export default function Assignments(){
+  return <div className="generic-page">
+    <PageHeader eyebrow="CAMPUS OS · INTELLIGENCE" title="Assignments" description="Explore live campus telemetry, operational intelligence and simulated decision support from the digital twin." action={<button className="primary-btn"><Sparkles size={15}/> Run Analysis</button>}/>
+    <section className="feature-grid">
+      {['Live telemetry','Risk index','Prediction confidence','Recommended action'].map((x,i)=><div key={x}><span className="eyebrow">METRIC 0{i+1}</span><strong>{x}</strong><small>Updated just now</small></div>)}
+    </section>
+    <section className="workspace-grid">
+      <div className="panel workspace-main">
+        <div className="panel-head"><div><span className="eyebrow">LIVE ANALYTICS</span><h3>Operational intelligence workspace</h3></div><CircleGauge size={19}/></div>
+        <div className="metric-orbit"><div className="orbit-center"><strong>82</strong><span>Health Index</span></div><div className="orbit-ring ring-one"/><div className="orbit-ring ring-two"/></div>
+        <div className="insight-row"><div><CheckCircle2 size={15}/> Systems <b>98%</b></div><div><CheckCircle2 size={15}/> Freshness <b>2.4s</b></div><div><CheckCircle2 size={15}/> Confidence <b>91%</b></div></div>
       </div>
-
-      <div className="glass-card table-card">
-        <h2 className="section-title">Assignment List</h2>
-
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Assignment</th>
-              <th>Subject</th>
-              <th>Deadline</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {assignments.map((assignment) => (
-              <tr key={assignment.title}>
-                <td>
-                  <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-                    <FileText size={17} />
-                    {assignment.title}
-                  </div>
-                </td>
-
-                <td>{assignment.subject}</td>
-
-                <td>{assignment.deadline}</td>
-
-                <td>
-                  {assignment.status === "Submitted" ? (
-                    <span className="badge badge-success">
-                      <CheckCircle2 size={13} style={{ marginRight: 5 }} />
-                      Submitted
-                    </span>
-                  ) : (
-                    <span className="badge badge-warning">
-                      <Clock3 size={13} style={{ marginRight: 5 }} />
-                      Pending
-                    </span>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+      <div className="panel"><div className="panel-head"><div><span className="eyebrow">AI INSIGHT</span><h3>Recommended action</h3></div><Sparkles size={18}/></div><div className="ai-card"><b>Campus conditions are stable.</b><p>The simulation currently indicates moderate activity with no critical operational risk. Review the highlighted metric before the next planning cycle.</p><button className="panel-action">Open detailed analysis <ArrowRight size={14}/></button></div></div>
+    </section>
+  </div>;
 }
-
-export default Assignments;

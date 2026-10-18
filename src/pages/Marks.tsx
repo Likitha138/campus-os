@@ -1,134 +1,115 @@
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+// ============================================================
+// src/pages/Marks.tsx
+// ============================================================
 
+import {
+  Award,
+  BarChart3,
+  BookOpen,
+  TrendingUp,
+} from "lucide-react";
 import PageHeader from "../components/PageHeader";
+import StatCard from "../components/StatCard";
 import { marksData } from "../services/data";
 
 function Marks() {
-  const average = Math.round(
-    marksData.reduce((sum, item) => sum + item.marks, 0) /
-      marksData.length
-  );
-
   return (
-    <div>
+    <div className="page-container">
       <PageHeader
-        title="Marks & Performance"
-        description="View your subject-wise academic performance."
+        eyebrow="ACADEMIC PERFORMANCE"
+        title="Marks Intelligence"
+        description="Understand academic performance through centralized assessment analytics."
+        icon={<BarChart3 size={22} />}
       />
 
-      <div className="stats-grid">
-        <div className="glass-card stat-card">
-          <div className="stat-label">Average Marks</div>
-          <div className="stat-value">{average}%</div>
-          <div className="stat-change">Above class average</div>
-        </div>
+      <div className="stat-grid">
+        <StatCard
+          label="Average Score"
+          value="88%"
+          detail="Current semester"
+          icon={<Award size={18} />}
+          trend="+5.1%"
+          tone="green"
+        />
 
-        <div className="glass-card stat-card">
-          <div className="stat-label">Highest Score</div>
-          <div className="stat-value">91%</div>
-          <div className="stat-change">Web Technology</div>
-        </div>
+        <StatCard
+          label="Highest Score"
+          value="96%"
+          detail="Project evaluation"
+          icon={<TrendingUp size={18} />}
+          tone="blue"
+        />
 
-        <div className="glass-card stat-card">
-          <div className="stat-label">Subjects</div>
-          <div className="stat-value">{marksData.length}</div>
-          <div className="stat-change">Current semester</div>
-        </div>
+        <StatCard
+          label="Subjects"
+          value="05"
+          detail="Tracked subjects"
+          icon={<BookOpen size={18} />}
+          tone="purple"
+        />
 
-        <div className="glass-card stat-card">
-          <div className="stat-label">Overall GPA</div>
-          <div className="stat-value">8.7</div>
-          <div className="stat-change">Good performance</div>
-        </div>
+        <StatCard
+          label="Performance"
+          value="Excellent"
+          detail="AI classification"
+          icon={<Award size={18} />}
+          tone="orange"
+        />
       </div>
 
-      <div className="glass-card chart-card">
-        <h2 className="section-title">Subject Performance</h2>
-
-        <div className="chart-container">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={marksData}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="rgba(148,163,184,0.08)"
-              />
-
-              <XAxis
-                dataKey="subject"
-                stroke="#64748b"
-                fontSize={12}
-              />
-
-              <YAxis
-                domain={[0, 100]}
-                stroke="#64748b"
-                fontSize={12}
-              />
-
-              <Tooltip
-                contentStyle={{
-                  background: "#0f1b2d",
-                  border: "1px solid rgba(148,163,184,0.15)",
-                  borderRadius: "10px",
-                }}
-              />
-
-              <Bar
-                dataKey="marks"
-                fill="#8b5cf6"
-                radius={[8, 8, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
+      <section className="content-card">
+        <div className="card-header">
+          <div>
+            <span>ASSESSMENT MATRIX</span>
+            <h2>Academic Results</h2>
+          </div>
         </div>
-      </div>
 
-      <div className="glass-card table-card">
-        <h2 className="section-title">Marks Details</h2>
+        <div className="marks-table">
+          <div className="marks-header">
+            <span>SUBJECT</span>
+            <span>INTERNAL</span>
+            <span>TOTAL</span>
+            <span>PERFORMANCE</span>
+          </div>
 
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Subject</th>
-              <th>Marks</th>
-              <th>Grade</th>
-            </tr>
-          </thead>
+          {marksData.map((item) => {
+            const percentage =
+              (item.internal / item.total) * 100;
 
-          <tbody>
-            {marksData.map((item) => {
-              const grade =
-                item.marks >= 90
-                  ? "A+"
-                  : item.marks >= 80
-                  ? "A"
-                  : item.marks >= 70
-                  ? "B+"
-                  : "B";
+            return (
+              <div
+                className="marks-row"
+                key={item.subject}
+              >
+                <strong>{item.subject}</strong>
 
-              return (
-                <tr key={item.subject}>
-                  <td>{item.subject}</td>
-                  <td>{item.marks}%</td>
-                  <td>
-                    <span className="badge badge-success">
-                      {grade}
-                    </span>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                <span>
+                  {item.internal}
+                </span>
+
+                <span>
+                  {item.total}
+                </span>
+
+                <div className="marks-performance">
+                  <div>
+                    <span
+                      style={{
+                        width: `${percentage}%`,
+                      }}
+                    />
+                  </div>
+
+                  <strong>
+                    {Math.round(percentage)}%
+                  </strong>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
     </div>
   );
 }

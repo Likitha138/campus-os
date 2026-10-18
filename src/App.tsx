@@ -1,4 +1,8 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+// ============================================================
+// src/App.tsx
+// ============================================================
+
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import DashboardLayout from "./layouts/DashboardLayout";
 
@@ -12,7 +16,6 @@ import Career from "./pages/Career";
 import Alerts from "./pages/Alerts";
 import Settings from "./pages/Settings";
 
-// Campus OS pages
 import NavigationPage from "./pages/Navigation";
 import ActivityPage from "./pages/Activity";
 import TrafficPage from "./pages/Traffic";
@@ -27,13 +30,9 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-
         <Route element={<DashboardLayout />}>
-
-          {/* Main */}
           <Route path="/" element={<Dashboard />} />
 
-          {/* Academic */}
           <Route path="/attendance" element={<Attendance />} />
           <Route path="/marks" element={<Marks />} />
           <Route path="/assignments" element={<Assignments />} />
@@ -42,7 +41,6 @@ function App() {
           <Route path="/career" element={<Career />} />
           <Route path="/alerts" element={<Alerts />} />
 
-          {/* Campus OS */}
           <Route path="/navigation" element={<NavigationPage />} />
           <Route path="/activity" element={<ActivityPage />} />
           <Route path="/traffic" element={<TrafficPage />} />
@@ -53,11 +51,10 @@ function App() {
           <Route path="/ai-assistant" element={<AIAssistantPage />} />
           <Route path="/scenarios" element={<ScenariosPage />} />
 
-          {/* Settings */}
           <Route path="/settings" element={<Settings />} />
-
         </Route>
 
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

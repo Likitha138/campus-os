@@ -1,46 +1,46 @@
-import type { LucideIcon } from "lucide-react";
+// ============================================================
+// src/components/StatCard.tsx
+// ============================================================
 
-interface StatCardProps {
+import { ReactNode } from "react";
+
+type StatCardProps = {
   label: string;
   value: string | number;
-  change?: string;
-  description?: string;
-  icon: LucideIcon;
-}
+  detail: string;
+  icon: ReactNode;
+  trend?: string;
+  tone?: "blue" | "green" | "orange" | "purple";
+};
 
 function StatCard({
   label,
   value,
-  change,
-  description,
-  icon: Icon,
+  detail,
+  icon,
+  trend,
+  tone = "blue",
 }: StatCardProps) {
   return (
-    <div className="stat-card glass-card">
-      <div className="stat-top">
-        <div>
-          <p className="stat-label">{label}</p>
-
-          <h3 className="stat-value">{value}</h3>
-
-          {change && (
-            <p className="stat-change">
-              {change}
-            </p>
-          )}
-
-          {description && (
-            <p className="stat-label">
-              {description}
-            </p>
-          )}
-        </div>
-
+    <article className={`stat-card stat-${tone}`}>
+      <div className="stat-card-top">
         <div className="stat-icon">
-          <Icon size={21} />
+          {icon}
         </div>
+
+        {trend && (
+          <span className="stat-trend">
+            {trend}
+          </span>
+        )}
       </div>
-    </div>
+
+      <span className="stat-label">{label}</span>
+
+      <strong className="stat-value">{value}</strong>
+
+      <span className="stat-detail">{detail}</span>
+    </article>
   );
 }
 

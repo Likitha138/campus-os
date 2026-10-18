@@ -1,853 +1,1976 @@
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
-import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import {
-  Search,
-  Route,
-  Ruler,
-  Layers,
+  Activity,
+  AlertTriangle,
+  ArrowRight,
+  Building2,
+  CalendarDays,
+  Car,
+  ChevronRight,
+  Clock3,
+  Compass,
   Info,
-  RotateCcw,
-  Plus,
+  Layers,
+  Map,
   Minus,
   Navigation,
+  Plus,
+  RotateCcw,
+  Search,
+  ShieldAlert,
   Users,
-  Car,
-  CalendarDays,
-  Leaf,
-  Library,
-  Utensils,
-  FlaskConical,
-  ParkingCircle,
-  Accessibility,
-  CircleHelp,
-  Map,
-  TriangleAlert,
-  Sun,
+  Zap,
 } from "lucide-react";
 
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
-  Tooltip,
-} from "recharts";
-
 import campusMap from "../assets/campus-map.svg";
-import { apiRequest } from "../services/api";
 
-/* =========================================
-   TYPES
-========================================= */
+import {
+  getActivities,
+  getAlerts,
+  getBuildings,
+  getDashboard,
+  getEvents,
+  getTraffic,
+} from "../services/api";
 
-type DashboardApiResponse = {
-  success: boolean;
-  message: string;
-  data: {
-    totalUsers: number;
-  };
+// =========================================================
+// TYPES
+// =========================================================
+
+type MapMode = "2D" | "3D";
+
+type Vehicle = {
+  id: string;
+  type: "Car" | "Bus" | "Bike";
+  speed: number;
+  road: string;
+  status: "Moving" | "Stopped" | "Slow";
 };
 
-type EventsApiResponse = {
-  success: boolean;
-  count?: number;
-  data: unknown[];
-};
-
-type CampusEvent = {
-  title: string;
-  date: string;
-  location: string;
+type CampusLocation = {
+  name: string;
   type: string;
+  occupancy: number;
+  status:
+    | "Operational"
+    | "Maintenance"
+    | "Restricted";
+  activity:
+    | "Low"
+    | "Moderate"
+    | "High";
 };
 
-/* =========================================
-   FALLBACK SAMPLE DATA
-========================================= */
+// =========================================================
+// FALLBACK CAMPUS DATA
+// Used only when backend data is unavailable.
+// =========================================================
 
-const activityData = [
-  { time: "6 AM", students: 800, faculty: 500, visitors: 300 },
-  { time: "9 AM", students: 1800, faculty: 1000, visitors: 650 },
-  { time: "12 PM", students: 2400, faculty: 1400, visitors: 1100 },
-  { time: "3 PM", students: 2200, faculty: 1800, visitors: 1400 },
-  { time: "6 PM", students: 1500, faculty: 1000, visitors: 1100 },
-  { time: "9 PM", students: 1200, faculty: 900, visitors: 700 },
+const fallbackVehicles: Vehicle[] = [
+  {
+    id: "VH-001",
+    type: "Car",
+    speed: 32,
+    road: "Main Road",
+    status: "Moving",
+  },
+  {
+    id: "VH-002",
+    type: "Bus",
+    speed: 18,
+    road: "East Gate",
+    status: "Moving",
+  },
+  {
+    id: "VH-003",
+    type: "Bike",
+    speed: 12,
+    road: "Library Road",
+    status: "Slow",
+  },
+  {
+    id: "VH-004",
+    type: "Car",
+    speed: 0,
+    road: "Parking Zone",
+    status: "Stopped",
+  },
 ];
 
-const fallbackEvents: CampusEvent[] = [
+const fallbackLocations: CampusLocation[] = [
   {
-    title: "Annual Tech Fest",
-    date: "15 - 17 Aug 2026",
-    location: "Main Auditorium",
-    type: "purple",
+    name: "Library",
+    type: "Academic Facility",
+    occupancy: 82,
+    status: "Operational",
+    activity: "High",
   },
   {
-    title: "Placement Drive",
-    date: "20 Aug 2026",
-    location: "Placement Cell",
-    type: "blue",
+    name: "Main Auditorium",
+    type: "Events Facility",
+    occupancy: 64,
+    status: "Operational",
+    activity: "Moderate",
   },
   {
-    title: "Sports Meet",
-    date: "25 Aug 2026",
-    location: "Sports Complex",
-    type: "green",
+    name: "Block A",
+    type: "Academic Block",
+    occupancy: 68,
+    status: "Operational",
+    activity: "Moderate",
+  },
+  {
+    name: "Block B",
+    type: "Academic Block",
+    occupancy: 51,
+    status: "Operational",
+    activity: "Moderate",
+  },
+  {
+    name: "Block C",
+    type: "Academic Block",
+    occupancy: 37,
+    status: "Operational",
+    activity: "Low",
+  },
+  {
+    name: "Admin Block",
+    type: "Administration",
+    occupancy: 59,
+    status: "Operational",
+    activity: "Moderate",
   },
 ];
 
-/* =========================================
-   EVENT HELPERS
-========================================= */
+const fallbackActivity = [
+  {
+    label: "08:00",
+    value: 42,
+  },
+  {
+    label: "09:00",
+    value: 56,
+  },
+  {
+    label: "10:00",
+    value: 68,
+  },
+  {
+    label: "11:00",
+    value: 74,
+  },
+  {
+    label: "12:00",
+    value: 63,
+  },
+  {
+    label: "13:00",
+    value: 58,
+  },
+  {
+    label: "14:00",
+    value: 71,
+  },
+  {
+    label: "15:00",
+    value: 78,
+  },
+  {
+    label: "16:00",
+    value: 69,
+  },
+];
 
-function getEventType(index: number): string {
-  const types = ["purple", "blue", "green"];
-  return types[index % types.length];
-}
+// =========================================================
+// SAFE NUMBER
+// =========================================================
 
-function formatEventDate(value: unknown): string {
-  if (typeof value !== "string" && !(value instanceof Date)) {
-    return "Date not available";
-  }
-
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return String(value);
-  }
-
-  return date.toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}
-
-function normalizeEvent(
+function safeNumber(
   value: unknown,
-  index: number
-): CampusEvent {
-  const event =
-    value && typeof value === "object"
-      ? (value as Record<string, unknown>)
-      : {};
+  fallback: number,
+): number {
+  const number = Number(value);
 
-  const title =
-    event.title ??
-    event.name ??
-    event.event_name ??
-    event.eventName;
-
-  const date =
-    event.date ??
-    event.event_date ??
-    event.eventDate ??
-    event.start_date ??
-    event.startDate;
-
-  const location =
-    event.location ??
-    event.venue ??
-    event.place ??
-    event.building_name;
-
-  return {
-    title:
-      typeof title === "string" && title.trim()
-        ? title
-        : `Campus Event ${index + 1}`,
-
-    date: formatEventDate(date),
-
-    location:
-      typeof location === "string" && location.trim()
-        ? location
-        : "Campus",
-
-    type: getEventType(index),
-  };
+  return Number.isFinite(number)
+    ? number
+    : fallback;
 }
 
-/* =========================================
-   DASHBOARD
-========================================= */
+// =========================================================
+// DASHBOARD
+// =========================================================
 
 function Dashboard() {
-  const [totalUsers, setTotalUsers] = useState<number | null>(null);
+  const navigate = useNavigate();
 
-  const [apiStatus, setApiStatus] = useState<
-    "loading" | "connected" | "offline"
-  >("loading");
+  // -------------------------------------------------------
+  // UI STATE
+  // -------------------------------------------------------
 
-  const [events, setEvents] = useState<CampusEvent[]>(fallbackEvents);
+  const [mapMode, setMapMode] =
+    useState<MapMode>("3D");
 
-  const [eventsSource, setEventsSource] = useState<
-    "loading" | "connected" | "fallback"
-  >("loading");
+  const [zoom, setZoom] =
+    useState(1);
+
+  const [
+    selectedLocation,
+    setSelectedLocation,
+  ] = useState<CampusLocation | null>(null);
+
+  const [
+    selectedTool,
+    setSelectedTool,
+  ] = useState<string | null>(null);
+
+  const [
+    simulationRunning,
+    setSimulationRunning,
+  ] = useState(false);
+
+  const [
+    searchOpen,
+    setSearchOpen,
+  ] = useState(false);
+
+  const [
+    searchValue,
+    setSearchValue,
+  ] = useState("");
+
+  const [
+    currentTime,
+    setCurrentTime,
+  ] = useState(new Date());
+
+  // -------------------------------------------------------
+  // BACKEND DATA STATE
+  // -------------------------------------------------------
+
+  const [
+    backendBuildings,
+    setBackendBuildings,
+  ] = useState<unknown[]>([]);
+
+  const [
+    backendTraffic,
+    setBackendTraffic,
+  ] = useState<unknown[]>([]);
+
+  const [
+    backendEvents,
+    setBackendEvents,
+  ] = useState<unknown[]>([]);
+
+  const [
+    backendActivities,
+    setBackendActivities,
+  ] = useState<unknown[]>([]);
+
+  const [
+    backendAlerts,
+    setBackendAlerts,
+  ] = useState<unknown[]>([]);
+
+  const [
+    backendDashboard,
+    setBackendDashboard,
+  ] = useState<unknown>(null);
+
+  const [
+    backendLoading,
+    setBackendLoading,
+  ] = useState(true);
+
+  // -------------------------------------------------------
+  // CLOCK
+  // -------------------------------------------------------
 
   useEffect(() => {
-    let active = true;
+    const timer =
+      window.setInterval(() => {
+        setCurrentTime(new Date());
+      }, 1000);
 
-    async function loadDashboardData() {
-      try {
-        const response =
-          await apiRequest<DashboardApiResponse>("/dashboard");
+    return () =>
+      window.clearInterval(timer);
+  }, []);
 
-        if (
-          active &&
-          response.success &&
-          typeof response.data?.totalUsers === "number"
-        ) {
-          setTotalUsers(response.data.totalUsers);
-          setApiStatus("connected");
-        } else if (active) {
-          setApiStatus("offline");
-        }
-      } catch {
-        if (active) {
-          setApiStatus("offline");
-        }
+  // -------------------------------------------------------
+  // LOAD BACKEND
+  // -------------------------------------------------------
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadCampusData() {
+      setBackendLoading(true);
+
+      const results =
+        await Promise.allSettled([
+          getDashboard(),
+          getBuildings(),
+          getTraffic(),
+          getEvents(),
+          getActivities(),
+          getAlerts(),
+        ]);
+
+      if (!mounted) {
+        return;
       }
 
-      try {
-        const response =
-          await apiRequest<EventsApiResponse>("/events");
+      const [
+        dashboardResult,
+        buildingsResult,
+        trafficResult,
+        eventsResult,
+        activitiesResult,
+        alertsResult,
+      ] = results;
 
-        if (active && response.success && Array.isArray(response.data)) {
-          const normalizedEvents = response.data.map(normalizeEvent);
+      if (
+        dashboardResult.status ===
+        "fulfilled"
+      ) {
+        setBackendDashboard(
+          dashboardResult.value,
+        );
+      }
 
-          setEvents(
-            normalizedEvents.length > 0
-              ? normalizedEvents
-              : fallbackEvents
-          );
+      if (
+        buildingsResult.status ===
+        "fulfilled"
+      ) {
+        setBackendBuildings(
+          normalizeArray(
+            buildingsResult.value,
+          ),
+        );
+      }
 
-          setEventsSource(
-            normalizedEvents.length > 0 ? "connected" : "fallback"
-          );
-        } else if (active) {
-          setEvents(fallbackEvents);
-          setEventsSource("fallback");
-        }
-      } catch {
-        if (active) {
-          setEvents(fallbackEvents);
-          setEventsSource("fallback");
+      if (
+        trafficResult.status ===
+        "fulfilled"
+      ) {
+        setBackendTraffic(
+          normalizeArray(
+            trafficResult.value,
+          ),
+        );
+      }
+
+      if (
+        eventsResult.status ===
+        "fulfilled"
+      ) {
+        setBackendEvents(
+          normalizeArray(
+            eventsResult.value,
+          ),
+        );
+      }
+
+      if (
+        activitiesResult.status ===
+        "fulfilled"
+      ) {
+        setBackendActivities(
+          normalizeArray(
+            activitiesResult.value,
+          ),
+        );
+      }
+
+      if (
+        alertsResult.status ===
+        "fulfilled"
+      ) {
+        setBackendAlerts(
+          normalizeArray(
+            alertsResult.value,
+          ),
+        );
+      }
+
+      setBackendLoading(false);
+    }
+
+    loadCampusData();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // -------------------------------------------------------
+  // NORMALIZE API DATA
+  // -------------------------------------------------------
+
+  function normalizeArray(
+    value: unknown,
+  ): unknown[] {
+    if (Array.isArray(value)) {
+      return value;
+    }
+
+    if (
+      typeof value === "object" &&
+      value !== null
+    ) {
+      const object =
+        value as Record<
+          string,
+          unknown
+        >;
+
+      const possibleArrays = [
+        object.data,
+        object.rows,
+        object.results,
+        object.buildings,
+        object.traffic,
+        object.events,
+        object.activities,
+        object.alerts,
+      ];
+
+      for (
+        const item of possibleArrays
+      ) {
+        if (Array.isArray(item)) {
+          return item;
         }
       }
     }
 
-    void loadDashboardData();
+    return [];
+  }
 
-    return () => {
-      active = false;
+  // -------------------------------------------------------
+  // BUILDING COUNT
+  // -------------------------------------------------------
+
+  const buildingCount =
+    backendBuildings.length > 0
+      ? backendBuildings.length
+      : 24;
+
+  // -------------------------------------------------------
+  // VEHICLE COUNT
+  // -------------------------------------------------------
+
+  const vehicleCount =
+    backendTraffic.length > 0
+      ? backendTraffic.length
+      : fallbackVehicles.length;
+
+  const totalVehicles =
+    simulationRunning
+      ? Math.max(
+          vehicleCount,
+          48,
+        )
+      : vehicleCount;
+
+  // -------------------------------------------------------
+  // OCCUPANCY
+  // -------------------------------------------------------
+
+  const currentActivity =
+    simulationRunning
+      ? 81
+      : 63;
+
+  // -------------------------------------------------------
+  // LOCATION SEARCH
+  // -------------------------------------------------------
+
+  const filteredLocations =
+    useMemo(() => {
+      if (
+        !searchValue.trim()
+      ) {
+        return fallbackLocations;
+      }
+
+      return fallbackLocations.filter(
+        (location) =>
+          location.name
+            .toLowerCase()
+            .includes(
+              searchValue
+                .toLowerCase(),
+            ),
+      );
+    }, [searchValue]);
+
+  // -------------------------------------------------------
+  // LOCATION SELECT
+  // -------------------------------------------------------
+
+  const handleLocationSelect =
+    (name: string) => {
+      const location =
+        fallbackLocations.find(
+          (item) =>
+            item.name === name,
+        );
+
+      if (location) {
+        setSelectedLocation(
+          location,
+        );
+
+        setSelectedTool(null);
+      }
     };
-  }, []);
+
+  // -------------------------------------------------------
+  // RESET
+  // -------------------------------------------------------
+
+  const resetMap = () => {
+    setZoom(1);
+    setMapMode("3D");
+    setSelectedTool(null);
+    setSelectedLocation(null);
+    setSearchOpen(false);
+    setSearchValue("");
+  };
+
+  // -------------------------------------------------------
+  // TOOLS
+  // -------------------------------------------------------
+
+  const handleTool = (
+    tool: string,
+  ) => {
+    setSelectedTool(tool);
+
+    if (tool === "Route") {
+      navigate("/navigation");
+      return;
+    }
+
+    if (tool === "Search") {
+      setSearchOpen(true);
+    }
+  };
+
+  // -------------------------------------------------------
+  // RENDER
+  // -------------------------------------------------------
 
   return (
     <div className="explore-page">
-      {/* =========================================
-          TOP HEADER AREA
-      ========================================= */}
+
+      {/* =================================================
+          HEADER
+      ================================================= */}
 
       <section className="explore-header">
+
         <div className="explore-heading">
-          <span>WELCOME TO</span>
 
-          <h1>CAMPUS OS</h1>
+          <span>
+            CAMPUS OPERATING SYSTEM
+          </span>
 
-          <p>Explore. Simulate. Optimize.</p>
+          <h1>
+            Digital Campus Twin
+          </h1>
 
-          <small>Your intelligent 3D campus twin.</small>
+          <p>
+            Explore, monitor and simulate
+            your campus environment in
+            real time.
+          </p>
 
-          <small
-            role="status"
-            aria-live="polite"
-            style={{
-              display: "block",
-              marginTop: "8px",
-              color:
-                apiStatus === "connected"
-                  ? "#26d67b"
-                  : apiStatus === "offline"
-                    ? "#f59e0b"
-                    : "#718096",
-            }}
-          >
-            {apiStatus === "loading" && "Connecting to backend..."}
-            {apiStatus === "connected" &&
-              `Backend connected • ${totalUsers} registered users`}
-            {apiStatus === "offline" &&
-              "Backend unavailable • Showing sample data"}
-          </small>
         </div>
 
-        <div className="explore-tabs">
-          <button className="explore-tab active">
-            <Map size={18} />
-            <span>Explore</span>
-          </button>
+        <div className="explore-live-status">
 
-          <button className="explore-tab">
-            <Navigation size={18} />
-            <span>Navigate</span>
-          </button>
+          <span className="live-status-dot" />
 
-          <button className="explore-tab">
-            <ActivityIcon />
-            <span>Activity</span>
-          </button>
+          <div>
 
-          <button className="explore-tab">
-            <Car size={18} />
-            <span>Traffic</span>
-          </button>
+            <strong>
+              LIVE SYSTEM
+            </strong>
 
-          <button className="explore-tab">
-            <CalendarDays size={18} />
-            <span>Events</span>
-          </button>
+            <span>
+              {currentTime.toLocaleTimeString(
+                [],
+                {
+                  hour:
+                    "2-digit",
+                  minute:
+                    "2-digit",
+                  second:
+                    "2-digit",
+                },
+              )}
+            </span>
 
-          <button className="explore-tab">
-            <span className="more-dots">•••</span>
-            <span>More</span>
-          </button>
-        </div>
-      </section>
-
-      {/* =========================================
-          MAIN CONTENT
-      ========================================= */}
-
-      <section className="dashboard-main-grid">
-        {/* =====================================
-            CAMPUS MAP
-        ===================================== */}
-
-        <div className="campus-map-panel">
-          <div className="map-statistics">
-            <div className="map-stat">
-              <div className="map-stat-icon purple">
-                <Map size={21} />
-              </div>
-
-              <div>
-                <span>BUILDINGS</span>
-                <strong>24</strong>
-              </div>
-            </div>
-
-            <div className="map-stat">
-              <div className="map-stat-icon green">
-                <Library size={21} />
-              </div>
-
-              <div>
-                <span>ROOMS</span>
-                <strong>215</strong>
-              </div>
-            </div>
-
-            <div className="map-stat">
-              <div className="map-stat-icon orange">
-                <Users size={21} />
-              </div>
-
-              <div>
-                <span>STUDENTS</span>
-                <strong>3,248</strong>
-              </div>
-            </div>
           </div>
 
-          {/* Campus Map */}
+        </div>
 
-          <div className="campus-map">
-            <img
-              src={campusMap}
-              alt="Campus digital twin"
-              className="campus-map-image"
+      </section>
+
+      {/* =================================================
+          NAVIGATION
+      ================================================= */}
+
+      <div className="explore-tabs">
+
+        <button
+          type="button"
+          className="explore-tab active"
+          onClick={() =>
+            navigate("/")
+          }
+        >
+          <Map size={18} />
+          <span>
+            Explore
+          </span>
+        </button>
+
+        <button
+          type="button"
+          className="explore-tab"
+          onClick={() =>
+            navigate(
+              "/navigation",
+            )
+          }
+        >
+          <Navigation size={18} />
+          <span>
+            Navigate
+          </span>
+        </button>
+
+        <button
+          type="button"
+          className="explore-tab"
+          onClick={() =>
+            navigate(
+              "/activity",
+            )
+          }
+        >
+          <Activity size={18} />
+          <span>
+            Activity
+          </span>
+        </button>
+
+        <button
+          type="button"
+          className="explore-tab"
+          onClick={() =>
+            navigate(
+              "/traffic",
+            )
+          }
+        >
+          <Car size={18} />
+          <span>
+            Traffic
+          </span>
+        </button>
+
+        <button
+          type="button"
+          className="explore-tab"
+          onClick={() =>
+            navigate(
+              "/events",
+            )
+          }
+        >
+          <CalendarDays
+            size={18}
+          />
+          <span>
+            Events
+          </span>
+        </button>
+
+        <button
+          type="button"
+          className="explore-tab"
+          onClick={() =>
+            navigate(
+              "/ai-assistant",
+            )
+          }
+        >
+          <span className="more-dots">
+            •••
+          </span>
+
+          <span>
+            More
+          </span>
+        </button>
+
+      </div>
+
+      {/* =================================================
+          STATISTICS
+      ================================================= */}
+
+      <section className="explore-stat-grid">
+
+        <div className="explore-stat-card">
+
+          <div className="explore-stat-icon">
+            <Building2
+              size={21}
             />
+          </div>
 
-            <div className="map-label label-library">LIBRARY</div>
+          <div>
 
-            <div className="map-label label-auditorium">
-              AUDITORIUM
+            <span>
+              BUILDINGS
+            </span>
+
+            <strong>
+              {buildingCount}
+            </strong>
+
+            <small>
+              Campus facilities
+            </small>
+
+          </div>
+
+        </div>
+
+        <div className="explore-stat-card">
+
+          <div className="explore-stat-icon">
+            <Users size={21} />
+          </div>
+
+          <div>
+
+            <span>
+              STUDENTS
+            </span>
+
+            <strong>
+              3,248
+            </strong>
+
+            <small>
+              Currently registered
+            </small>
+
+          </div>
+
+        </div>
+
+        <div className="explore-stat-card">
+
+          <div className="explore-stat-icon">
+            <Car size={21} />
+          </div>
+
+          <div>
+
+            <span>
+              ACTIVE VEHICLES
+            </span>
+
+            <strong>
+              {totalVehicles}
+            </strong>
+
+            <small>
+              {simulationRunning
+                ? "Simulation active"
+                : "Live simulation"}
+            </small>
+
+          </div>
+
+        </div>
+
+        <div className="explore-stat-card">
+
+          <div className="explore-stat-icon">
+            <Activity
+              size={21}
+            />
+          </div>
+
+          <div>
+
+            <span>
+              OCCUPANCY
+            </span>
+
+            <strong>
+              {currentActivity}%
+            </strong>
+
+            <small>
+              Campus utilization
+            </small>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      {/* =================================================
+          COMMAND CENTER
+      ================================================= */}
+
+      <section className="explore-command-grid">
+
+        {/* =================================================
+            MAP
+        ================================================= */}
+
+        <div className="explore-map-card">
+
+          <div className="explore-map-header">
+
+            <div>
+
+              <span>
+                LIVE DIGITAL TWIN
+              </span>
+
+              <h2>
+                Campus Overview
+              </h2>
+
             </div>
 
-            <div className="map-label label-a">BLOCK A</div>
+            <div className="map-live-indicator">
 
-            <div className="map-label label-b">BLOCK B</div>
+              <span />
 
-            <div className="map-label label-c">BLOCK C</div>
+              SIMULATION ONLINE
 
-            <div className="map-label label-admin">
-              ADMIN BLOCK
             </div>
 
-            <div className="campus-marker">
-              <Navigation size={24} fill="currentColor" />
-            </div>
+          </div>
 
-            {/* 2D / 3D Controls */}
+          <div className="explore-map-wrapper">
+
+            {/* MAP MODE */}
 
             <div className="map-mode-controls">
-              <button type="button">2D</button>
 
-              <button type="button" className="selected">
+              <button
+                type="button"
+                className={
+                  mapMode === "2D"
+                    ? "selected"
+                    : ""
+                }
+                onClick={() =>
+                  setMapMode("2D")
+                }
+              >
+                2D
+              </button>
+
+              <button
+                type="button"
+                className={
+                  mapMode === "3D"
+                    ? "selected"
+                    : ""
+                }
+                onClick={() =>
+                  setMapMode("3D")
+                }
+              >
                 3D
               </button>
 
-              <button type="button" aria-label="Layers">
-                <Layers size={18} />
-              </button>
-
-              <button type="button" aria-label="Zoom in">
-                <Plus size={19} />
-              </button>
-
-              <button type="button" aria-label="Zoom out">
-                <Minus size={19} />
-              </button>
-
-              <button type="button" aria-label="Reset view">
-                <RotateCcw size={18} />
-              </button>
             </div>
 
-            {/* Map Toolbar */}
+            {/* SEARCH */}
+
+            {searchOpen && (
+              <div className="campus-map-search">
+
+                <Search
+                  size={16}
+                />
+
+                <input
+                  autoFocus
+                  value={
+                    searchValue
+                  }
+                  onChange={(
+                    event,
+                  ) =>
+                    setSearchValue(
+                      event
+                        .target
+                        .value,
+                    )
+                  }
+                  placeholder="Search campus..."
+                />
+
+                {searchValue && (
+                  <div className="campus-search-results">
+
+                    {filteredLocations.length >
+                    0 ? (
+                      filteredLocations.map(
+                        (
+                          location,
+                        ) => (
+                          <button
+                            type="button"
+                            key={
+                              location.name
+                            }
+                            onClick={() =>
+                              handleLocationSelect(
+                                location.name,
+                              )
+                            }
+                          >
+                            <Building2
+                              size={
+                                15
+                              }
+                            />
+
+                            {
+                              location.name
+                            }
+                          </button>
+                        ),
+                      )
+                    ) : (
+                      <span>
+                        No campus
+                        location
+                        found.
+                      </span>
+                    )}
+
+                  </div>
+                )}
+
+              </div>
+            )}
+
+            {/* =================================================
+                MAP
+            ================================================= */}
+
+            <div
+              className={`campus-map ${
+                mapMode === "2D"
+                  ? "map-2d"
+                  : "map-3d"
+              }`}
+            >
+
+              <img
+                src={campusMap}
+                alt="Campus digital twin"
+                className="campus-map-image"
+                style={{
+                  transform:
+                    `scale(${zoom})`,
+                  transition:
+                    "transform 0.25s ease",
+                  width:
+                    "100%",
+                  height:
+                    "100%",
+                  objectFit:
+                    "contain",
+                }}
+              />
+
+              {/* VEHICLE ONE */}
+
+              <div className="campus-vehicle vehicle-one">
+
+                <span className="vehicle-pulse" />
+
+                <Car
+                  size={17}
+                />
+
+              </div>
+
+              {/* VEHICLE TWO */}
+
+              <div className="campus-vehicle vehicle-two">
+
+                <span className="vehicle-pulse" />
+
+                <Car
+                  size={17}
+                />
+
+              </div>
+
+              {/* VEHICLE THREE */}
+
+              <div className="campus-vehicle vehicle-three">
+
+                <span className="vehicle-pulse" />
+
+                <Car
+                  size={17}
+                />
+
+              </div>
+
+              {/* INCIDENT */}
+
+              <button
+                type="button"
+                className="campus-incident-marker"
+                onClick={() =>
+                  navigate(
+                    "/emergency",
+                  )
+                }
+                title="View active incident"
+              >
+                <AlertTriangle
+                  size={16}
+                />
+              </button>
+
+              {/* LABELS */}
+
+              <button
+                type="button"
+                className="map-label label-library"
+                onClick={() =>
+                  handleLocationSelect(
+                    "Library",
+                  )
+                }
+              >
+                LIBRARY
+              </button>
+
+              <button
+                type="button"
+                className="map-label label-auditorium"
+                onClick={() =>
+                  handleLocationSelect(
+                    "Main Auditorium",
+                  )
+                }
+              >
+                AUDITORIUM
+              </button>
+
+              <button
+                type="button"
+                className="map-label label-a"
+                onClick={() =>
+                  handleLocationSelect(
+                    "Block A",
+                  )
+                }
+              >
+                BLOCK A
+              </button>
+
+              <button
+                type="button"
+                className="map-label label-b"
+                onClick={() =>
+                  handleLocationSelect(
+                    "Block B",
+                  )
+                }
+              >
+                BLOCK B
+              </button>
+
+              <button
+                type="button"
+                className="map-label label-c"
+                onClick={() =>
+                  handleLocationSelect(
+                    "Block C",
+                  )
+                }
+              >
+                BLOCK C
+              </button>
+
+              <button
+                type="button"
+                className="map-label label-admin"
+                onClick={() =>
+                  handleLocationSelect(
+                    "Admin Block",
+                  )
+                }
+              >
+                ADMIN BLOCK
+              </button>
+
+            </div>
+
+            {/* MAP CONTROLS */}
+
+            <div className="map-controls">
+
+              <button
+                type="button"
+                aria-label="Zoom in"
+                onClick={() =>
+                  setZoom(
+                    (value) =>
+                      Math.min(
+                        value +
+                          0.1,
+                        1.5,
+                      ),
+                  )
+                }
+              >
+                <Plus size={18} />
+              </button>
+
+              <button
+                type="button"
+                aria-label="Zoom out"
+                onClick={() =>
+                  setZoom(
+                    (value) =>
+                      Math.max(
+                        value -
+                          0.1,
+                        0.8,
+                      ),
+                  )
+                }
+              >
+                <Minus size={18} />
+              </button>
+
+              <button
+                type="button"
+                aria-label="Reset view"
+                onClick={
+                  resetMap
+                }
+              >
+                <RotateCcw
+                  size={18}
+                />
+              </button>
+
+            </div>
+
+            {/* TOOLBAR */}
 
             <div className="map-toolbar">
-              <button type="button">
-                <Search size={20} />
-                <span>Search</span>
+
+              <button
+                type="button"
+                onClick={() =>
+                  handleTool(
+                    "Search",
+                  )
+                }
+              >
+                <Search
+                  size={19}
+                />
+
+                <span>
+                  Search
+                </span>
               </button>
 
-              <button type="button">
-                <Route size={20} />
-                <span>Route</span>
+              <button
+                type="button"
+                onClick={() =>
+                  handleTool(
+                    "Route",
+                  )
+                }
+              >
+                <Navigation
+                  size={19}
+                />
+
+                <span>
+                  Route
+                </span>
               </button>
 
-              <button type="button">
-                <Ruler size={20} />
-                <span>Measure</span>
+              <button
+                type="button"
+                onClick={() =>
+                  handleTool(
+                    "Layers",
+                  )
+                }
+              >
+                <Layers
+                  size={19}
+                />
+
+                <span>
+                  Layers
+                </span>
               </button>
 
-              <button type="button">
-                <Layers size={20} />
-                <span>Layers</span>
+              <button
+                type="button"
+                onClick={() =>
+                  handleTool(
+                    "Info",
+                  )
+                }
+              >
+                <Info
+                  size={19}
+                />
+
+                <span>
+                  Info
+                </span>
               </button>
 
-              <button type="button">
-                <Info size={20} />
-                <span>Info</span>
-              </button>
-
-              <button type="button">
-                <RotateCcw size={20} />
-                <span>Reset View</span>
-              </button>
             </div>
+
+            {/* SIMULATION */}
+
+            <div className="map-simulation-control">
+
+              <button
+                type="button"
+                onClick={() =>
+                  setSimulationRunning(
+                    (value) =>
+                      !value,
+                  )
+                }
+              >
+
+                <span
+                  className={`simulation-dot ${
+                    simulationRunning
+                      ? "running"
+                      : ""
+                  }`}
+                />
+
+                {simulationRunning
+                  ? "Simulation Running"
+                  : "Start Simulation"}
+
+              </button>
+
+            </div>
+
+            {/* TOOL FEEDBACK */}
+
+            {selectedTool && (
+              <div className="map-tool-feedback">
+
+                <strong>
+                  {selectedTool}
+                </strong>
+
+                <span>
+
+                  {selectedTool ===
+                    "Search" &&
+                    "Search buildings, rooms and campus facilities."}
+
+                  {selectedTool ===
+                    "Route" &&
+                    "Opening the campus route planner."}
+
+                  {selectedTool ===
+                    "Layers" &&
+                    "Campus information layers are available."}
+
+                  {selectedTool ===
+                    "Info" &&
+                    "Select a campus object to view details."}
+
+                </span>
+
+              </div>
+            )}
+
           </div>
-        </div>
 
-        {/* =====================================
-            RIGHT SIDEBAR
-        ===================================== */}
+          {/* LOCATION */}
 
-        <aside className="right-dashboard">
-          {/* Campus Status */}
+          {selectedLocation && (
+            <div className="campus-selection-panel">
 
-          <div className="side-panel">
-            <div className="panel-heading">
-              <h3>CAMPUS STATUS</h3>
+              <div>
 
-              <span className="live-badge">
-                <span></span>
-                Live
-              </span>
-            </div>
+                <span>
+                  SELECTED LOCATION
+                </span>
 
-            <div className="status-grid">
-              <StatusCard
-                icon={<Users />}
-                value="63%"
-                label="Occupancy"
-                note="Medium"
-                type="orange"
-              />
+                <strong>
+                  {
+                    selectedLocation.name
+                  }
+                </strong>
 
-              <StatusCard
-                icon={<Car />}
-                value="Moderate"
-                label="Traffic"
-                note="Smooth Flow"
-                type="green"
-              />
-
-              <StatusCard
-                icon={<CalendarDays />}
-                value="2"
-                label="Events Today"
-                note="Active"
-                type="red"
-              />
-
-              <StatusCard
-                icon={<Leaf />}
-                value="Good"
-                label="Air Quality"
-                note="AQI 42"
-                type="green"
-              />
-            </div>
-          </div>
-
-          {/* Upcoming Events */}
-
-          <div className="side-panel">
-            <div className="panel-heading">
-              <h3>UPCOMING EVENTS</h3>
-
-              <a href="#events">View All</a>
-            </div>
-
-            <div className="events-list" id="events">
-              {events.map((event, index) => (
-                <div className="event-row" key={`${event.title}-${index}`}>
-                  <div className={`event-icon ${event.type}`}>
-                    <CalendarDays size={17} />
-                  </div>
-
-                  <div className="event-info">
-                    <strong>{event.title}</strong>
-
-                    <span>▣ {event.date}</span>
-
-                    <span>⌖ {event.location}</span>
-                  </div>
-
-                  <span className={`event-status ${event.type}`}>
-                    UPCOMING
-                  </span>
-                </div>
-              ))}
-
-              {eventsSource === "loading" && (
-                <small role="status">Checking event updates...</small>
-              )}
-
-              {eventsSource === "fallback" && (
                 <small>
-                  Showing sample events because event data is unavailable.
+                  {
+                    selectedLocation.type
+                  }
                 </small>
+
+              </div>
+
+              <div className="selection-details">
+
+                <div>
+                  <span>
+                    Occupancy
+                  </span>
+
+                  <strong>
+                    {
+                      selectedLocation.occupancy
+                    }%
+                  </strong>
+                </div>
+
+                <div>
+                  <span>
+                    Status
+                  </span>
+
+                  <strong>
+                    {
+                      selectedLocation.status
+                    }
+                  </strong>
+                </div>
+
+                <div>
+                  <span>
+                    Activity
+                  </span>
+
+                  <strong>
+                    {
+                      selectedLocation.activity
+                    }
+                  </strong>
+                </div>
+
+              </div>
+
+              <button
+                type="button"
+                onClick={() =>
+                  setSelectedLocation(
+                    null,
+                  )
+                }
+              >
+                Close
+              </button>
+
+            </div>
+          )}
+
+        </div>
+
+        {/* =================================================
+            RIGHT COMMAND PANEL
+        ================================================= */}
+
+        <aside className="explore-side-panel">
+
+          {/* STATUS */}
+
+          <div className="explore-panel">
+
+            <div className="panel-title-row">
+
+              <div>
+
+                <span>
+                  SYSTEM MONITOR
+                </span>
+
+                <h3>
+                  Campus Status
+                </h3>
+
+              </div>
+
+              <span className="status-online">
+                ONLINE
+              </span>
+
+            </div>
+
+            <div className="status-list">
+
+              <div>
+
+                <span>
+                  <Users
+                    size={15}
+                  />
+
+                  Occupancy
+                </span>
+
+                <strong>
+                  63%
+                </strong>
+
+              </div>
+
+              <div>
+
+                <span>
+                  <Car
+                    size={15}
+                  />
+
+                  Traffic
+                </span>
+
+                <strong className="status-warning">
+                  Moderate
+                </strong>
+
+              </div>
+
+              <div>
+
+                <span>
+                  <Zap
+                    size={15}
+                  />
+
+                  Energy
+                </span>
+
+                <strong className="status-good">
+                  Normal
+                </strong>
+
+              </div>
+
+              <div>
+
+                <span>
+                  <ShieldAlert
+                    size={15}
+                  />
+
+                  Security
+                </span>
+
+                <strong className="status-good">
+                  Secure
+                </strong>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          {/* VEHICLES */}
+
+          <div className="explore-panel">
+
+            <div className="panel-title-row">
+
+              <div>
+
+                <span>
+                  TRANSPORT
+                </span>
+
+                <h3>
+                  Active Vehicles
+                </h3>
+
+              </div>
+
+              <button
+                type="button"
+                onClick={() =>
+                  navigate(
+                    "/traffic",
+                  )
+                }
+                className="panel-link"
+              >
+                View
+
+                <ChevronRight
+                  size={14}
+                />
+              </button>
+
+            </div>
+
+            <div className="vehicle-list">
+
+              {fallbackVehicles.map(
+                (
+                  vehicle,
+                ) => (
+
+                  <button
+                    type="button"
+                    key={
+                      vehicle.id
+                    }
+                    className="vehicle-row"
+                    onClick={() =>
+                      navigate(
+                        "/traffic",
+                      )
+                    }
+                  >
+
+                    <div className="vehicle-icon">
+
+                      <Car
+                        size={16}
+                      />
+
+                    </div>
+
+                    <div className="vehicle-info">
+
+                      <strong>
+                        {
+                          vehicle.id
+                        }
+                      </strong>
+
+                      <span>
+                        {
+                          vehicle.type
+                        }{" "}
+                        ·{" "}
+                        {
+                          vehicle.road
+                        }
+                      </span>
+
+                    </div>
+
+                    <div className="vehicle-speed">
+
+                      <strong>
+                        {
+                          vehicle.speed
+                        }
+                      </strong>
+
+                      <span>
+                        km/h
+                      </span>
+
+                    </div>
+
+                  </button>
+
+                ),
               )}
+
             </div>
+
           </div>
 
-          {/* Campus Activity */}
+          {/* ALERT */}
 
-          <div className="side-panel activity-panel">
-            <div className="panel-heading">
-              <h3>CAMPUS ACTIVITY (LIVE)</h3>
+          <div className="explore-panel explore-alert-panel">
+
+            <div className="panel-title-row">
+
+              <div>
+
+                <span>
+                  ATTENTION
+                </span>
+
+                <h3>
+                  Active Alert
+                </h3>
+
+              </div>
+
+              <AlertTriangle
+                size={19}
+              />
+
             </div>
 
-            <div className="activity-legend">
-              <span>
-                <i className="legend-student"></i>
-                Students
-              </span>
+            <div className="alert-content">
 
-              <span>
-                <i className="legend-faculty"></i>
-                Faculty
-              </span>
+              <strong>
+                Traffic congestion
+                detected
+              </strong>
 
-              <span>
-                <i className="legend-visitor"></i>
-                Visitors
-              </span>
+              <p>
+                Zone C currently
+                has higher than
+                normal vehicle
+                density.
+              </p>
+
+              <button
+                type="button"
+                onClick={() =>
+                  navigate(
+                    "/traffic",
+                  )
+                }
+              >
+                Analyze Traffic
+
+                <ArrowRight
+                  size={15}
+                />
+              </button>
+
             </div>
 
-            <div className="activity-chart">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={activityData}>
-                  <XAxis
-                    dataKey="time"
-                    tick={{
-                      fill: "#718096",
-                      fontSize: 9,
-                    }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-
-                  <YAxis
-                    tick={{
-                      fill: "#718096",
-                      fontSize: 9,
-                    }}
-                    axisLine={false}
-                    tickLine={false}
-                    tickFormatter={(value) => `${value / 1000}K`}
-                  />
-
-                  <Tooltip
-                    contentStyle={{
-                      background: "#081321",
-                      border: "1px solid rgba(96,165,250,.25)",
-                      borderRadius: 8,
-                      color: "#fff",
-                    }}
-                  />
-
-                  <Line
-                    type="monotone"
-                    dataKey="students"
-                    stroke="#26d67b"
-                    strokeWidth={2}
-                    dot={false}
-                  />
-
-                  <Line
-                    type="monotone"
-                    dataKey="faculty"
-                    stroke="#3d8bff"
-                    strokeWidth={2}
-                    dot={false}
-                  />
-
-                  <Line
-                    type="monotone"
-                    dataKey="visitors"
-                    stroke="#a855f7"
-                    strokeWidth={2}
-                    dot={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
           </div>
+
         </aside>
+
       </section>
 
-      {/* =========================================
-          BOTTOM SECTION
-      ========================================= */}
+      {/* =================================================
+          LOWER ANALYTICS
+      ================================================= */}
 
-      <section className="bottom-dashboard-grid">
-        {/* Quick Actions */}
+      <section className="explore-bottom-grid">
 
-        <div className="bottom-panel">
-          <h3>QUICK ACTIONS</h3>
+        {/* ACTIVITY */}
 
-          <div className="quick-actions">
-            <QuickAction
-              icon={<Navigation />}
-              title="Find Route"
-              type="green"
-            />
+        <div className="explore-analytics-card">
 
-            <QuickAction
-              icon={<CalendarDays />}
-              title="Book Facility"
-              type="purple"
-            />
-
-            <QuickAction
-              icon={<TriangleAlert />}
-              title="Report Issue"
-              type="red"
-            />
-          </div>
-        </div>
-
-        {/* Shortcuts */}
-
-        <div className="bottom-panel shortcuts-panel">
-          <h3>SHORTCUTS</h3>
-
-          <div className="shortcut-list">
-            <Shortcut
-              icon={<Library />}
-              label="Library"
-              type="green"
-            />
-
-            <Shortcut
-              icon={<Utensils />}
-              label="Canteen"
-              type="red"
-            />
-
-            <Shortcut
-              icon={<FlaskConical />}
-              label="Labs"
-              type="orange"
-            />
-
-            <Shortcut
-              icon={<ParkingCircle />}
-              label="Parking"
-              type="blue"
-            />
-
-            <Shortcut
-              icon={<Accessibility />}
-              label="Washroom"
-              type="purple"
-            />
-
-            <Shortcut
-              icon={<CircleHelp />}
-              label="Help Desk"
-              type="green"
-            />
-          </div>
-        </div>
-
-        {/* Weather */}
-
-        <div className="bottom-panel weather-panel">
-          <h3>WEATHER</h3>
-
-          <div className="weather-main">
-            <Sun size={48} />
+          <div className="analytics-header">
 
             <div>
-              <strong>28°C</strong>
-              <span>Partly Cloudy</span>
+
+              <span>
+                LIVE ANALYTICS
+              </span>
+
+              <h3>
+                Campus Activity
+              </h3>
+
             </div>
+
+            <button
+              type="button"
+              onClick={() =>
+                navigate(
+                  "/activity",
+                )
+              }
+            >
+              Detailed View
+
+              <ArrowRight
+                size={14}
+              />
+
+            </button>
+
           </div>
 
-          <div className="weather-details">
-            <div>
-              <span>Humidity</span>
-              <strong>60%</strong>
-            </div>
+          <div className="activity-chart">
 
-            <div>
-              <span>Wind</span>
-              <strong>12 km/h</strong>
-            </div>
+            {fallbackActivity.map(
+              (item) => (
 
-            <div>
-              <span>Feels like</span>
-              <strong>30°C</strong>
-            </div>
+                <div
+                  className="activity-column"
+                  key={
+                    item.label
+                  }
+                >
+
+                  <div className="activity-bar-wrapper">
+
+                    <div
+                      className="activity-bar"
+                      style={{
+                        height:
+                          `${item.value}%`,
+                      }}
+                    />
+
+                  </div>
+
+                  <span>
+                    {
+                      item.label
+                    }
+                  </span>
+
+                </div>
+
+              ),
+            )}
+
           </div>
+
         </div>
 
-        {/* Campus Map Overview */}
+        {/* OPERATIONS */}
 
-        <div className="bottom-panel overview-panel">
-          <h3>CAMPUS MAP OVERVIEW</h3>
+        <div className="explore-analytics-card">
 
-          <div className="mini-map">
-            <img src={campusMap} alt="Campus overview" />
+          <div className="analytics-header">
 
-            <div className="mini-map-focus"></div>
+            <div>
+
+              <span>
+                TODAY
+              </span>
+
+              <h3>
+                Campus Operations
+              </h3>
+
+            </div>
+
+            <Clock3
+              size={18}
+            />
+
           </div>
+
+          <div className="operation-list">
+
+            <button
+              type="button"
+              onClick={() =>
+                navigate(
+                  "/events",
+                )
+              }
+            >
+
+              <div>
+                <CalendarDays
+                  size={17}
+                />
+              </div>
+
+              <span>
+
+                <strong>
+                  {
+                    backendEvents.length ||
+                    2
+                  } Events
+                </strong>
+
+                <small>
+                  Scheduled today
+                </small>
+
+              </span>
+
+              <ChevronRight
+                size={16}
+              />
+
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                navigate(
+                  "/emergency",
+                )
+              }
+            >
+
+              <div>
+                <AlertTriangle
+                  size={17}
+                />
+              </div>
+
+              <span>
+
+                <strong>
+                  {
+                    backendAlerts.length ||
+                    2
+                  } Alerts
+                </strong>
+
+                <small>
+                  Requires monitoring
+                </small>
+
+              </span>
+
+              <ChevronRight
+                size={16}
+              />
+
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                navigate(
+                  "/environment",
+                )
+              }
+            >
+
+              <div>
+                <Activity
+                  size={17}
+                />
+              </div>
+
+              <span>
+
+                <strong>
+                  AQI 42
+                </strong>
+
+                <small>
+                  Air quality is good
+                </small>
+
+              </span>
+
+              <ChevronRight
+                size={16}
+              />
+
+            </button>
+
+          </div>
+
         </div>
+
       </section>
-    </div>
-  );
-}
 
-/* =========================================
-   ACTIVITY ICON
-========================================= */
+      {/* =================================================
+          AI INSIGHT
+      ================================================= */}
 
-function ActivityIcon() {
-  return (
-    <svg
-      width="19"
-      height="19"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      aria-hidden="true"
-    >
-      <path d="M3 12h4l3-8 4 16 3-8h4" />
-    </svg>
-  );
-}
+      <section className="explore-ai-insight">
 
-/* =========================================
-   STATUS CARD
-========================================= */
+        <div className="ai-insight-icon">
 
-function StatusCard({
-  icon,
-  value,
-  label,
-  note,
-  type,
-}: {
-  icon: React.ReactNode;
-  value: string;
-  label: string;
-  note: string;
-  type: string;
-}) {
-  return (
-    <div className="status-card">
-      <div className={`status-icon ${type}`}>{icon}</div>
+          <Compass
+            size={22}
+          />
 
-      <div>
-        <span>{label}</span>
+        </div>
 
-        <strong>{value}</strong>
+        <div className="ai-insight-content">
 
-        <small className={type}>{note}</small>
+          <span>
+            AI CAMPUS INSIGHT
+          </span>
+
+          <h3>
+            Campus activity is
+            currently stable with
+            moderate traffic.
+          </h3>
+
+          <p>
+            Zone C has the highest
+            simulated traffic density.
+            The East Gate route currently
+            offers the lowest congestion
+            level.
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          onClick={() =>
+            navigate(
+              "/ai-assistant",
+            )
+          }
+        >
+          Ask Campus AI
+
+          <ArrowRight
+            size={16}
+          />
+
+        </button>
+
+      </section>
+
+      {/* BACKEND STATUS */}
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent:
+            "flex-end",
+          padding:
+            "8px 0 0",
+          fontSize:
+            "11px",
+          opacity: 0.55,
+        }}
+      >
+        {backendLoading
+          ? "Syncing campus data..."
+          : "Campus data synchronized"}
       </div>
+
     </div>
-  );
-}
-
-/* =========================================
-   QUICK ACTION
-========================================= */
-
-function QuickAction({
-  icon,
-  title,
-  type,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  type: string;
-}) {
-  return (
-    <button type="button" className={`quick-action ${type}`}>
-      <div>{icon}</div>
-
-      <span>{title}</span>
-    </button>
-  );
-}
-
-/* =========================================
-   SHORTCUT
-========================================= */
-
-function Shortcut({
-  icon,
-  label,
-  type,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  type: string;
-}) {
-  return (
-    <button type="button" className="shortcut">
-      <div className={`shortcut-icon ${type}`}>{icon}</div>
-
-      <span>{label}</span>
-    </button>
   );
 }
 

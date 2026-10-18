@@ -1,298 +1,202 @@
-export const student = {
-  name: "likitha",
-  id: "STU2026001",
-  course: "BCA",
-  semester: "6th Semester",
-  email: "student@campusos.edu",
+// ============================================================
+// src/services/data.ts
+// ============================================================
+
+export const campusStats = {
+  buildings: 24,
+  rooms: 215,
+  students: 3248,
+  occupancy: 63,
+  activeVehicles: 48,
+  events: 2,
+  alerts: 2,
+  aqi: 42,
 };
 
-// ------------------------------------------
-// Attendance - Monthly Data
-// ------------------------------------------
-
-export const attendanceData = [
+export const buildings = [
   {
-    month: "Jan",
-    attendance: 88,
+    id: "BLD-A",
+    name: "Block A",
+    type: "Academic",
+    occupancy: 68,
+    status: "Operational",
   },
   {
-    month: "Feb",
-    attendance: 91,
+    id: "BLD-B",
+    name: "Block B",
+    type: "Academic",
+    occupancy: 51,
+    status: "Operational",
   },
   {
-    month: "Mar",
-    attendance: 86,
+    id: "BLD-C",
+    name: "Block C",
+    type: "Academic",
+    occupancy: 37,
+    status: "Operational",
   },
   {
-    month: "Apr",
-    attendance: 94,
+    id: "LIB-01",
+    name: "Library",
+    type: "Academic Facility",
+    occupancy: 82,
+    status: "Operational",
   },
   {
-    month: "May",
-    attendance: 89,
+    id: "ADM-01",
+    name: "Admin Block",
+    type: "Administration",
+    occupancy: 59,
+    status: "Operational",
   },
   {
-    month: "Jun",
-    attendance: 92,
-  },
-];
-
-// ------------------------------------------
-// Attendance - Subject Wise
-// ------------------------------------------
-
-export const subjectAttendance = [
-  {
-    subject: "Python",
-    attended: 45,
-    total: 48,
-    percentage: 94,
-  },
-  {
-    subject: "Web Technology",
-    attended: 42,
-    total: 46,
-    percentage: 91,
-  },
-  {
-    subject: "DBMS",
-    attended: 36,
-    total: 46,
-    percentage: 78,
-  },
-  {
-    subject: "Artificial Intelligence",
-    attended: 47,
-    total: 49,
-    percentage: 96,
-  },
-  {
-    subject: "Cloud Computing",
-    attended: 41,
-    total: 46,
-    percentage: 89,
+    id: "AUD-01",
+    name: "Main Auditorium",
+    type: "Events",
+    occupancy: 64,
+    status: "Operational",
   },
 ];
 
-// ------------------------------------------
-// Marks
-// ------------------------------------------
-
-export const marksData = [
+export const vehicles = [
   {
-    subject: "Python",
-    marks: 86,
+    id: "VH-001",
+    type: "Car",
+    road: "Main Road",
+    speed: 32,
+    status: "Moving",
   },
   {
-    subject: "Web Tech",
-    marks: 91,
+    id: "VH-002",
+    type: "Bus",
+    road: "East Gate",
+    speed: 18,
+    status: "Moving",
   },
   {
-    subject: "DBMS",
-    marks: 78,
+    id: "VH-003",
+    type: "Bike",
+    road: "Library Road",
+    speed: 12,
+    status: "Slow",
   },
   {
-    subject: "AI",
-    marks: 88,
+    id: "VH-004",
+    type: "Car",
+    road: "Parking Zone",
+    speed: 0,
+    status: "Stopped",
   },
   {
-    subject: "Cloud",
-    marks: 82,
-  },
-];
-
-// ------------------------------------------
-// Assignments
-// ------------------------------------------
-
-export const assignments = [
-  {
-    title: "React Dashboard",
-    subject: "Web Technology",
-    deadline: "05 Sep 2026",
-    status: "Pending",
-  },
-  {
-    title: "AI Case Study",
-    subject: "Artificial Intelligence",
-    deadline: "08 Sep 2026",
-    status: "Submitted",
-  },
-  {
-    title: "Database Design",
-    subject: "DBMS",
-    deadline: "10 Sep 2026",
-    status: "Pending",
-  },
-  {
-    title: "Cloud Computing Report",
-    subject: "Cloud Computing",
-    deadline: "14 Sep 2026",
-    status: "Submitted",
-  },
-  {
-    title: "Python Data Analysis",
-    subject: "Python",
-    deadline: "18 Sep 2026",
-    status: "Pending",
+    id: "VH-005",
+    type: "Bus",
+    road: "North Road",
+    speed: 24,
+    status: "Moving",
   },
 ];
 
-// ------------------------------------------
-// Smart Alerts
-// ------------------------------------------
+export const activityData = [
+  { time: "08:00", value: 42 },
+  { time: "09:00", value: 56 },
+  { time: "10:00", value: 68 },
+  { time: "11:00", value: 74 },
+  { time: "12:00", value: 63 },
+  { time: "13:00", value: 58 },
+  { time: "14:00", value: 71 },
+  { time: "15:00", value: 78 },
+  { time: "16:00", value: 69 },
+  { time: "17:00", value: 61 },
+];
 
 export const alerts = [
   {
-    title: "Attendance Reminder",
-    message:
-      "Your DBMS attendance is below the recommended level.",
-    type: "warning",
+    id: "ALT-001",
+    title: "Traffic congestion detected",
+    zone: "Zone C",
+    severity: "High",
+    time: "2 min ago",
   },
   {
-    title: "New Assignment",
-    message:
-      "A new Web Technology assignment has been added.",
-    type: "info",
+    id: "ALT-002",
+    title: "Library occupancy increasing",
+    zone: "Library",
+    severity: "Medium",
+    time: "8 min ago",
   },
   {
-    title: "Performance Update",
-    message:
-      "Your overall academic performance improved this month.",
-    type: "success",
-  },
-  {
-    title: "Assignment Deadline",
-    message:
-      "Your React Dashboard assignment is due soon.",
-    type: "warning",
+    id: "ALT-003",
+    title: "Vehicle stopped",
+    zone: "Parking Zone",
+    severity: "Low",
+    time: "14 min ago",
   },
 ];
 
-// ------------------------------------------
-// Student Skills
-// ------------------------------------------
-
-export const skills = [
+export const events = [
   {
-    name: "Python",
-    value: 86,
+    id: "EV-001",
+    title: "Student Innovation Summit",
+    location: "Main Auditorium",
+    time: "10:00 AM",
+    attendees: 420,
   },
   {
-    name: "React",
-    value: 78,
-  },
-  {
-    name: "SQL",
-    value: 82,
-  },
-  {
-    name: "AI/ML",
-    value: 74,
-  },
-  {
-    name: "Cloud",
-    value: 68,
+    id: "EV-002",
+    title: "AI Workshop",
+    location: "Block A",
+    time: "02:00 PM",
+    attendees: 180,
   },
 ];
 
-// ------------------------------------------
-// AI Performance
-// ------------------------------------------
-
-export const aiPerformance = {
-  academicScore: 87,
-  riskLevel: "Low",
-  overallGPA: 8.7,
-  performanceTrend: 8,
-
-  strengths: [
-    "Programming",
-    "Web Technology",
-    "Artificial Intelligence",
-  ],
-
-  improvementAreas: [
-    "DBMS",
-    "Cloud Computing",
-  ],
-
-  recommendation:
-    "Focus more on DBMS and Cloud Computing to improve your overall academic score.",
-};
-
-// ------------------------------------------
-// Career Recommendations
-// ------------------------------------------
-
-export const careerRecommendations = [
+export const attendanceData = [
   {
-    title: "Full Stack Developer",
-    match: 94,
-    description:
-      "Build modern web applications using frontend and backend technologies.",
-    skills: [
-      "React",
-      "Node.js",
-      "TypeScript",
-      "SQL",
-    ],
+    subject: "Web Technology",
+    percentage: 92,
   },
   {
-    title: "Data Analyst",
-    match: 88,
-    description:
-      "Analyze data and create meaningful insights for organizations.",
-    skills: [
-      "Python",
-      "SQL",
-      "Excel",
-      "Power BI",
-    ],
+    subject: "Data Analytics",
+    percentage: 87,
   },
   {
-    title: "Cloud Engineer",
-    match: 81,
-    description:
-      "Work with cloud platforms, deployment and scalable infrastructure.",
-    skills: [
-      "AWS",
-      "Azure",
-      "Linux",
-      "Docker",
-    ],
+    subject: "Cloud Computing",
+    percentage: 81,
+  },
+  {
+    subject: "Machine Learning",
+    percentage: 89,
+  },
+  {
+    subject: "Project",
+    percentage: 96,
   },
 ];
 
-// ------------------------------------------
-// Reports
-// ------------------------------------------
-
-export const reports = [
+export const marksData = [
   {
-    title: "Semester Performance Report",
-    type: "Academic",
-    date: "03 Sep 2026",
+    subject: "Web Technology",
+    internal: 42,
+    total: 50,
   },
   {
-    title: "Attendance Report",
-    type: "Attendance",
-    date: "01 Sep 2026",
+    subject: "Data Analytics",
+    internal: 44,
+    total: 50,
   },
   {
-    title: "Assignment Performance Report",
-    type: "Assignments",
-    date: "30 Aug 2026",
+    subject: "Cloud Computing",
+    internal: 39,
+    total: 50,
+  },
+  {
+    subject: "Machine Learning",
+    internal: 46,
+    total: 50,
+  },
+  {
+    subject: "Project",
+    internal: 48,
+    total: 50,
   },
 ];
-
-// ------------------------------------------
-// Dashboard Statistics
-// ------------------------------------------
-
-export const dashboardStats = {
-  attendance: 92,
-  overallGPA: 8.7,
-  academicScore: 85,
-  pendingTasks: 3,
-};

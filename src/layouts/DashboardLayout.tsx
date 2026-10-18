@@ -1,27 +1,41 @@
+// ============================================================
+// src/layouts/DashboardLayout.tsx
+// ============================================================
+
+import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
 
 function DashboardLayout() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
     <div className="campus-layout">
-
-      {/* SIDEBAR */}
-      <div className="campus-sidebar">
-        <Sidebar />
+      <div
+        className={`sidebar-wrapper ${
+          sidebarOpen ? "sidebar-open" : ""
+        }`}
+      >
+        <Sidebar onNavigate={() => setSidebarOpen(false)} />
       </div>
 
-      {/* MAIN APPLICATION AREA */}
-      <div className="campus-main">
+      {sidebarOpen && (
+        <button
+          type="button"
+          className="sidebar-overlay"
+          aria-label="Close navigation"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
-        <Topbar />
+      <main className="campus-main">
+        <Topbar onMenuClick={() => setSidebarOpen(true)} />
 
-        <main className="campus-page">
+        <div className="campus-content">
           <Outlet />
-        </main>
-
-      </div>
-
+        </div>
+      </main>
     </div>
   );
 }
