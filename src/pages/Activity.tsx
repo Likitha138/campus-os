@@ -1,135 +1,225 @@
-// ============================================================
-// src/pages/Activity.tsx
-// ============================================================
-
 import {
   Activity as ActivityIcon,
-  ArrowUpRight,
-  Clock3,
+  Clock,
   Users,
-  Zap,
 } from "lucide-react";
+
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+
 import PageHeader from "../components/PageHeader";
 import StatCard from "../components/StatCard";
-import { activityData } from "../services/data";
+import { activityData, campusLocations } from "../data/campus";
 
-function Activity() {
+export default function Activity() {
   return (
-    <div className="page-container">
+    <div className="page">
       <PageHeader
-        eyebrow="CAMPUS INTELLIGENCE"
-        title="Activity Monitoring"
-        description="Observe simulated campus movement, occupancy and activity patterns."
-        icon={<ActivityIcon size={22} />}
+        title="Campus Activity"
+        subtitle="Observe simulated occupancy and movement across the campus."
       />
 
-      <div className="stat-grid">
+      <div className="stats-grid">
         <StatCard
-          label="Current Activity"
-          value="69%"
-          detail="Campus utilization"
-          icon={<ActivityIcon size={18} />}
-          trend="+8.4%"
-          tone="blue"
+          label="Current Occupancy"
+          value="63%"
+          change="+4.2%"
+          trend="up"
+          icon="users"
         />
 
         <StatCard
-          label="Peak Activity"
-          value="78%"
-          detail="Highest today"
-          icon={<ArrowUpRight size={18} />}
-          tone="orange"
+          label="Active Zones"
+          value="08"
+          change="6 busy"
+          trend="neutral"
+          icon="building"
         />
 
         <StatCard
-          label="People Flow"
-          value="2,184"
-          detail="Estimated movement"
-          icon={<Users size={18} />}
-          trend="+12%"
-          tone="purple"
+          label="Peak Occupancy"
+          value="83%"
+          change="16:00"
+          trend="neutral"
+          icon="chart"
         />
 
         <StatCard
-          label="Energy Load"
-          value="64%"
-          detail="Current utilization"
-          icon={<Zap size={18} />}
-          tone="green"
+          label="Activity Index"
+          value="78/100"
+          change="+6.8%"
+          trend="up"
+          icon="activity"
         />
       </div>
 
-      <section className="content-grid two-column">
-        <div className="content-card">
-          <div className="card-header">
+      <div className="two-column-grid">
+        <div className="panel large-chart-panel">
+          <div className="panel-header">
             <div>
-              <span>ACTIVITY FLOW</span>
-              <h2>Hourly Campus Activity</h2>
+              <span className="panel-kicker">
+                TIME SIMULATION
+              </span>
+              <h3>Campus Occupancy Timeline</h3>
             </div>
 
-            <Clock3 size={18} />
+            <div className="simulation-control">
+              <Clock size={14} />
+              12:00 PM
+            </div>
           </div>
 
-          <div className="large-activity-chart">
-            {activityData.map((item) => (
-              <div
-                className="large-activity-column"
-                key={item.time}
-              >
-                <strong>{item.value}%</strong>
+          <div className="chart-wrap tall">
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+            >
+              <AreaChart data={activityData}>
+                <defs>
+                  <linearGradient
+                    id="activityFill"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop
+                      offset="0%"
+                      stopColor="#4f8cff"
+                      stopOpacity=".35"
+                    />
+                    <stop
+                      offset="100%"
+                      stopColor="#4f8cff"
+                      stopOpacity="0"
+                    />
+                  </linearGradient>
+                </defs>
 
-                <div className="large-bar-track">
-                  <div
-                    className="large-bar"
-                    style={{
-                      height: `${item.value}%`,
-                    }}
-                  />
-                </div>
+                <CartesianGrid
+                  stroke="rgba(255,255,255,.05)"
+                  vertical={false}
+                />
 
-                <span>{item.time}</span>
-              </div>
-            ))}
+                <XAxis
+                  dataKey="time"
+                  stroke="#667085"
+                  tickLine={false}
+                  axisLine={false}
+                />
+
+                <YAxis
+                  stroke="#667085"
+                  tickLine={false}
+                  axisLine={false}
+                />
+
+                <Tooltip
+                  contentStyle={{
+                    background: "#10151f",
+                    border:
+                      "1px solid rgba(255,255,255,.1)",
+                    borderRadius: 12,
+                  }}
+                />
+
+                <Area
+                  dataKey="occupancy"
+                  type="monotone"
+                  stroke="#4f8cff"
+                  fill="url(#activityFill)"
+                  strokeWidth={3}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="content-card">
-          <div className="card-header">
+        <div className="panel">
+          <div className="panel-header">
             <div>
-              <span>ACTIVITY ZONES</span>
-              <h2>Live Distribution</h2>
+              <span className="panel-kicker">
+                LOCATION ANALYSIS
+              </span>
+              <h3>Zone Occupancy</h3>
             </div>
+
+            <Users size={18} />
           </div>
 
-          <div className="zone-list">
-            {[
-              ["Library", 82],
-              ["Block A", 68],
-              ["Auditorium", 64],
-              ["Admin", 59],
-              ["Block B", 51],
-              ["Block C", 37],
-            ].map(([name, value]) => (
-              <div className="zone-row" key={name}>
-                <div>
-                  <strong>{name}</strong>
-                  <span>{value}% occupied</span>
+          <div className="occupancy-list">
+            {campusLocations.map((location) => (
+              <div
+                className="occupancy-item"
+                key={location.id}
+              >
+                <div className="occupancy-item-top">
+                  <strong>{location.name}</strong>
+                  <span>
+                    {location.occupancy}%
+                  </span>
                 </div>
 
-                <div className="zone-progress">
+                <div className="progress-bar">
                   <span
                     style={{
-                      width: `${value}%`,
+                      width: `${location.occupancy}%`,
                     }}
                   />
                 </div>
+
+                <small>
+                  {location.capacity.toLocaleString()} capacity
+                </small>
               </div>
             ))}
           </div>
         </div>
-      </section>
+      </div>
+
+      <div className="panel simulation-timeline">
+        <div className="panel-header">
+          <div>
+            <span className="panel-kicker">
+              SIMULATION CONTROL
+            </span>
+            <h3>Activity Time Controller</h3>
+          </div>
+
+          <span className="status-pill success">
+            RUNNING
+          </span>
+        </div>
+
+        <div className="time-controller">
+          <div className="time-label">
+            <span>06:00</span>
+            <strong>12:00 PM</strong>
+            <span>20:00</span>
+          </div>
+
+          <input
+            type="range"
+            min="6"
+            max="20"
+            defaultValue="12"
+          />
+
+          <div className="timeline-markers">
+            <span>Morning</span>
+            <span>Peak</span>
+            <span>Afternoon</span>
+            <span>Evening</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
-
-export default Activity;

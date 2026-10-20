@@ -1,48 +1,54 @@
-// ============================================================
-// src/components/Sidebar.tsx
-// ============================================================
-
 import {
   Activity,
   AlertTriangle,
   BarChart3,
+  Bell,
   Bot,
   Building2,
-  CalendarDays,
   Car,
-  ChevronRight,
+  CalendarDays,
   ClipboardCheck,
   Compass,
-  FileBarChart,
+  Cpu,
+  DoorOpen,
   GraduationCap,
+  HeartPulse,
+  Layers3,
   LayoutDashboard,
   Leaf,
   Map,
-  Navigation,
+  Navigation as NavigationIcon,
   Settings,
   ShieldAlert,
   Sparkles,
-  Target,
+  TrafficCone,
   Users,
-  X,
-  Zap,
+  Workflow,
 } from "lucide-react";
+
 import { NavLink } from "react-router-dom";
 
-type SidebarProps = {
-  onNavigate?: () => void;
+type Item = {
+  label: string;
+  path: string;
+  icon: React.ElementType;
 };
 
-const primaryItems = [
+const primary: Item[] = [
+  {
+    label: "Dashboard",
+    path: "/dashboard",
+    icon: LayoutDashboard,
+  },
   {
     label: "Explore",
-    path: "/",
+    path: "/explore",
     icon: Map,
   },
   {
-    label: "Navigate",
+    label: "Navigation",
     path: "/navigation",
-    icon: Navigation,
+    icon: Compass,
   },
   {
     label: "Activity",
@@ -52,7 +58,7 @@ const primaryItems = [
   {
     label: "Traffic",
     path: "/traffic",
-    icon: Car,
+    icon: TrafficCone,
   },
   {
     label: "Events",
@@ -61,7 +67,35 @@ const primaryItems = [
   },
 ];
 
-const academicItems = [
+const operations: Item[] = [
+  {
+    label: "Emergency",
+    path: "/emergency",
+    icon: ShieldAlert,
+  },
+  {
+    label: "Build",
+    path: "/build",
+    icon: Building2,
+  },
+  {
+    label: "Environment",
+    path: "/environment",
+    icon: Leaf,
+  },
+  {
+    label: "Scenarios",
+    path: "/scenarios",
+    icon: Workflow,
+  },
+  {
+    label: "AI Assistant",
+    path: "/ai",
+    icon: Bot,
+  },
+];
+
+const academic: Item[] = [
   {
     label: "Attendance",
     path: "/attendance",
@@ -75,191 +109,139 @@ const academicItems = [
   {
     label: "Assignments",
     path: "/assignments",
-    icon: Target,
+    icon: Layers3,
   },
   {
     label: "Reports",
     path: "/reports",
-    icon: FileBarChart,
+    icon: Cpu,
   },
-];
-
-const intelligenceItems = [
   {
     label: "AI Performance",
     path: "/ai-performance",
     icon: Sparkles,
   },
   {
-    label: "Career Intelligence",
+    label: "Career",
     path: "/career",
     icon: GraduationCap,
   },
-  {
-    label: "Campus AI",
-    path: "/ai-assistant",
-    icon: Bot,
-  },
 ];
 
-const systemItems = [
-  {
-    label: "Emergency",
-    path: "/emergency",
-    icon: ShieldAlert,
-  },
-  {
-    label: "Environment",
-    path: "/environment",
-    icon: Leaf,
-  },
-  {
-    label: "Scenarios",
-    path: "/scenarios",
-    icon: Zap,
-  },
-  {
-    label: "Build",
-    path: "/build",
-    icon: Building2,
-  },
+const system: Item[] = [
   {
     label: "Alerts",
     path: "/alerts",
     icon: AlertTriangle,
   },
+  {
+    label: "Notifications",
+    path: "/notifications",
+    icon: Bell,
+  },
+  {
+    label: "Settings",
+    path: "/settings",
+    icon: Settings,
+  },
 ];
 
-function Sidebar({ onNavigate }: SidebarProps) {
-  const renderItem = (
-    item: {
-      label: string;
-      path: string;
-      icon: React.ComponentType<{ size?: number }>;
-    },
-  ) => {
-    const Icon = item.icon;
+function NavGroup({
+  title,
+  items,
+}: {
+  title: string;
+  items: Item[];
+}) {
+  return (
+    <div className="sidebar-group">
+      <div className="sidebar-section-title">{title}</div>
 
-    return (
-      <NavLink
-        key={item.path}
-        to={item.path}
-        end={item.path === "/"}
-        onClick={onNavigate}
-        className={({ isActive }) =>
-          `sidebar-item ${isActive ? "active" : ""}`
-        }
-      >
-        <span className="sidebar-item-icon">
-          <Icon size={17} />
-        </span>
+      <div className="sidebar-items">
+        {items.map((item) => {
+          const Icon = item.icon;
 
-        <span className="sidebar-item-label">{item.label}</span>
+          return (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className={({ isActive }) =>
+                `sidebar-link ${isActive ? "active" : ""}`
+              }
+            >
+              <span className="sidebar-link-icon">
+                <Icon size={17} />
+              </span>
 
-        <ChevronRight
-          className="sidebar-item-arrow"
-          size={14}
-        />
-      </NavLink>
-    );
-  };
+              <span className="sidebar-link-label">
+                {item.label}
+              </span>
 
+              {item.label === "Alerts" && (
+                <span className="sidebar-count">4</span>
+              )}
+            </NavLink>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+export default function Sidebar() {
   return (
     <aside className="sidebar">
-      <div className="sidebar-brand">
+      <div className="brand">
         <div className="brand-mark">
-          <div className="brand-core" />
-          <div className="brand-ring ring-one" />
-          <div className="brand-ring ring-two" />
+          <div className="brand-mark-inner">
+            <Cpu size={22} />
+          </div>
         </div>
 
         <div className="brand-copy">
           <strong>CAMPUS OS</strong>
-          <span>DIGITAL TWIN</span>
-        </div>
-
-        <button
-          type="button"
-          className="mobile-sidebar-close"
-          onClick={onNavigate}
-          aria-label="Close menu"
-        >
-          <X size={18} />
-        </button>
-      </div>
-
-      <div className="sidebar-system-status">
-        <span className="status-pulse" />
-
-        <div>
-          <strong>LIVE SYSTEM</strong>
-          <small>All systems operational</small>
+          <span>Digital Campus Twin</span>
         </div>
       </div>
 
-      <nav className="sidebar-navigation">
-        <div className="sidebar-section-title">
-          <span>COMMAND CENTER</span>
-        </div>
-
-        {primaryItems.map(renderItem)}
-
-        <div className="sidebar-section-title">
-          <span>ACADEMIC INTELLIGENCE</span>
-        </div>
-
-        {academicItems.map(renderItem)}
-
-        <div className="sidebar-section-title">
-          <span>AI & INTELLIGENCE</span>
-        </div>
-
-        {intelligenceItems.map(renderItem)}
-
-        <div className="sidebar-section-title">
-          <span>CAMPUS OPERATIONS</span>
-        </div>
-
-        {systemItems.map(renderItem)}
-
-        <div className="sidebar-section-title">
-          <span>ADMINISTRATION</span>
-        </div>
-
-        {renderItem({
-          label: "Settings",
-          path: "/settings",
-          icon: Settings,
-        })}
-      </nav>
-
-      <div className="sidebar-bottom-card">
-        <div className="sidebar-bottom-icon">
-          <Compass size={18} />
+      <div className="sidebar-live-card">
+        <div className="sidebar-live-icon">
+          <HeartPulse size={16} />
         </div>
 
         <div>
-          <strong>Campus AI</strong>
-          <span>Ready to assist</span>
+          <span>Campus Status</span>
+          <strong>Operational</strong>
         </div>
 
-        <div className="sidebar-ai-dot" />
+        <span className="live-dot" />
       </div>
 
-      <div className="sidebar-profile">
-        <div className="profile-avatar">
-          L
+      <div className="sidebar-scroll">
+        <NavGroup title="MAIN" items={primary} />
+        <NavGroup title="CAMPUS OPERATIONS" items={operations} />
+        <NavGroup title="ACADEMIC INTELLIGENCE" items={academic} />
+        <NavGroup title="SYSTEM" items={system} />
+      </div>
+
+      <div className="sidebar-footer">
+        <div className="sidebar-footer-card">
+          <div className="footer-icon">
+            <Users size={16} />
+          </div>
+
+          <div>
+            <strong>3,248</strong>
+            <span>Active students</span>
+          </div>
+
+          <DoorOpen size={16} />
         </div>
 
-        <div className="profile-info">
-          <strong>Likitha</strong>
-          <span>Student</span>
+        <div className="sidebar-version">
+          CAMPUS OS <span>v1.0.0</span>
         </div>
-
-        <Users size={16} />
       </div>
     </aside>
   );
 }
-
-export default Sidebar;

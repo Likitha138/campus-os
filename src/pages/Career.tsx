@@ -1,136 +1,200 @@
-// ============================================================
-// src/pages/Career.tsx
-// ============================================================
-
 import {
   BriefcaseBusiness,
-  Code2,
+  Building2,
+  CheckCircle2,
   GraduationCap,
-  Rocket,
   Target,
   TrendingUp,
 } from "lucide-react";
+
 import PageHeader from "../components/PageHeader";
-import StatCard from "../components/StatCard";
 
-function Career() {
-  const roles = [
-    ["Data Analyst", "94%", "Python · SQL · Analytics"],
-    ["Frontend Engineer", "91%", "React · TypeScript"],
-    ["AI Engineer", "84%", "ML · Python · AI"],
-    ["Business Analyst", "79%", "SQL · Communication"],
-  ];
+const careerSkills = [
+  {
+    name: "Frontend Development",
+    score: 88,
+  },
+  {
+    name: "Data Analytics",
+    score: 82,
+  },
+  {
+    name: "Database Management",
+    score: 76,
+  },
+  {
+    name: "Cloud Computing",
+    score: 68,
+  },
+  {
+    name: "AI & Machine Learning",
+    score: 71,
+  },
+];
 
+export default function Career() {
   return (
-    <div className="page-container">
+    <div className="page">
       <PageHeader
-        eyebrow="CAREER INTELLIGENCE"
         title="Career Intelligence"
-        description="Explore AI-assisted career paths based on academic and technical signals."
-        icon={<GraduationCap size={22} />}
+        subtitle="Analyse skills, career readiness and placement opportunities."
       />
 
-      <div className="stat-grid">
-        <StatCard
-          label="Career Readiness"
-          value="87%"
-          detail="Overall score"
-          icon={<Rocket size={18} />}
-          trend="+7%"
-          tone="green"
-        />
+      <div className="career-hero">
+        <div>
+          <span className="panel-kicker">
+            CAREER READINESS
+          </span>
 
-        <StatCard
-          label="Skills Matched"
-          value="14"
-          detail="Verified skills"
-          icon={<Code2 size={18} />}
-          tone="blue"
-        />
+          <h2>
+            Your current readiness score is
+            <strong> 84%</strong>.
+          </h2>
 
-        <StatCard
-          label="Top Match"
-          value="94%"
-          detail="Data Analyst"
-          icon={<Target size={18} />}
-          tone="purple"
-        />
+          <p>
+            Strong technical fundamentals with
+            opportunities to improve cloud, AI and
+            interview readiness.
+          </p>
+        </div>
 
-        <StatCard
-          label="Opportunities"
-          value="28"
-          detail="Recommended roles"
-          icon={<BriefcaseBusiness size={18} />}
-          tone="orange"
-        />
+        <div className="career-score">
+          <strong>84</strong>
+          <span>/100</span>
+        </div>
       </div>
 
-      <section className="content-grid two-column">
-        <div className="content-card">
-          <div className="card-header">
+      <div className="career-grid">
+        <div className="panel">
+          <div className="panel-header">
             <div>
-              <span>AI ROLE MATCHING</span>
-              <h2>Recommended Careers</h2>
+              <span className="panel-kicker">
+                SKILL PROFILE
+              </span>
+              <h3>Technical Skills</h3>
             </div>
+
+            <Target size={18} />
           </div>
 
-          <div className="career-list">
-            {roles.map(([role, match, skills]) => (
-              <div className="career-row" key={role}>
-                <div className="career-icon">
-                  <BriefcaseBusiness size={17} />
+          <div className="career-skills">
+            {careerSkills.map((skill) => (
+              <div
+                className="career-skill"
+                key={skill.name}
+              >
+                <div>
+                  <span>{skill.name}</span>
+                  <strong>
+                    {skill.score}%
+                  </strong>
                 </div>
 
-                <div className="career-main">
-                  <strong>{role}</strong>
-                  <span>{skills}</span>
-                </div>
-
-                <div className="career-match">
-                  <strong>{match}</strong>
-                  <span>match</span>
+                <div className="progress-bar">
+                  <span
+                    style={{
+                      width: `${skill.score}%`,
+                    }}
+                  />
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="content-card">
-          <div className="card-header">
+        <div className="panel">
+          <div className="panel-header">
             <div>
-              <span>SKILL INTELLIGENCE</span>
-              <h2>Strength Profile</h2>
+              <span className="panel-kicker">
+                CAREER PATH
+              </span>
+              <h3>Recommended Roles</h3>
             </div>
 
-            <TrendingUp size={18} />
+            <BriefcaseBusiness size={18} />
           </div>
 
-          {[
-            ["Problem Solving", 91],
-            ["Technical Skills", 88],
-            ["Communication", 82],
-            ["Leadership", 79],
-            ["Analytics", 94],
-          ].map(([name, value]) => (
-            <div className="skill-row" key={name}>
-              <div>
-                <span>{name}</span>
-                <strong>{value}%</strong>
+          <div className="career-role-list">
+            <div>
+              <div className="role-icon">
+                <TrendingUp size={17} />
               </div>
 
-              <div className="skill-track">
-                <span
-                  style={{
-                    width: `${value}%`,
-                  }}
-                />
+              <div>
+                <strong>Data Analyst</strong>
+                <span>92% match</span>
               </div>
             </div>
-          ))}
+
+            <div>
+              <div className="role-icon">
+                <Building2 size={17} />
+              </div>
+
+              <div>
+                <strong>Frontend Developer</strong>
+                <span>88% match</span>
+              </div>
+            </div>
+
+            <div>
+              <div className="role-icon">
+                <GraduationCap size={17} />
+              </div>
+
+              <div>
+                <strong>AI Developer</strong>
+                <span>76% match</span>
+              </div>
+            </div>
+          </div>
         </div>
-      </section>
+      </div>
+
+      <div className="panel career-roadmap">
+        <div className="panel-header">
+          <div>
+            <span className="panel-kicker">
+              DEVELOPMENT PLAN
+            </span>
+            <h3>Career Roadmap</h3>
+          </div>
+        </div>
+
+        <div className="career-roadmap-track">
+          <div className="roadmap-step completed">
+            <i>
+              <CheckCircle2 size={15} />
+            </i>
+            <strong>Core Skills</strong>
+            <span>Completed</span>
+          </div>
+
+          <div className="roadmap-line" />
+
+          <div className="roadmap-step active">
+            <i>2</i>
+            <strong>Advanced Projects</strong>
+            <span>Current</span>
+          </div>
+
+          <div className="roadmap-line" />
+
+          <div className="roadmap-step">
+            <i>3</i>
+            <strong>Interview Preparation</strong>
+            <span>Upcoming</span>
+          </div>
+
+          <div className="roadmap-line" />
+
+          <div className="roadmap-step">
+            <i>4</i>
+            <strong>Placement</strong>
+            <span>Target</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
-
-export default Career;

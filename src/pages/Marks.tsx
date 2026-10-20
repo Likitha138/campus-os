@@ -1,117 +1,224 @@
-// ============================================================
-// src/pages/Marks.tsx
-// ============================================================
-
 import {
   Award,
-  BarChart3,
-  BookOpen,
+  Download,
   TrendingUp,
 } from "lucide-react";
+
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+
 import PageHeader from "../components/PageHeader";
 import StatCard from "../components/StatCard";
-import { marksData } from "../services/data";
+import { marksData } from "../data/campus";
 
-function Marks() {
+export default function Marks() {
   return (
-    <div className="page-container">
+    <div className="page">
       <PageHeader
-        eyebrow="ACADEMIC PERFORMANCE"
-        title="Marks Intelligence"
-        description="Understand academic performance through centralized assessment analytics."
-        icon={<BarChart3 size={22} />}
+        title="Marks & Performance"
+        subtitle="Track internal assessment, assignments and examination performance."
+        actions={
+          <button className="secondary-button">
+            <Download size={15} />
+            Export Report
+          </button>
+        }
       />
 
-      <div className="stat-grid">
+      <div className="stats-grid">
         <StatCard
           label="Average Score"
-          value="88%"
-          detail="Current semester"
-          icon={<Award size={18} />}
-          trend="+5.1%"
-          tone="green"
+          value="82.6%"
+          change="+5.4%"
+          trend="up"
+          icon="chart"
         />
 
         <StatCard
           label="Highest Score"
-          value="96%"
-          detail="Project evaluation"
-          icon={<TrendingUp size={18} />}
-          tone="blue"
+          value="94%"
+          change="AI & ML"
+          trend="up"
+          icon="activity"
         />
 
         <StatCard
-          label="Subjects"
-          value="05"
-          detail="Tracked subjects"
-          icon={<BookOpen size={18} />}
-          tone="purple"
+          label="Students Above 75%"
+          value="2,486"
+          change="76.5%"
+          trend="up"
+          icon="users"
         />
 
         <StatCard
-          label="Performance"
-          value="Excellent"
-          detail="AI classification"
-          icon={<Award size={18} />}
-          tone="orange"
+          label="Needs Attention"
+          value="182"
+          change="-21"
+          trend="up"
+          icon="activity"
         />
       </div>
 
-      <section className="content-card">
-        <div className="card-header">
-          <div>
-            <span>ASSESSMENT MATRIX</span>
-            <h2>Academic Results</h2>
+      <div className="two-column-grid">
+        <div className="panel large-chart-panel">
+          <div className="panel-header">
+            <div>
+              <span className="panel-kicker">
+                SCORE BREAKDOWN
+              </span>
+              <h3>Subject Performance</h3>
+            </div>
+
+            <TrendingUp size={18} />
+          </div>
+
+          <div className="chart-wrap tall">
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+            >
+              <BarChart data={marksData}>
+                <CartesianGrid
+                  stroke="rgba(255,255,255,.05)"
+                  vertical={false}
+                />
+
+                <XAxis
+                  dataKey="subject"
+                  stroke="#667085"
+                  tickLine={false}
+                  axisLine={false}
+                />
+
+                <YAxis
+                  stroke="#667085"
+                  tickLine={false}
+                  axisLine={false}
+                />
+
+                <Tooltip
+                  contentStyle={{
+                    background: "#111721",
+                    border:
+                      "1px solid rgba(255,255,255,.1)",
+                    borderRadius: 12,
+                  }}
+                />
+
+                <Bar
+                  dataKey="internal"
+                  fill="#4f8cff"
+                  radius={[5, 5, 0, 0]}
+                />
+
+                <Bar
+                  dataKey="assignment"
+                  fill="#39d98a"
+                  radius={[5, 5, 0, 0]}
+                />
+
+                <Bar
+                  dataKey="exam"
+                  fill="#b28cff"
+                  radius={[5, 5, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="marks-table">
-          <div className="marks-header">
-            <span>SUBJECT</span>
-            <span>INTERNAL</span>
-            <span>TOTAL</span>
-            <span>PERFORMANCE</span>
+        <div className="panel performance-summary">
+          <div className="panel-header">
+            <div>
+              <span className="panel-kicker">
+                ACADEMIC SUMMARY
+              </span>
+              <h3>Performance Index</h3>
+            </div>
+
+            <Award size={18} />
           </div>
 
-          {marksData.map((item) => {
-            const percentage =
-              (item.internal / item.total) * 100;
+          <div className="performance-score">
+            <strong>82.6</strong>
+            <span>/ 100</span>
+          </div>
+
+          <div className="performance-grade">
+            <span>Overall Grade</span>
+            <strong>A</strong>
+          </div>
+
+          <div className="performance-list">
+            <div>
+              <span>Internal</span>
+              <strong>36.6 / 40</strong>
+            </div>
+
+            <div>
+              <span>Assignments</span>
+              <strong>17.8 / 20</strong>
+            </div>
+
+            <div>
+              <span>Examination</span>
+              <strong>41.2 / 50</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="panel data-table-panel">
+        <div className="panel-header">
+          <div>
+            <span className="panel-kicker">
+              MARKS REGISTER
+            </span>
+            <h3>Subject-wise Scores</h3>
+          </div>
+        </div>
+
+        <div className="data-table">
+          <div className="data-table-head">
+            <span>Subject</span>
+            <span>Internal</span>
+            <span>Assignments</span>
+            <span>Exam</span>
+            <span>Total</span>
+            <span>Grade</span>
+          </div>
+
+          {marksData.map((row) => {
+            const total =
+              row.internal +
+              row.assignment +
+              row.exam;
 
             return (
               <div
-                className="marks-row"
-                key={item.subject}
+                className="data-table-row"
+                key={row.subject}
               >
-                <strong>{item.subject}</strong>
-
-                <span>
-                  {item.internal}
+                <strong>{row.subject}</strong>
+                <span>{row.internal}</span>
+                <span>{row.assignment}</span>
+                <span>{row.exam}</span>
+                <strong>{total}</strong>
+                <span className="status-pill success">
+                  A
                 </span>
-
-                <span>
-                  {item.total}
-                </span>
-
-                <div className="marks-performance">
-                  <div>
-                    <span
-                      style={{
-                        width: `${percentage}%`,
-                      }}
-                    />
-                  </div>
-
-                  <strong>
-                    {Math.round(percentage)}%
-                  </strong>
-                </div>
               </div>
             );
           })}
         </div>
-      </section>
+      </div>
     </div>
   );
 }
-
-export default Marks;

@@ -1,465 +1,105 @@
-// =========================================================
-// CAMPUS OS — CREATE EVENT FORM
-// =========================================================
+import { CalendarPlus, MapPin, Users } from "lucide-react";
+import { FormEvent, useState } from "react";
+import { eventsApi } from "../services/api";
 
-import {
-  useState,
-  type FormEvent,
-} from "react";
+export default function CreateEventForm() {
+  const [title, setTitle] = useState("");
+  const [location, setLocation] = useState("Auditorium");
+  const [date, setDate] = useState("");
+  const [capacity, setCapacity] = useState("100");
 
-import {
-  CalendarDays,
-  Clock3,
-  MapPin,
-  Send,
-  Users,
-} from "lucide-react";
-
-import type {
-  CampusEvent,
-  EventCategory,
-} from "../data/events";
-
-type Props = {
-  onCreate?: (
-    event: CampusEvent
-  ) => void;
-};
-
-const departments = [
-  "BCA",
-  "MCA",
-  "BBA",
-  "B.Com",
-];
-
-const years = [1, 2, 3];
-
-const interests = [
-  "Artificial Intelligence",
-  "AI",
-  "Machine Learning",
-  "Web Development",
-  "Data Science",
-  "Cyber Security",
-  "Cloud Computing",
-];
-
-export default function CreateEventForm({
-  onCreate,
-}: Props) {
-  const [title, setTitle] =
-    useState("");
-
-  const [description, setDescription] =
-    useState("");
-
-  const [category, setCategory] =
-    useState<EventCategory>(
-      "Workshop"
-    );
-
-  const [date, setDate] =
-    useState("");
-
-  const [time, setTime] =
-    useState("");
-
-  const [venue, setVenue] =
-    useState("");
-
-  const [department, setDepartment] =
-    useState("BCA");
-
-  const [year, setYear] =
-    useState(3);
-
-  const [interest, setInterest] =
-    useState("");
-
-  const [created, setCreated] =
-    useState(false);
-
-  const handleSubmit = (
-    event: FormEvent
-  ) => {
+  const submit = async (event: FormEvent) => {
     event.preventDefault();
 
-    if (
-      !title.trim() ||
-      !date ||
-      !time ||
-      !venue
-    ) {
-      return;
+    try {
+      await eventsApi.create({
+        title,
+        location,
+        date,
+        capacity: Number(capacity),
+      });
+
+      setTitle("");
+      setDate("");
+      setCapacity("100");
+    } catch {
+      console.log("Demo event created locally");
+      setTitle("");
     }
-
-    const newEvent: CampusEvent = {
-      id: `EVT-${Date.now()}`,
-
-      title,
-
-      description,
-
-      category,
-
-      date,
-
-      time,
-
-      venue,
-
-      organizer:
-        "Campus OS Administration",
-
-      target: {
-        departments: [
-          department,
-        ],
-
-        years: [year],
-
-        interests: interest
-          ? [interest]
-          : undefined,
-      },
-
-      createdAt:
-        new Date().toISOString(),
-
-      status: "upcoming",
-    };
-
-    onCreate?.(newEvent);
-
-    setCreated(true);
-
-    setTitle("");
-
-    setDescription("");
-
-    setDate("");
-
-    setTime("");
-
-    setVenue("");
-
-    setInterest("");
-
-    setTimeout(
-      () => setCreated(false),
-      3000
-    );
   };
 
   return (
-    <form
-      className="create-event-form"
-      onSubmit={handleSubmit}
-    >
-      {/* HEADER */}
-
-      <div className="create-event-header">
-        <div>
-          <span>
-            EVENT MANAGEMENT
-          </span>
-
-          <h2>
-            Create Campus Event
-          </h2>
-
-          <p>
-            Create an event and Campus OS
-            will automatically identify
-            eligible students.
-          </p>
+    <form className="form-card" onSubmit={submit}>
+      <div className="form-card-header">
+        <div className="section-icon">
+          <CalendarPlus size={17} />
         </div>
 
-        <div className="create-event-symbol">
-          <CalendarDays size={22} />
+        <div>
+          <h3>Create Event</h3>
+          <p>Schedule a new campus event.</p>
         </div>
       </div>
 
-      {/* BASIC DETAILS */}
-
-      <div className="event-form-grid">
-        <div className="event-form-group full">
-          <label>
-            Event Name
-          </label>
-
+      <div className="form-grid">
+        <label className="field">
+          <span>Event name</span>
           <input
             value={title}
-            onChange={(e) =>
-              setTitle(
-                e.target.value
-              )
-            }
-            placeholder="Example: AI & Machine Learning Workshop"
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Enter event name"
+            required
           />
-        </div>
+        </label>
 
-        <div className="event-form-group full">
-          <label>
-            Description
-          </label>
+        <label className="field">
+          <span>Location</span>
+          <div className="input-with-icon">
+            <MapPin size={15} />
+            <select
+              value={location}
+              onChange={(e) =>
+                setLocation(e.target.value)
+              }
+            >
+              <option>Auditorium</option>
+              <option>Main Academic Block</option>
+              <option>Central Library</option>
+              <option>Sports Complex</option>
+            </select>
+          </div>
+        </label>
 
-          <textarea
-            value={description}
-            onChange={(e) =>
-              setDescription(
-                e.target.value
-              )
-            }
-            placeholder="Describe the event..."
+        <label className="field">
+          <span>Date</span>
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            required
           />
-        </div>
+        </label>
 
-        <div className="event-form-group">
-          <label>
-            Category
-          </label>
-
-          <select
-            value={category}
-            onChange={(e) =>
-              setCategory(
-                e.target
-                  .value as EventCategory
-              )
-            }
-          >
-            <option>
-              Workshop
-            </option>
-
-            <option>
-              Seminar
-            </option>
-
-            <option>
-              Competition
-            </option>
-
-            <option>
-              Hackathon
-            </option>
-
-            <option>
-              Placement
-            </option>
-
-            <option>
-              Cultural
-            </option>
-
-            <option>
-              Sports
-            </option>
-          </select>
-        </div>
-
-        <div className="event-form-group">
-          <label>
-            Venue
-          </label>
-
-          <div className="event-input-icon">
-            <MapPin size={14} />
-
+        <label className="field">
+          <span>Expected attendees</span>
+          <div className="input-with-icon">
+            <Users size={15} />
             <input
-              value={venue}
+              type="number"
+              value={capacity}
               onChange={(e) =>
-                setVenue(
-                  e.target.value
-                )
+                setCapacity(e.target.value)
               }
-              placeholder="Seminar Hall"
+              min="1"
             />
           </div>
-        </div>
-
-        <div className="event-form-group">
-          <label>
-            Date
-          </label>
-
-          <div className="event-input-icon">
-            <CalendarDays size={14} />
-
-            <input
-              type="date"
-              value={date}
-              onChange={(e) =>
-                setDate(
-                  e.target.value
-                )
-              }
-            />
-          </div>
-        </div>
-
-        <div className="event-form-group">
-          <label>
-            Time
-          </label>
-
-          <div className="event-input-icon">
-            <Clock3 size={14} />
-
-            <input
-              value={time}
-              onChange={(e) =>
-                setTime(
-                  e.target.value
-                )
-              }
-              placeholder="10:00 AM - 1:00 PM"
-            />
-          </div>
-        </div>
+        </label>
       </div>
 
-      {/* STUDENT TARGETING */}
-
-      <div className="student-targeting">
-        <div className="targeting-header">
-          <div className="targeting-icon">
-            <Users size={16} />
-          </div>
-
-          <div>
-            <strong>
-              Student Identification
-            </strong>
-
-            <span>
-              Define who should receive
-              this event notification.
-            </span>
-          </div>
-        </div>
-
-        <div className="event-form-grid">
-          {/* DEPARTMENT */}
-
-          <div className="event-form-group">
-            <label>
-              Department
-            </label>
-
-            <select
-              value={department}
-              onChange={(e) =>
-                setDepartment(
-                  e.target.value
-                )
-              }
-            >
-              {departments.map(
-                (item) => (
-                  <option
-                    key={item}
-                    value={item}
-                  >
-                    {item}
-                  </option>
-                )
-              )}
-            </select>
-          </div>
-
-          {/* YEAR */}
-
-          <div className="event-form-group">
-            <label>
-              Year
-            </label>
-
-            <select
-              value={year}
-              onChange={(e) =>
-                setYear(
-                  Number(
-                    e.target.value
-                  )
-                )
-              }
-            >
-              {years.map(
-                (item) => (
-                  <option
-                    key={item}
-                    value={item}
-                  >
-                    {item}
-                    {item === 1
-                      ? "st"
-                      : item === 2
-                      ? "nd"
-                      : "rd"}{" "}
-                    Year
-                  </option>
-                )
-              )}
-            </select>
-          </div>
-
-          {/* INTEREST */}
-
-          <div className="event-form-group full">
-            <label>
-              Relevant Interest
-            </label>
-
-            <select
-              value={interest}
-              onChange={(e) =>
-                setInterest(
-                  e.target.value
-                )
-              }
-            >
-              <option value="">
-                No specific interest
-              </option>
-
-              {interests.map(
-                (item) => (
-                  <option
-                    key={item}
-                    value={item}
-                  >
-                    {item}
-                  </option>
-                )
-              )}
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* SUBMIT */}
-
-      <div className="create-event-footer">
-        {created && (
-          <div className="event-created-message">
-            ✓ Event created and
-            eligible students
-            identified.
-          </div>
-        )}
-
-        <button
-          type="submit"
-          className="create-event-button"
-        >
-          <Send size={14} />
-
-          Create Event
-        </button>
-      </div>
+      <button className="primary-button" type="submit">
+        <CalendarPlus size={16} />
+        Create Event
+      </button>
     </form>
   );
 }

@@ -1,146 +1,211 @@
-// ============================================================
-// src/pages/AIPerformance.tsx
-// ============================================================
-
 import {
   BrainCircuit,
   CheckCircle2,
-  Lightbulb,
-  Target,
+  ShieldAlert,
+  Sparkles,
+  TrendingDown,
   TrendingUp,
 } from "lucide-react";
-import PageHeader from "../components/PageHeader";
-import StatCard from "../components/StatCard";
 
-function AIPerformance() {
+import PageHeader from "../components/PageHeader";
+
+export default function AIPerformance() {
   return (
-    <div className="page-container">
+    <div className="page">
       <PageHeader
-        eyebrow="ARTIFICIAL INTELLIGENCE"
-        title="AI Performance"
-        description="Predict academic trends and identify areas requiring attention."
-        icon={<BrainCircuit size={22} />}
+        title="AI Performance Intelligence"
+        subtitle="AI-assisted academic performance and student risk analysis."
       />
 
       <div className="ai-performance-hero">
-        <div className="ai-score-orb">
-          <div>
-            <strong>88</strong>
-            <span>/100</span>
-          </div>
+        <div className="ai-performance-icon">
+          <BrainCircuit size={30} />
         </div>
 
         <div>
-          <span>AI PERFORMANCE SCORE</span>
+          <span className="panel-kicker">
+            AI PERFORMANCE ENGINE
+          </span>
 
           <h2>
-            Excellent academic trajectory
+            Academic performance prediction is
+            currently stable.
           </h2>
 
           <p>
-            Current performance indicates a
-            strong probability of maintaining
-            above-average results.
+            The simulation combines attendance,
+            marks, assignment completion and activity
+            patterns to identify students requiring
+            attention.
           </p>
+        </div>
 
-          <div className="ai-confidence">
-            <span>Prediction confidence</span>
-            <strong>91%</strong>
+        <div className="ai-confidence">
+          <span>MODEL CONFIDENCE</span>
+          <strong>91%</strong>
+        </div>
+      </div>
+
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-card-top">
+            <div className="stat-icon">
+              <TrendingUp size={19} />
+            </div>
+          </div>
+
+          <div className="stat-value">
+            2,486
+          </div>
+
+          <div className="stat-label">
+            Low-risk students
+          </div>
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-card-top">
+            <div className="stat-icon">
+              <ShieldAlert size={19} />
+            </div>
+          </div>
+
+          <div className="stat-value">
+            624
+          </div>
+
+          <div className="stat-label">
+            Medium-risk students
+          </div>
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-card-top">
+            <div className="stat-icon">
+              <TrendingDown size={19} />
+            </div>
+          </div>
+
+          <div className="stat-value">
+            138
+          </div>
+
+          <div className="stat-label">
+            High-risk students
+          </div>
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-card-top">
+            <div className="stat-icon">
+              <Sparkles size={19} />
+            </div>
+          </div>
+
+          <div className="stat-value">
+            86%
+          </div>
+
+          <div className="stat-label">
+            Predicted improvement
           </div>
         </div>
       </div>
 
-      <div className="stat-grid">
-        <StatCard
-          label="Predicted Grade"
-          value="A+"
-          detail="End-semester estimate"
-          icon={<TrendingUp size={18} />}
-          tone="green"
-        />
+      <div className="two-column-grid">
+        <div className="panel">
+          <div className="panel-header">
+            <div>
+              <span className="panel-kicker">
+                RISK FACTORS
+              </span>
+              <h3>AI Signals</h3>
+            </div>
+          </div>
 
-        <StatCard
-          label="Risk Level"
-          value="Low"
-          detail="Academic risk"
-          icon={<CheckCircle2 size={18} />}
-          tone="blue"
-        />
+          <div className="risk-factor-list">
+            <RiskFactor
+              label="Attendance"
+              value="High impact"
+              width={82}
+            />
 
-        <StatCard
-          label="Strong Areas"
-          value="04"
-          detail="Subjects"
-          icon={<Target size={18} />}
-          tone="purple"
-        />
+            <RiskFactor
+              label="Internal marks"
+              value="Medium impact"
+              width={67}
+            />
 
-        <StatCard
-          label="AI Recommendations"
-          value="06"
-          detail="Personalized actions"
-          icon={<Lightbulb size={18} />}
-          tone="orange"
-        />
+            <RiskFactor
+              label="Assignments"
+              value="Medium impact"
+              width={54}
+            />
+
+            <RiskFactor
+              label="Academic activity"
+              value="Low impact"
+              width={31}
+            />
+          </div>
+        </div>
+
+        <div className="panel">
+          <div className="panel-header">
+            <div>
+              <span className="panel-kicker">
+                RECOMMENDATIONS
+              </span>
+              <h3>AI Actions</h3>
+            </div>
+          </div>
+
+          <div className="recommendation-list">
+            <div>
+              <CheckCircle2 size={16} />
+              Contact high-risk students early.
+            </div>
+
+            <div>
+              <CheckCircle2 size={16} />
+              Prioritise attendance intervention.
+            </div>
+
+            <div>
+              <CheckCircle2 size={16} />
+              Recommend subject-specific revision.
+            </div>
+
+            <div>
+              <CheckCircle2 size={16} />
+              Monitor assignment completion.
+            </div>
+          </div>
+        </div>
       </div>
-
-      <section className="content-grid two-column">
-        <div className="content-card">
-          <div className="card-header">
-            <div>
-              <span>MODEL ANALYSIS</span>
-              <h2>Performance Signals</h2>
-            </div>
-          </div>
-
-          <div className="signal-list">
-            {[
-              ["Attendance consistency", 94],
-              ["Assessment performance", 88],
-              ["Assignment completion", 91],
-              ["Learning activity", 84],
-            ].map(([label, value]) => (
-              <div className="signal-row" key={label}>
-                <div>
-                  <strong>{label}</strong>
-                  <span>{value}% confidence</span>
-                </div>
-
-                <div className="signal-bar">
-                  <span
-                    style={{
-                      width: `${value}%`,
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="content-card ai-recommendation-card">
-          <div className="card-header">
-            <div>
-              <span>AI RECOMMENDATION</span>
-              <h2>Next Best Actions</h2>
-            </div>
-          </div>
-
-          {[
-            "Maintain attendance above 90%.",
-            "Revise Machine Learning concepts.",
-            "Complete pending assignment early.",
-            "Increase project documentation quality.",
-          ].map((item) => (
-            <div className="recommendation-row" key={item}>
-              <CheckCircle2 size={17} />
-              <span>{item}</span>
-            </div>
-          ))}
-        </div>
-      </section>
     </div>
   );
 }
 
-export default AIPerformance;
+function RiskFactor({
+  label,
+  value,
+  width,
+}: {
+  label: string;
+  value: string;
+  width: number;
+}) {
+  return (
+    <div className="risk-factor">
+      <div>
+        <span>{label}</span>
+        <strong>{value}</strong>
+      </div>
+
+      <div className="progress-bar">
+        <span style={{ width: `${width}%` }} />
+      </div>
+    </div>
+  );
+}

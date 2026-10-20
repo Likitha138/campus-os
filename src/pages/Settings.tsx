@@ -1,137 +1,209 @@
-// ============================================================
-// src/pages/Settings.tsx
-// ============================================================
-
 import {
   Bell,
   Database,
-  MonitorCog,
   Palette,
   Save,
+  Server,
   Shield,
-  SlidersHorizontal,
+  UserRound,
 } from "lucide-react";
+
 import PageHeader from "../components/PageHeader";
 
-function Settings() {
+export default function Settings() {
   return (
-    <div className="page-container">
+    <div className="page">
       <PageHeader
-        eyebrow="SYSTEM CONFIGURATION"
         title="Settings"
-        description="Configure your Campus OS experience and simulation preferences."
-        icon={<MonitorCog size={22} />}
-        action={
-          <button type="button" className="primary-button">
-            <Save size={16} />
-            Save Changes
-          </button>
-        }
+        subtitle="Configure Campus OS behaviour, appearance and system preferences."
       />
 
-      <section className="settings-grid">
-        <div className="settings-card">
-          <div className="settings-title">
-            <Palette size={18} />
-            <div>
-              <strong>Appearance</strong>
-              <span>Interface preferences</span>
+      <div className="settings-layout">
+        <aside className="settings-nav">
+          <button className="active">
+            <UserRound size={16} />
+            Profile
+          </button>
+
+          <button>
+            <Bell size={16} />
+            Notifications
+          </button>
+
+          <button>
+            <Palette size={16} />
+            Appearance
+          </button>
+
+          <button>
+            <Server size={16} />
+            Backend
+          </button>
+
+          <button>
+            <Database size={16} />
+            Data
+          </button>
+
+          <button>
+            <Shield size={16} />
+            Security
+          </button>
+        </aside>
+
+        <section className="settings-content">
+          <div className="panel settings-panel">
+            <div className="panel-header">
+              <div>
+                <span className="panel-kicker">
+                  USER PROFILE
+                </span>
+                <h3>Administrator Profile</h3>
+              </div>
+            </div>
+
+            <div className="settings-profile">
+              <div className="settings-avatar">
+                BM
+              </div>
+
+              <div>
+                <strong>Bhuvan M</strong>
+                <span>
+                  Campus OS Administrator
+                </span>
+              </div>
+            </div>
+
+            <div className="form-grid">
+              <label className="field">
+                <span>Full name</span>
+                <input
+                  defaultValue="Bhuvan M"
+                />
+              </label>
+
+              <label className="field">
+                <span>Role</span>
+                <input
+                  defaultValue="Administrator"
+                />
+              </label>
+
+              <label className="field">
+                <span>Email</span>
+                <input
+                  defaultValue="admin@campus-os.local"
+                />
+              </label>
+
+              <label className="field">
+                <span>Campus</span>
+                <input
+                  defaultValue="Main Campus"
+                />
+              </label>
             </div>
           </div>
 
-          <label className="settings-toggle">
-            <span>
-              Dark digital-twin theme
-            </span>
-            <input type="checkbox" defaultChecked />
-          </label>
+          <div className="panel settings-panel">
+            <div className="panel-header">
+              <div>
+                <span className="panel-kicker">
+                  SYSTEM
+                </span>
+                <h3>Backend Connection</h3>
+              </div>
+            </div>
 
-          <label className="settings-toggle">
-            <span>Animated interface</span>
-            <input type="checkbox" defaultChecked />
-          </label>
-        </div>
+            <div className="settings-connection">
+              <div>
+                <Server size={18} />
+                <div>
+                  <strong>
+                    Node.js / Express API
+                  </strong>
+                  <span>
+                    http://localhost:5000/api
+                  </span>
+                </div>
+              </div>
 
-        <div className="settings-card">
-          <div className="settings-title">
-            <Bell size={18} />
-            <div>
-              <strong>Notifications</strong>
-              <span>System alerts</span>
+              <span className="status-pill success">
+                CONFIGURED
+              </span>
             </div>
           </div>
 
-          <label className="settings-toggle">
-            <span>Traffic alerts</span>
-            <input type="checkbox" defaultChecked />
-          </label>
+          <div className="panel settings-panel">
+            <div className="panel-header">
+              <div>
+                <span className="panel-kicker">
+                  PREFERENCES
+                </span>
+                <h3>Application Preferences</h3>
+              </div>
+            </div>
 
-          <label className="settings-toggle">
-            <span>Campus events</span>
-            <input type="checkbox" defaultChecked />
-          </label>
-        </div>
+            <div className="settings-options">
+              <Toggle
+                title="Live simulation updates"
+                description="Automatically refresh simulation information."
+                checked
+              />
 
-        <div className="settings-card">
-          <div className="settings-title">
-            <Database size={18} />
-            <div>
-              <strong>Data Engine</strong>
-              <span>Simulation preferences</span>
+              <Toggle
+                title="AI recommendations"
+                description="Show Campus Intelligence recommendations."
+                checked
+              />
+
+              <Toggle
+                title="System notifications"
+                description="Receive important system notifications."
+                checked
+              />
+
+              <Toggle
+                title="Compact data tables"
+                description="Reduce table spacing on smaller screens."
+                checked={false}
+              />
             </div>
           </div>
 
-          <label className="settings-toggle">
-            <span>Real-time simulation</span>
-            <input type="checkbox" defaultChecked />
-          </label>
-
-          <label className="settings-toggle">
-            <span>Auto-refresh data</span>
-            <input type="checkbox" defaultChecked />
-          </label>
-        </div>
-
-        <div className="settings-card">
-          <div className="settings-title">
-            <Shield size={18} />
-            <div>
-              <strong>Security</strong>
-              <span>Campus access controls</span>
-            </div>
-          </div>
-
-          <label className="settings-toggle">
-            <span>Secure session</span>
-            <input type="checkbox" defaultChecked />
-          </label>
-
-          <label className="settings-toggle">
-            <span>Activity logging</span>
-            <input type="checkbox" defaultChecked />
-          </label>
-        </div>
-      </section>
-
-      <section className="settings-advanced">
-        <div>
-          <SlidersHorizontal size={19} />
-          <div>
-            <strong>Advanced Simulation Configuration</strong>
-            <span>
-              Configure digital twin refresh rate,
-              vehicle density and campus activity
-              sensitivity.
-            </span>
-          </div>
-        </div>
-
-        <button type="button">
-          Configure
-        </button>
-      </section>
+          <button className="primary-button">
+            <Save size={15} />
+            Save Settings
+          </button>
+        </section>
+      </div>
     </div>
   );
 }
 
-export default Settings;
+function Toggle({
+  title,
+  description,
+  checked,
+}: {
+  title: string;
+  description: string;
+  checked: boolean;
+}) {
+  return (
+    <label className="setting-toggle">
+      <div>
+        <strong>{title}</strong>
+        <span>{description}</span>
+      </div>
+
+      <input
+        type="checkbox"
+        defaultChecked={checked}
+      />
+
+      <i />
+    </label>
+  );
+}

@@ -1,146 +1,200 @@
-// ============================================================
-// src/pages/Traffic.tsx
-// ============================================================
-
 import {
-  AlertTriangle,
   Car,
   Gauge,
-  Map,
+  MapPin,
+  Play,
   Route,
-  TrendingUp,
+  Square,
+  TriangleAlert,
 } from "lucide-react";
+
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+
 import PageHeader from "../components/PageHeader";
 import StatCard from "../components/StatCard";
-import { vehicles } from "../services/data";
+import {
+  trafficData,
+  trafficVehicles,
+} from "../data/campus";
 
-function Traffic() {
+export default function Traffic() {
   return (
-    <div className="page-container">
+    <div className="page">
       <PageHeader
-        eyebrow="TRANSPORT INTELLIGENCE"
-        title="Traffic Command Center"
-        description="Monitor simulated vehicle movement and congestion across campus roads."
-        icon={<Car size={22} />}
+        title="Traffic Simulation"
+        subtitle="Monitor congestion, vehicle movement and alternate campus routes."
       />
 
-      <div className="stat-grid">
+      <div className="stats-grid">
         <StatCard
-          label="Active Vehicles"
-          value="48"
-          detail="Currently simulated"
-          icon={<Car size={18} />}
-          trend="+14%"
-          tone="blue"
+          label="Vehicles Active"
+          value="148"
+          change="+18"
+          trend="up"
+          icon="activity"
         />
 
         <StatCard
-          label="Traffic Level"
-          value="Moderate"
-          detail="Campus average"
-          icon={<Gauge size={18} />}
-          tone="orange"
+          label="Congestion Index"
+          value="58%"
+          change="+7%"
+          trend="up"
+          icon="chart"
         />
 
         <StatCard
           label="Average Speed"
-          value="24 km/h"
-          detail="Network average"
-          icon={<TrendingUp size={18} />}
-          tone="green"
+          value="22 km/h"
+          change="-4 km/h"
+          trend="down"
+          icon="activity"
         />
 
         <StatCard
-          label="Congested Zones"
+          label="Blocked Roads"
           value="02"
-          detail="Needs monitoring"
-          icon={<AlertTriangle size={18} />}
-          tone="purple"
+          change="Simulation"
+          trend="neutral"
+          icon="building"
         />
       </div>
 
-      <section className="content-grid two-column">
-        <div className="content-card traffic-map">
-          <div className="card-header">
+      <div className="traffic-main-grid">
+        <div className="panel traffic-chart-panel">
+          <div className="panel-header">
             <div>
-              <span>LIVE NETWORK</span>
-              <h2>Traffic Simulation</h2>
+              <span className="panel-kicker">
+                CONGESTION ANALYTICS
+              </span>
+              <h3>Traffic Load</h3>
             </div>
 
-            <Map size={18} />
+            <div className="simulation-buttons">
+              <button className="primary-button compact">
+                <Play size={14} />
+                Run
+              </button>
+
+              <button className="secondary-button compact">
+                <Square size={14} />
+                Stop
+              </button>
+            </div>
           </div>
 
-          <div className="traffic-network">
-            <div className="traffic-road road-1" />
-            <div className="traffic-road road-2" />
-            <div className="traffic-road road-3" />
-            <div className="traffic-road road-4" />
+          <div className="chart-wrap tall">
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+            >
+              <AreaChart data={trafficData}>
+                <defs>
+                  <linearGradient
+                    id="trafficFill"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop
+                      offset="0%"
+                      stopColor="#ffb84d"
+                      stopOpacity=".35"
+                    />
+                    <stop
+                      offset="100%"
+                      stopColor="#ffb84d"
+                      stopOpacity="0"
+                    />
+                  </linearGradient>
+                </defs>
 
-            <div className="traffic-node node-a" />
-            <div className="traffic-node node-b" />
-            <div className="traffic-node node-c" />
-            <div className="traffic-node node-d" />
+                <CartesianGrid
+                  stroke="rgba(255,255,255,.05)"
+                  vertical={false}
+                />
 
-            <div className="traffic-car car-1">
-              <Car size={14} />
-            </div>
+                <XAxis
+                  dataKey="time"
+                  stroke="#657084"
+                  tickLine={false}
+                  axisLine={false}
+                />
 
-            <div className="traffic-car car-2">
-              <Car size={14} />
-            </div>
+                <YAxis
+                  stroke="#657084"
+                  tickLine={false}
+                  axisLine={false}
+                />
 
-            <div className="traffic-car car-3">
-              <Car size={14} />
-            </div>
+                <Tooltip
+                  contentStyle={{
+                    background: "#111721",
+                    border:
+                      "1px solid rgba(255,255,255,.1)",
+                    borderRadius: 12,
+                  }}
+                />
 
-            <div className="traffic-warning">
-              <AlertTriangle size={15} />
-              Zone C congestion
-            </div>
+                <Area
+                  dataKey="congestion"
+                  type="monotone"
+                  stroke="#ffb84d"
+                  fill="url(#trafficFill)"
+                  strokeWidth={2.5}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="content-card">
-          <div className="card-header">
+        <div className="panel">
+          <div className="panel-header">
             <div>
-              <span>VEHICLE NETWORK</span>
-              <h2>Live Vehicles</h2>
+              <span className="panel-kicker">
+                VEHICLE MONITOR
+              </span>
+              <h3>Active Vehicles</h3>
             </div>
 
-            <Route size={18} />
+            <Car size={18} />
           </div>
 
-          <div className="data-table">
-            {vehicles.map((vehicle) => (
+          <div className="vehicle-list">
+            {trafficVehicles.map((vehicle) => (
               <div
-                className="data-row"
+                className="vehicle-row"
                 key={vehicle.id}
               >
-                <div className="row-leading-icon">
-                  <Car size={14} />
+                <div className="vehicle-icon">
+                  <Car size={15} />
                 </div>
 
-                <div className="row-main">
+                <div className="vehicle-main">
                   <strong>{vehicle.id}</strong>
-                  <span>
-                    {vehicle.type} · {vehicle.road}
-                  </span>
+                  <span>{vehicle.road}</span>
                 </div>
 
-                <div className="row-value">
-                  <strong>
-                    {vehicle.speed}
-                  </strong>
-                  <span>km/h</span>
+                <div className="vehicle-speed">
+                  <Gauge size={12} />
+                  {vehicle.speed}
                 </div>
 
                 <span
-                  className={`status-chip ${
-                    vehicle.status === "Moving"
-                      ? "success"
+                  className={`vehicle-status ${
+                    vehicle.status === "Stopped"
+                      ? "danger"
                       : vehicle.status === "Slow"
-                        ? "warning"
-                        : "neutral"
+                      ? "warning"
+                      : "success"
                   }`}
                 >
                   {vehicle.status}
@@ -149,9 +203,116 @@ function Traffic() {
             ))}
           </div>
         </div>
-      </section>
+      </div>
+
+      <div className="traffic-map">
+        <div className="traffic-map-header">
+          <div>
+            <span className="panel-kicker">
+              DIGITAL ROAD NETWORK
+            </span>
+            <h3>Live Traffic Map</h3>
+          </div>
+
+          <div className="traffic-legend">
+            <span>
+              <i className="traffic-green" />
+              Low
+            </span>
+            <span>
+              <i className="traffic-yellow" />
+              Moderate
+            </span>
+            <span>
+              <i className="traffic-red" />
+              Heavy
+            </span>
+          </div>
+        </div>
+
+        <div className="traffic-map-canvas">
+          <div className="map-grid" />
+
+          <div className="traffic-road road-1">
+            <span>North Gate Road</span>
+          </div>
+
+          <div className="traffic-road road-2">
+            <span>Central Avenue</span>
+          </div>
+
+          <div className="traffic-road road-3">
+            <span>Library Road</span>
+          </div>
+
+          <div className="traffic-road road-4">
+            <span>Sports Road</span>
+          </div>
+
+          <div className="traffic-vehicle-marker marker-1">
+            <Car size={13} />
+          </div>
+
+          <div className="traffic-vehicle-marker marker-2">
+            <Car size={13} />
+          </div>
+
+          <div className="traffic-vehicle-marker marker-3">
+            <Car size={13} />
+          </div>
+
+          <div className="traffic-incident">
+            <TriangleAlert size={15} />
+          </div>
+
+          <div className="road-block">
+            <MapPin size={14} />
+            Blocked Road
+          </div>
+        </div>
+      </div>
+
+      <div className="panel alternate-route-panel">
+        <div className="panel-header">
+          <div>
+            <span className="panel-kicker">
+              INTELLIGENT ROUTING
+            </span>
+            <h3>Alternate Route Recommendation</h3>
+          </div>
+
+          <Route size={18} />
+        </div>
+
+        <div className="alternate-route">
+          <div className="route-card">
+            <span>PRIMARY</span>
+            <strong>Central Avenue</strong>
+            <small>1.2 km · 11 min</small>
+            <b className="warning-text">
+              Moderate congestion
+            </b>
+          </div>
+
+          <div className="route-card recommended">
+            <span>RECOMMENDED</span>
+            <strong>East Service Road</strong>
+            <small>1.5 km · 8 min</small>
+            <b className="success-text">
+              Low congestion
+            </b>
+          </div>
+
+          <div className="route-card">
+            <span>ALTERNATIVE</span>
+            <strong>Library Road</strong>
+            <small>1.8 km · 10 min</small>
+            <b className="success-text">
+              Stable
+            </b>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
-
-export default Traffic;

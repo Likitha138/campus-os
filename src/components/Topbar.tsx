@@ -1,85 +1,63 @@
-// ============================================================
-// src/components/Topbar.tsx
-// ============================================================
-
 import {
-  Bell,
+  Activity,
+  CalendarDays,
+  CloudSun,
   Menu,
-  Search,
-  Sun,
-  UserRound,
+  Wifi,
 } from "lucide-react";
 
-type TopbarProps = {
-  onMenuClick?: () => void;
+type Props = {
+  onMenu?: () => void;
 };
 
-function Topbar({ onMenuClick }: TopbarProps) {
+export default function Topbar({ onMenu }: Props) {
   return (
-    <header className="topbar">
-      <button
-        type="button"
-        className="mobile-menu-button"
-        onClick={onMenuClick}
-        aria-label="Open navigation"
-      >
-        <Menu size={20} />
-      </button>
+    <div className="topbar">
+      <div className="topbar-left">
+        <button className="mobile-menu-button" onClick={onMenu}>
+          <Menu size={19} />
+        </button>
 
-      <div className="topbar-search">
-        <Search size={17} />
-
-        <input
-          placeholder="Search campus, rooms, vehicles..."
-          aria-label="Search campus"
-        />
-
-        <kbd>⌘ K</kbd>
-      </div>
-
-      <div className="topbar-spacer" />
-
-      <div className="topbar-weather">
-        <Sun size={17} />
-        <div>
-          <strong>28°C</strong>
-          <span>Bengaluru</span>
+        <div className="system-status">
+          <span className="live-indicator" />
+          <span>SIMULATION ONLINE</span>
         </div>
       </div>
 
-      <div className="topbar-time">
-        <strong>
-          {new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-        </strong>
-        <span>LIVE</span>
-      </div>
-
-      <button
-        type="button"
-        className="topbar-icon-button notification-button"
-        aria-label="Notifications"
-      >
-        <Bell size={18} />
-        <span />
-      </button>
-
-      <div className="topbar-user">
-        <div className="topbar-user-avatar">
-          L
+      <div className="topbar-center">
+        <div className="topbar-metric">
+          <Activity size={15} />
+          <span>System Load</span>
+          <strong>42%</strong>
         </div>
 
-        <div>
-          <strong>Likitha</strong>
-          <span>Student</span>
+        <div className="topbar-metric">
+          <Wifi size={15} />
+          <span>Network</span>
+          <strong className="success-text">Stable</strong>
         </div>
 
-        <UserRound size={15} />
+        <div className="topbar-metric">
+          <CloudSun size={15} />
+          <span>AQI</span>
+          <strong>42</strong>
+        </div>
       </div>
-    </header>
+
+      <div className="topbar-right">
+        <div className="topbar-date">
+          <CalendarDays size={15} />
+          <span>20 Oct 2026</span>
+        </div>
+
+        <div className="user-chip">
+          <div className="avatar">BM</div>
+          <div>
+            <strong>Bhuvan M</strong>
+            <span>Administrator</span>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
-
-export default Topbar;

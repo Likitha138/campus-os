@@ -1,6 +1,171 @@
-import {Canvas,useFrame} from '@react-three/fiber';
-import {Environment,OrbitControls,RoundedBox,Text,Float} from '@react-three/drei';
-import {useRef} from 'react';import * as THREE from 'three';import {vehicles} from '../data/campus';
-function Building({p,s,label,color,active,onClick}:{p:[number,number,number];s:[number,number,number];label:string;color:string;active:boolean;onClick:()=>void}){return <group position={p} onClick={onClick}><RoundedBox args={s} radius={.12} smoothness={4} castShadow><meshStandardMaterial color={active?'#168cff':'#0a2236'} metalness={.7} roughness={.28}/></RoundedBox><mesh position={[0,s[1]/2+.03,0]}><boxGeometry args={[s[0]*.84,.04,s[2]*.84]}/><meshStandardMaterial color={color} emissive={color} emissiveIntensity={1.4}/></mesh><Text position={[0,s[1]+.55,0]} fontSize={.3} color={active?'#fff':'#8bdfff'} anchorX="center">{label}</Text></group>}
-function Vehicle({x,z,i}:{x:number;z:number;i:number}){const r=useRef<THREE.Group>(null);useFrame(({clock})=>{if(r.current)r.current.position.y=.17+Math.sin(clock.elapsedTime*1.5+i)*.025});return <group ref={r} position={[x,.17,z]}><mesh castShadow><boxGeometry args={[.62,.24,1.0]}/><meshStandardMaterial color={i%2?'#ffd34e':'#20d7ff'} metalness={.6}/></mesh><mesh position={[0,.16,0]}><boxGeometry args={[.4,.12,.5]}/><meshStandardMaterial color="#102d3d"/></mesh></group>}
-export default function Campus3D({selected,onSelect}:{selected:string;onSelect:(x:string)=>void}){const b=[['LIBRARY',[-5,1,-2],[3,2,2.3],'#20d7ff'],['AUDITORIUM',[4.5,.9,-2.4],[3.7,1.8,2.6],'#a56cff'],['BLOCK A',[-4.5,1.5,3.2],[3,3,2.5],'#20d7ff'],['BLOCK B',[.3,1.15,3.2],[2.8,2.3,2.4],'#35e0a1'],['BLOCK C',[4.8,.85,3.4],[2.6,1.7,2.2],'#ffd34e'],['ADMIN',[.2,.8,-2.4],[2.3,1.6,1.8],'#ff5f76']] as const;return <div className="campus-3d"><Canvas shadows camera={{position:[11,10,13],fov:48}}><color attach="background" args={['#020914']}/><fog attach="fog" args={['#020914',12,29]}/><ambientLight intensity={1.6}/><directionalLight position={[8,12,6]} intensity={3} castShadow/><pointLight position={[-7,5,-5]} color="#168cff" intensity={20} distance={18}/><Environment preset="city"/><mesh rotation={[-Math.PI/2,0,0]} receiveShadow><planeGeometry args={[30,24]}/><meshStandardMaterial color="#04111c" roughness={.9}/></mesh><mesh rotation={[-Math.PI/2,0,0]} position={[0,.01,0]}><planeGeometry args={[24,1.2]}/><meshStandardMaterial color="#07131e"/></mesh>{b.map(([label,p,s,c])=><Building key={label} label={label} p={p as any} s={s as any} color={c} active={selected===label} onClick={()=>onSelect(label)}/>)}{vehicles.map((v,i)=><Vehicle key={v.id} x={v.x} z={v.z} i={i}/>)}<Float speed={2} floatIntensity={.25}><mesh position={[0,2.5,0]}><torusGeometry args={[.42,.025,12,64]}/><meshStandardMaterial color="#20d7ff" emissive="#20d7ff" emissiveIntensity={2}/></mesh></Float><OrbitControls makeDefault enableDamping dampingFactor={.06} minDistance={8} maxDistance={25} minPolarAngle={.35} maxPolarAngle={1.45} target={[0,.8,0]}/></Canvas><div className="scene-hint">DRAG TO ORBIT · SCROLL TO ZOOM · CLICK A BUILDING</div></div>}
+import {
+  Building2,
+  Car,
+  Maximize2,
+  Minus,
+  Plus,
+  Rotate3D,
+  Users,
+} from "lucide-react";
+
+import { useState } from "react";
+import { campusLocations } from "../data/campus";
+
+export default function Campus3D() {
+  const [zoom, setZoom] = useState(1);
+  const [selected, setSelected] = useState(
+    campusLocations[0]
+  );
+
+  return (
+    <div className="campus-3d">
+      <div className="campus-toolbar">
+        <div className="campus-toolbar-title">
+          <Rotate3D size={16} />
+          <span>INTERACTIVE CAMPUS VIEW</span>
+        </div>
+
+        <div className="campus-toolbar-actions">
+          <button
+            onClick={() =>
+              setZoom((value) =>
+                Math.min(value + 0.15, 1.6)
+              )
+            }
+          >
+            <Plus size={15} />
+          </button>
+
+          <button
+            onClick={() =>
+              setZoom((value) =>
+                Math.max(value - 0.15, 0.7)
+              )
+            }
+          >
+            <Minus size={15} />
+          </button>
+
+          <button>
+            <Maximize2 size={15} />
+          </button>
+        </div>
+      </div>
+
+      <div
+        className="campus-scene"
+        style={{
+          transform: `scale(${zoom})`,
+        }}
+      >
+        <div className="scene-grid" />
+
+        <div className="scene-road road-one" />
+        <div className="scene-road road-two" />
+        <div className="scene-road road-three" />
+
+        <div className="scene-zone zone-a">
+          ZONE A
+        </div>
+
+        <div className="scene-zone zone-b">
+          ZONE B
+        </div>
+
+        {campusLocations.map((location) => (
+          <button
+            key={location.id}
+            className={`scene-building ${
+              selected.id === location.id
+                ? "selected"
+                : ""
+            }`}
+            style={{
+              left: `${location.x}%`,
+              top: `${location.y}%`,
+            }}
+            onClick={() => setSelected(location)}
+          >
+            <span className="building-shadow" />
+
+            <span className="building-body">
+              <Building2 size={18} />
+            </span>
+
+            <span className="building-label">
+              {location.name}
+            </span>
+
+            <span
+              className={`occupancy-dot occupancy-${location.status.toLowerCase()}`}
+            />
+          </button>
+        ))}
+
+        <div className="scene-vehicle vehicle-one">
+          <Car size={16} />
+        </div>
+
+        <div className="scene-vehicle vehicle-two">
+          <Car size={16} />
+        </div>
+
+        <div className="scene-crowd">
+          <Users size={15} />
+        </div>
+      </div>
+
+      <div className="campus-info-panel">
+        <div className="campus-info-header">
+          <div>
+            <span className="panel-kicker">
+              SELECTED LOCATION
+            </span>
+
+            <h3>{selected.name}</h3>
+          </div>
+
+          <span className="status-pill success">
+            {selected.status}
+          </span>
+        </div>
+
+        <div className="campus-info-grid">
+          <div>
+            <span>TYPE</span>
+            <strong>{selected.type}</strong>
+          </div>
+
+          <div>
+            <span>ZONE</span>
+            <strong>{selected.zone}</strong>
+          </div>
+
+          <div>
+            <span>OCCUPANCY</span>
+            <strong>{selected.occupancy}%</strong>
+          </div>
+
+          <div>
+            <span>CAPACITY</span>
+            <strong>
+              {selected.capacity.toLocaleString()}
+            </strong>
+          </div>
+        </div>
+      </div>
+
+      <div className="campus-legend">
+        <span>
+          <i className="legend-green" /> Open
+        </span>
+        <span>
+          <i className="legend-orange" /> Busy
+        </span>
+        <span>
+          <i className="legend-red" /> Restricted
+        </span>
+      </div>
+    </div>
+  );
+}

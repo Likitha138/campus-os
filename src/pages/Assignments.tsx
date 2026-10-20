@@ -1,18 +1,145 @@
-import { ArrowRight, CheckCircle2, CircleGauge, Sparkles } from 'lucide-react';
-import PageHeader from '../components/PageHeader';
-export default function Assignments(){
-  return <div className="generic-page">
-    <PageHeader eyebrow="CAMPUS OS · INTELLIGENCE" title="Assignments" description="Explore live campus telemetry, operational intelligence and simulated decision support from the digital twin." action={<button className="primary-btn"><Sparkles size={15}/> Run Analysis</button>}/>
-    <section className="feature-grid">
-      {['Live telemetry','Risk index','Prediction confidence','Recommended action'].map((x,i)=><div key={x}><span className="eyebrow">METRIC 0{i+1}</span><strong>{x}</strong><small>Updated just now</small></div>)}
-    </section>
-    <section className="workspace-grid">
-      <div className="panel workspace-main">
-        <div className="panel-head"><div><span className="eyebrow">LIVE ANALYTICS</span><h3>Operational intelligence workspace</h3></div><CircleGauge size={19}/></div>
-        <div className="metric-orbit"><div className="orbit-center"><strong>82</strong><span>Health Index</span></div><div className="orbit-ring ring-one"/><div className="orbit-ring ring-two"/></div>
-        <div className="insight-row"><div><CheckCircle2 size={15}/> Systems <b>98%</b></div><div><CheckCircle2 size={15}/> Freshness <b>2.4s</b></div><div><CheckCircle2 size={15}/> Confidence <b>91%</b></div></div>
+import {
+  CalendarClock,
+  CheckCircle2,
+  ClipboardList,
+  Clock3,
+  Plus,
+} from "lucide-react";
+
+import PageHeader from "../components/PageHeader";
+
+const assignments = [
+  {
+    title: "Data Analytics Dashboard",
+    subject: "Data Analytics",
+    due: "22 Oct 2026",
+    progress: 82,
+    status: "In Progress",
+  },
+  {
+    title: "React Campus Module",
+    subject: "Web Technology",
+    due: "24 Oct 2026",
+    progress: 64,
+    status: "In Progress",
+  },
+  {
+    title: "Cloud Architecture Report",
+    subject: "Cloud Computing",
+    due: "18 Oct 2026",
+    progress: 100,
+    status: "Submitted",
+  },
+  {
+    title: "Software Design Document",
+    subject: "Software Engineering",
+    due: "28 Oct 2026",
+    progress: 42,
+    status: "Pending",
+  },
+];
+
+export default function Assignments() {
+  return (
+    <div className="page">
+      <PageHeader
+        title="Assignments"
+        subtitle="Track academic submissions, deadlines and progress."
+        actions={
+          <button className="primary-button">
+            <Plus size={15} />
+            New Assignment
+          </button>
+        }
+      />
+
+      <div className="assignment-summary">
+        <div>
+          <ClipboardList size={18} />
+          <span>Total assignments</span>
+          <strong>24</strong>
+        </div>
+
+        <div>
+          <Clock3 size={18} />
+          <span>Pending</span>
+          <strong>07</strong>
+        </div>
+
+        <div>
+          <CalendarClock size={18} />
+          <span>Due this week</span>
+          <strong>05</strong>
+        </div>
+
+        <div>
+          <CheckCircle2 size={18} />
+          <span>Completed</span>
+          <strong>17</strong>
+        </div>
       </div>
-      <div className="panel"><div className="panel-head"><div><span className="eyebrow">AI INSIGHT</span><h3>Recommended action</h3></div><Sparkles size={18}/></div><div className="ai-card"><b>Campus conditions are stable.</b><p>The simulation currently indicates moderate activity with no critical operational risk. Review the highlighted metric before the next planning cycle.</p><button className="panel-action">Open detailed analysis <ArrowRight size={14}/></button></div></div>
-    </section>
-  </div>;
+
+      <div className="assignment-grid">
+        {assignments.map((assignment) => (
+          <article
+            className="assignment-card"
+            key={assignment.title}
+          >
+            <div className="assignment-card-top">
+              <div className="assignment-icon">
+                <ClipboardList size={18} />
+              </div>
+
+              <span
+                className={`status-pill ${
+                  assignment.status ===
+                  "Submitted"
+                    ? "success"
+                    : assignment.progress < 50
+                    ? "warning"
+                    : "info"
+                }`}
+              >
+                {assignment.status}
+              </span>
+            </div>
+
+            <span className="assignment-subject">
+              {assignment.subject}
+            </span>
+
+            <h3>{assignment.title}</h3>
+
+            <div className="assignment-progress">
+              <div>
+                <span>Progress</span>
+                <strong>
+                  {assignment.progress}%
+                </strong>
+              </div>
+
+              <div className="progress-bar">
+                <span
+                  style={{
+                    width: `${assignment.progress}%`,
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="assignment-footer">
+              <span>
+                <CalendarClock size={13} />
+                Due {assignment.due}
+              </span>
+
+              <button>
+                View
+              </button>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
 }

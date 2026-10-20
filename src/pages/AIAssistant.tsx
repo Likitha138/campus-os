@@ -1,45 +1,44 @@
-// ============================================================
-// src/pages/AIAssistant.tsx
-// ============================================================
-
-import { useState } from "react";
 import {
   ArrowUp,
   Bot,
   BrainCircuit,
-  Car,
-  Compass,
+  Lightbulb,
   Sparkles,
+  User,
 } from "lucide-react";
+
+import { useState } from "react";
 import PageHeader from "../components/PageHeader";
 
-function AIAssistant() {
+const suggestions = [
+  "Which building has the highest occupancy?",
+  "Where should additional parking be added?",
+  "Analyse today's traffic situation.",
+  "How can the Tech Fest layout be improved?",
+];
+
+export default function AIAssistant() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<
-    { user: boolean; text: string }[]
+    { role: "ai" | "user"; text: string }[]
   >([
     {
-      user: false,
-      text:
-        "Hello. I am Campus AI. Ask me about campus activity, traffic, buildings, academic performance or navigation.",
+      role: "ai",
+      text: "Hello. I am Campus Intelligence. I can analyse the simulated campus state, occupancy, traffic, events, emergency scenarios and future-campus plans.",
     },
   ]);
 
-  const sendMessage = () => {
+  const send = () => {
     if (!message.trim()) return;
 
     const current = message;
 
     setMessages((items) => [
       ...items,
+      { role: "user", text: current },
       {
-        user: true,
-        text: current,
-      },
-      {
-        user: false,
-        text:
-          "Based on the current simulated campus state, I recommend checking the relevant operational module for live details.",
+        role: "ai",
+        text: `Based on the current simulated campus state, I recommend reviewing occupancy, traffic load and event pressure together before making this decision. The current simulation shows moderate-to-high activity.`,
       },
     ]);
 
@@ -47,114 +46,122 @@ function AIAssistant() {
   };
 
   return (
-    <div className="page-container">
+    <div className="page ai-page">
       <PageHeader
-        eyebrow="CAMPUS INTELLIGENCE"
-        title="Campus AI"
-        description="Ask questions about the digital twin and receive intelligent operational insights."
-        icon={<BrainCircuit size={22} />}
+        title="Campus Intelligence"
+        subtitle="AI-powered analysis and recommendations for the simulated campus."
       />
 
-      <section className="ai-workspace">
-        <div className="ai-chat">
-          <div className="ai-chat-header">
-            <div className="ai-avatar">
-              <Bot size={20} />
+      <div className="ai-layout">
+        <aside className="ai-sidebar">
+          <div className="ai-profile">
+            <div className="ai-large-icon">
+              <BrainCircuit size={27} />
+            </div>
+
+            <strong>Campus Intelligence</strong>
+            <span>Gemini-powered analysis layer</span>
+          </div>
+
+          <div className="ai-capabilities">
+            <span>CAPABILITIES</span>
+
+            <div>
+              <Sparkles size={15} />
+              Campus analysis
             </div>
 
             <div>
-              <strong>Campus AI</strong>
-              <span>
-                <i />
-                Intelligence engine online
-              </span>
+              <Lightbulb size={15} />
+              Recommendations
             </div>
 
-            <Sparkles size={18} />
+            <div>
+              <Bot size={15} />
+              Scenario reasoning
+            </div>
           </div>
 
-          <div className="ai-messages">
+          <div className="ai-note">
+            <strong>Simulation aware</strong>
+            <p>
+              AI responses should be interpreted
+              against the controlled digital-campus
+              dataset.
+            </p>
+          </div>
+        </aside>
+
+        <section className="ai-chat">
+          <div className="ai-chat-header">
+            <div>
+              <span className="panel-kicker">
+                CAMPUS AI
+              </span>
+              <h3>Ask anything about campus</h3>
+            </div>
+
+            <span className="status-pill success">
+              ONLINE
+            </span>
+          </div>
+
+          <div className="chat-messages">
             {messages.map((item, index) => (
               <div
-                key={`${item.text}-${index}`}
-                className={`ai-message ${
-                  item.user ? "user" : "assistant"
+                key={index}
+                className={`chat-message ${
+                  item.role === "user"
+                    ? "user"
+                    : "assistant"
                 }`}
               >
-                {!item.user && (
-                  <span className="ai-message-icon">
-                    <Bot size={13} />
-                  </span>
-                )}
+                <div className="chat-avatar">
+                  {item.role === "user" ? (
+                    <User size={15} />
+                  ) : (
+                    <Bot size={15} />
+                  )}
+                </div>
 
-                <p>{item.text}</p>
+                <div className="chat-bubble">
+                  {item.text}
+                </div>
               </div>
             ))}
           </div>
 
-          <div className="ai-input">
+          <div className="ai-suggestions">
+            {suggestions.map((item) => (
+              <button
+                key={item}
+                onClick={() =>
+                  setMessage(item)
+                }
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+
+          <div className="chat-input">
             <input
               value={message}
-              onChange={(event) =>
-                setMessage(event.target.value)
+              onChange={(e) =>
+                setMessage(e.target.value)
               }
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  sendMessage();
-                }
+              onKeyDown={(e) => {
+                if (e.key === "Enter") send();
               }}
-              placeholder="Ask Campus AI..."
+              placeholder="Ask Campus Intelligence..."
             />
 
-            <button
-              type="button"
-              onClick={sendMessage}
-              aria-label="Send"
-            >
+            <button onClick={send}>
               <ArrowUp size={17} />
             </button>
           </div>
-        </div>
-
-        <aside className="ai-suggestion-panel">
-          <div>
-            <span>INTELLIGENCE MODULES</span>
-            <h2>Try asking</h2>
-          </div>
-
-          {[
-            [
-              <Car size={16} />,
-              "Where is traffic highest?",
-            ],
-            [
-              <Compass size={16} />,
-              "Find the fastest route.",
-            ],
-            [
-              <Sparkles size={16} />,
-              "What is happening on campus?",
-            ],
-            [
-              <BrainCircuit size={16} />,
-              "Explain my performance.",
-            ],
-          ].map(([icon, text]) => (
-            <button
-              type="button"
-              key={text as string}
-              onClick={() =>
-                setMessage(text as string)
-              }
-            >
-              <span>{icon}</span>
-              {text}
-            </button>
-          ))}
-        </aside>
-      </section>
+        </section>
+      </div>
     </div>
   );
 }
-
-export default AIAssistant;

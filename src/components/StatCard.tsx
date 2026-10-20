@@ -1,47 +1,58 @@
-// ============================================================
-// src/components/StatCard.tsx
-// ============================================================
+import {
+  Activity,
+  ArrowDownRight,
+  ArrowUpRight,
+  BarChart3,
+  Building2,
+  Users,
+} from "lucide-react";
 
-import { ReactNode } from "react";
-
-type StatCardProps = {
+type Props = {
   label: string;
   value: string | number;
-  detail: string;
-  icon: ReactNode;
-  trend?: string;
-  tone?: "blue" | "green" | "orange" | "purple";
+  change?: string;
+  trend?: "up" | "down" | "neutral";
+  icon?: "users" | "building" | "activity" | "chart";
+  accent?: string;
 };
 
-function StatCard({
+const icons = {
+  users: Users,
+  building: Building2,
+  activity: Activity,
+  chart: BarChart3,
+};
+
+export default function StatCard({
   label,
   value,
-  detail,
-  icon,
-  trend,
-  tone = "blue",
-}: StatCardProps) {
+  change,
+  trend = "neutral",
+  icon = "activity",
+}: Props) {
+  const Icon = icons[icon];
+
   return (
-    <article className={`stat-card stat-${tone}`}>
+    <article className="stat-card">
       <div className="stat-card-top">
         <div className="stat-icon">
-          {icon}
+          <Icon size={19} />
         </div>
 
-        {trend && (
-          <span className="stat-trend">
-            {trend}
-          </span>
-        )}
+        <span className={`trend trend-${trend}`}>
+          {trend === "up" && <ArrowUpRight size={13} />}
+          {trend === "down" && <ArrowDownRight size={13} />}
+          {trend === "neutral" && <Activity size={12} />}
+          {change}
+        </span>
       </div>
 
-      <span className="stat-label">{label}</span>
+      <div className="stat-value">{value}</div>
+      <div className="stat-label">{label}</div>
 
-      <strong className="stat-value">{value}</strong>
-
-      <span className="stat-detail">{detail}</span>
+      <div className="stat-progress">
+        <span />
+      </div>
     </article>
   );
 }
-
-export default StatCard;

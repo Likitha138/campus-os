@@ -1,98 +1,136 @@
-// ============================================================
-// src/pages/Reports.tsx
-// ============================================================
-
 import {
   BarChart3,
   Download,
-  FileBarChart,
   FileText,
   PieChart,
+  TrendingUp,
 } from "lucide-react";
+
 import PageHeader from "../components/PageHeader";
 
-function Reports() {
-  const reports = [
-    ["Academic Performance", "Updated today"],
-    ["Attendance Analysis", "Updated today"],
-    ["Traffic Intelligence", "Updated 12 min ago"],
-    ["Campus Activity", "Updated 18 min ago"],
-  ];
+const reports = [
+  {
+    title: "Campus Occupancy Report",
+    type: "Simulation",
+    date: "20 Oct 2026",
+    icon: BarChart3,
+  },
+  {
+    title: "Student Academic Report",
+    type: "Academic",
+    date: "20 Oct 2026",
+    icon: TrendingUp,
+  },
+  {
+    title: "Traffic Analysis Report",
+    type: "Operations",
+    date: "19 Oct 2026",
+    icon: PieChart,
+  },
+  {
+    title: "Event Capacity Report",
+    type: "Events",
+    date: "18 Oct 2026",
+    icon: FileText,
+  },
+];
 
+export default function Reports() {
   return (
-    <div className="page-container">
+    <div className="page">
       <PageHeader
-        eyebrow="ANALYTICS CENTER"
-        title="Reports"
-        description="Generate and review intelligent campus and academic reports."
-        icon={<FileBarChart size={22} />}
-        action={
-          <button type="button" className="primary-button">
-            <Download size={16} />
-            Export Report
+        title="Reports & Analytics"
+        subtitle="Generate and review campus intelligence reports."
+        actions={
+          <button className="primary-button">
+            <Download size={15} />
+            Generate Report
           </button>
         }
       />
 
-      <section className="report-overview-grid">
-        <div className="report-summary-card">
-          <PieChart size={21} />
-          <span>Campus Health</span>
-          <strong>86%</strong>
-          <small>Overall operational score</small>
+      <div className="report-dashboard">
+        <div className="report-hero">
+          <div className="report-hero-content">
+            <span>ANALYTICS CENTER</span>
+            <h2>
+              Understand the campus through data.
+            </h2>
+            <p>
+              Combine academic, activity, traffic,
+              events and environment information into
+              actionable reports.
+            </p>
+
+            <button className="primary-button">
+              Generate Custom Report
+            </button>
+          </div>
+
+          <div className="report-hero-visual">
+            <div className="report-orbit orbit-one" />
+            <div className="report-orbit orbit-two" />
+            <BarChart3 size={44} />
+          </div>
         </div>
 
-        <div className="report-summary-card">
-          <BarChart3 size={21} />
-          <span>Academic Index</span>
-          <strong>88%</strong>
-          <small>Student performance</small>
-        </div>
-
-        <div className="report-summary-card">
-          <FileText size={21} />
-          <span>Generated Reports</span>
-          <strong>24</strong>
-          <small>This semester</small>
-        </div>
-      </section>
-
-      <section className="content-card">
-        <div className="card-header">
+        <div className="report-stat-grid">
           <div>
-            <span>REPORT LIBRARY</span>
-            <h2>Available Reports</h2>
+            <span>Reports generated</span>
+            <strong>126</strong>
+          </div>
+
+          <div>
+            <span>Data sources</span>
+            <strong>09</strong>
+          </div>
+
+          <div>
+            <span>Analytics models</span>
+            <strong>12</strong>
+          </div>
+        </div>
+      </div>
+
+      <div className="panel">
+        <div className="panel-header">
+          <div>
+            <span className="panel-kicker">
+              RECENT REPORTS
+            </span>
+            <h3>Generated Reports</h3>
           </div>
         </div>
 
         <div className="report-list">
-          {reports.map(([name, updated]) => (
-            <div className="report-row" key={name}>
-              <div className="report-icon">
-                <FileBarChart size={17} />
-              </div>
+          {reports.map((report) => {
+            const Icon = report.icon;
 
-              <div>
-                <strong>{name}</strong>
-                <span>{updated}</span>
-              </div>
-
-              <button type="button">
-                View Report
-              </button>
-
-              <button
-                type="button"
-                className="icon-button"
+            return (
+              <div
+                className="report-row"
+                key={report.title}
               >
-                <Download size={15} />
-              </button>
-            </div>
-          ))}
+                <div className="report-icon">
+                  <Icon size={18} />
+                </div>
+
+                <div className="report-info">
+                  <strong>{report.title}</strong>
+                  <span>
+                    {report.type} · {report.date}
+                  </span>
+                </div>
+
+                <button className="secondary-button compact">
+                  <Download size={14} />
+                  Download
+                </button>
+              </div>
+            );
+          })}
         </div>
-      </section>
+      </div>
     </div>
   );
 }
-
-export default Reports;

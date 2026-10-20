@@ -1,47 +1,60 @@
-// ============================================================
-// src/components/PageHeader.tsx
-// ============================================================
+import {
+  Bell,
+  ChevronRight,
+  Command,
+  Search,
+} from "lucide-react";
 
-import { ReactNode } from "react";
-
-type PageHeaderProps = {
-  eyebrow: string;
+type Props = {
   title: string;
-  description: string;
-  icon?: ReactNode;
-  action?: ReactNode;
+  subtitle?: string;
+  eyebrow?: string;
+  actions?: React.ReactNode;
 };
 
-function PageHeader({
-  eyebrow,
+export default function PageHeader({
   title,
-  description,
-  icon,
-  action,
-}: PageHeaderProps) {
+  subtitle,
+  eyebrow = "CAMPUS OS",
+  actions,
+}: Props) {
   return (
-    <section className="page-header">
-      <div className="page-header-main">
-        {icon && (
-          <div className="page-header-icon">
-            {icon}
-          </div>
-        )}
-
-        <div>
-          <span className="page-eyebrow">{eyebrow}</span>
-          <h1>{title}</h1>
-          <p>{description}</p>
+    <header className="page-header">
+      <div className="page-header-copy">
+        <div className="page-eyebrow">
+          <span className="eyebrow-dot" />
+          {eyebrow}
         </div>
+
+        <div className="breadcrumb">
+          <span>Campus OS</span>
+          <ChevronRight size={13} />
+          <strong>{title}</strong>
+        </div>
+
+        <h1>{title}</h1>
+
+        {subtitle && (
+          <p className="page-subtitle">{subtitle}</p>
+        )}
       </div>
 
-      {action && (
-        <div className="page-header-action">
-          {action}
+      <div className="page-header-actions">
+        <div className="header-search">
+          <Search size={16} />
+          <input placeholder="Search campus..." />
+          <span className="shortcut">
+            <Command size={11} /> K
+          </span>
         </div>
-      )}
-    </section>
+
+        <button className="icon-button">
+          <Bell size={18} />
+          <span className="notification-dot" />
+        </button>
+
+        {actions}
+      </div>
+    </header>
   );
 }
-
-export default PageHeader;

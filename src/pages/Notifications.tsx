@@ -1,205 +1,107 @@
-// =========================================================
-// CAMPUS OS — STUDENT NOTIFICATIONS PAGE
-// =========================================================
-
-import {
-  useMemo,
-  useState,
-} from "react";
-
 import {
   Bell,
-  CalendarDays,
   CheckCheck,
-  MapPin,
-  Users,
+  Clock3,
 } from "lucide-react";
 
-import {
-  campusEvents,
-} from "../data/events";
-
-import {
-  students,
-} from "../data/students";
-
-import {
-  createEventNotifications,
-  type StudentNotification,
-} from "../services/eventNotificationService";
-
-import EventNotificationPanel from "../components/EventNotificationPanel";
+import PageHeader from "../components/PageHeader";
+import { notifications } from "../data/campus";
 
 export default function Notifications() {
-  // Demo student.
-  //
-  // Replace this later with the currently
-  // authenticated Campus OS student ID.
-
-  const currentStudentId =
-    "STU001";
-
-  const [readNotifications, setReadNotifications] =
-    useState<string[]>([]);
-
-  const notifications =
-    useMemo(() => {
-      const allNotifications =
-        campusEvents.flatMap(
-          (event) =>
-            createEventNotifications(
-              students,
-              event
-            )
-        );
-
-      return allNotifications
-        .filter(
-          (notification) =>
-            notification.studentId ===
-            currentStudentId
-        )
-        .map(
-          (notification) => ({
-            ...notification,
-
-            read:
-              readNotifications.includes(
-                notification.id
-              ),
-          })
-        );
-    }, [readNotifications]);
-
-  const markRead = (
-    notificationId: string
-  ) => {
-    setReadNotifications(
-      (current) => [
-        ...current,
-        notificationId,
-      ]
-    );
-  };
-
-  const openEvent = (
-    eventId: string
-  ) => {
-    const event =
-      campusEvents.find(
-        (item) =>
-          item.id === eventId
-      );
-
-    if (!event) {
-      return;
-    }
-
-    alert(
-      `${event.title}\n\n` +
-        `Date: ${event.date}\n` +
-        `Time: ${event.time}\n` +
-        `Venue: ${event.venue}`
-    );
-  };
-
   return (
-    <div className="notifications-page">
-      {/* HEADER */}
-
-      <div className="notifications-page-header">
-        <div>
-          <span>
-            CAMPUS OS / STUDENT CENTER
-          </span>
-
-          <h1>
-            Notifications
-          </h1>
-
-          <p>
-            Important campus updates
-            identified specifically for you.
-          </p>
-        </div>
-
-        <div className="notification-header-icon">
-          <Bell size={20} />
-        </div>
-      </div>
-
-      {/* QUICK SUMMARY */}
-
-      <div className="notification-summary">
-        <div>
-          <div>
-            <Bell size={16} />
-          </div>
-
-          <section>
-            <strong>
-              {
-                notifications.filter(
-                  (item) =>
-                    !item.read
-                ).length
-              }
-            </strong>
-
-            <span>
-              Unread
-            </span>
-          </section>
-        </div>
-
-        <div>
-          <div>
-            <CalendarDays size={16} />
-          </div>
-
-          <section>
-            <strong>
-              {
-                notifications.length
-              }
-            </strong>
-
-            <span>
-              Event Alerts
-            </span>
-          </section>
-        </div>
-
-        <div>
-          <div>
-            <Users size={16} />
-          </div>
-
-          <section>
-            <strong>
-              Personalized
-            </strong>
-
-            <span>
-              Student Targeting
-            </span>
-          </section>
-        </div>
-      </div>
-
-      {/* NOTIFICATIONS */}
-
-      <EventNotificationPanel
-        notifications={
-          notifications
-        }
-        onMarkRead={
-          markRead
-        }
-        onOpenEvent={
-          openEvent
+    <div className="page">
+      <PageHeader
+        title="Notifications"
+        subtitle="Stay updated with campus activities and system messages."
+        actions={
+          <button className="secondary-button">
+            <CheckCheck size={15} />
+            Mark all read
+          </button>
         }
       />
+
+      <div className="notification-page-grid">
+        <div className="panel">
+          <div className="panel-header">
+            <div>
+              <span className="panel-kicker">
+                INBOX
+              </span>
+              <h3>Recent Notifications</h3>
+            </div>
+
+            <Bell size={18} />
+          </div>
+
+          <div className="notification-page-list">
+            {notifications.map(
+              (notification, index) => (
+                <div
+                  className={`notification-page-row ${
+                    notification.unread
+                      ? "unread"
+                      : ""
+                  }`}
+                  key={index}
+                >
+                  <div className="notification-page-icon">
+                    <Bell size={16} />
+                  </div>
+
+                  <div>
+                    <strong>
+                      {notification.title}
+                    </strong>
+
+                    <p>{notification.text}</p>
+
+                    <span>
+                      <Clock3 size={12} />
+                      {notification.time}
+                    </span>
+                  </div>
+
+                  {notification.unread && (
+                    <i className="unread-dot" />
+                  )}
+                </div>
+              )
+            )}
+          </div>
+        </div>
+
+        <div className="panel notification-preferences">
+          <div className="panel-header">
+            <div>
+              <span className="panel-kicker">
+                PREFERENCES
+              </span>
+              <h3>Notification Channels</h3>
+            </div>
+          </div>
+
+          {[
+            "Event updates",
+            "Attendance alerts",
+            "Traffic warnings",
+            "Emergency alerts",
+            "AI recommendations",
+          ].map((item) => (
+            <label
+              className="toggle-row"
+              key={item}
+            >
+              <span>{item}</span>
+              <input
+                type="checkbox"
+                defaultChecked
+              />
+              <i />
+            </label>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
