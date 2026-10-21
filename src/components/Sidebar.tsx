@@ -1,92 +1,82 @@
 import {
   Activity,
-  AlertTriangle,
   BarChart3,
   Bell,
   Bot,
+  BriefcaseBusiness,
   Building2,
   Car,
-  CalendarDays,
+  ChevronRight,
+  CircleUserRound,
   ClipboardCheck,
-  Compass,
-  Cpu,
-  DoorOpen,
   GraduationCap,
-  HeartPulse,
-  Layers3,
   LayoutDashboard,
-  Leaf,
+  LogIn,
+  LogOut,
   Map,
-  Navigation as NavigationIcon,
+  Megaphone,
+  Navigation2,
   Settings,
   ShieldAlert,
   Sparkles,
-  TrafficCone,
+  Thermometer,
   Users,
-  Workflow,
+  X,
 } from "lucide-react";
+import { NavLink, useNavigate } from "react-router-dom";
 
-import { NavLink } from "react-router-dom";
+interface SessionUser {
+  id: string;
+  name: string;
+  email: string;
+  role: "student" | "admin";
+}
 
-type Item = {
-  label: string;
-  path: string;
-  icon: React.ElementType;
-};
+interface Session {
+  user: SessionUser | null;
+  isAuthenticated: boolean;
+  logout: () => void;
+}
 
-const primary: Item[] = [
-  {
-    label: "Dashboard",
-    path: "/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    label: "Explore",
-    path: "/explore",
-    icon: Map,
-  },
-  {
-    label: "Navigation",
-    path: "/navigation",
-    icon: Compass,
-  },
+interface Props {
+  mobileOpen?: boolean;
+  onClose?: () => void;
+  session?: Session;
+}
+
+const campusNavigation = [
   {
     label: "Activity",
     path: "/activity",
     icon: Activity,
   },
   {
+    label: "Navigation",
+    path: "/navigation",
+    icon: Navigation2,
+  },
+  {
     label: "Traffic",
     path: "/traffic",
-    icon: TrafficCone,
+    icon: Car,
   },
   {
     label: "Events",
     path: "/events",
-    icon: CalendarDays,
+    icon: Megaphone,
   },
 ];
 
-const operations: Item[] = [
-  {
-    label: "Emergency",
-    path: "/emergency",
-    icon: ShieldAlert,
-  },
-  {
-    label: "Build",
-    path: "/build",
-    icon: Building2,
-  },
+const intelligenceNavigation = [
   {
     label: "Environment",
     path: "/environment",
-    icon: Leaf,
+    icon: Thermometer,
   },
   {
     label: "Scenarios",
     path: "/scenarios",
-    icon: Workflow,
+    icon: Building2,
   },
   {
     label: "AI Assistant",
@@ -95,7 +85,7 @@ const operations: Item[] = [
   },
 ];
 
-const academic: Item[] = [
+const studentNavigation = [
   {
     label: "Attendance",
     path: "/attendance",
@@ -109,30 +99,12 @@ const academic: Item[] = [
   {
     label: "Assignments",
     path: "/assignments",
-    icon: Layers3,
+    icon: GraduationCap,
   },
   {
     label: "Reports",
     path: "/reports",
-    icon: Cpu,
-  },
-  {
-    label: "AI Performance",
-    path: "/ai-performance",
-    icon: Sparkles,
-  },
-  {
-    label: "Career",
-    path: "/career",
-    icon: GraduationCap,
-  },
-];
-
-const system: Item[] = [
-  {
-    label: "Alerts",
-    path: "/alerts",
-    icon: AlertTriangle,
+    icon: Map,
   },
   {
     label: "Notifications",
@@ -140,108 +112,284 @@ const system: Item[] = [
     icon: Bell,
   },
   {
-    label: "Settings",
-    path: "/settings",
-    icon: Settings,
+    label: "Career",
+    path: "/career",
+    icon: BriefcaseBusiness,
+  },
+  {
+    label: "AI Performance",
+    path: "/ai-performance",
+    icon: Sparkles,
   },
 ];
 
-function NavGroup({
-  title,
-  items,
-}: {
-  title: string;
-  items: Item[];
-}) {
+export default function Sidebar({
+  mobileOpen,
+  onClose,
+  session,
+}: Props) {
+  const navigate = useNavigate();
+
+  const isAuthenticated = session?.isAuthenticated ?? false;
+  const user = session?.user ?? null;
+
+  const handleLogout = () => {
+    session?.logout();
+    onClose?.();
+    navigate("/dashboard", { replace: true });
+  };
+
+  const handleLogin = () => {
+    onClose?.();
+    navigate("/login");
+  };
+
+  const renderItem = (
+    item: {
+      label: string;
+      path: string;
+      icon: React.ElementType;
+    },
+    closeOnClick = true
+  ) => {
+    const Icon = item.icon;
+
+    return (
+      <NavLink
+        key={item.path}
+        to={item.path}
+        onClick={() => {
+          if (closeOnClick) {
+            onClose?.();
+          }
+        }}
+        className={({ isActive }) =>
+          `side-link ${isActive ? "active" : ""}`
+        }
+      >
+        <Icon size={17} />
+        <span>{item.label}</span>
+
+        <ChevronRight
+          className="side-chevron"
+          size={14}
+        />
+      </NavLink>
+    );
+  };
+
   return (
-    <div className="sidebar-group">
-      <div className="sidebar-section-title">{title}</div>
+    <>
+      {mobileOpen && (
+        <div
+          className="mobile-overlay"
+          onClick={onClose}
+        />
+      )}
 
-      <div className="sidebar-items">
-        {items.map((item) => {
-          const Icon = item.icon;
+      <aside
+        className={`sidebar ${
+          mobileOpen ? "mobile-open" : ""
+        }`}
+      >
+        {/* =====================================================
+            SIDEBAR HEADER
+        ===================================================== */}
 
-          return (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) =>
-                `sidebar-link ${isActive ? "active" : ""}`
-              }
-            >
-              <span className="sidebar-link-icon">
-                <Icon size={17} />
-              </span>
+        <div className="sidebar-top">
+          <div
+            className="sidebar-brand"
+            onClick={() => {
+              navigate("/dashboard");
+              onClose?.();
+            }}
+            role="button"
+            tabIndex={0}
+          >
+            <div className="brand-mark">
+              C
+            </div>
 
-              <span className="sidebar-link-label">
-                {item.label}
-              </span>
+            <div>
+              <strong>CAMPUS OS</strong>
+              <span>Digital Campus Twin</span>
+            </div>
+          </div>
 
-              {item.label === "Alerts" && (
-                <span className="sidebar-count">4</span>
+          <button
+            className="mobile-close"
+            onClick={onClose}
+            type="button"
+            aria-label="Close navigation"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* =====================================================
+            SYSTEM STATUS
+        ===================================================== */}
+
+        <div className="sidebar-status">
+          <span className="live-dot" />
+          <span>Campus system online</span>
+        </div>
+
+        {/* =====================================================
+            NAVIGATION
+        ===================================================== */}
+
+        <nav className="sidebar-nav">
+
+          {/* PUBLIC */}
+          <div className="nav-section-title">
+            EXPLORE
+          </div>
+
+          {renderItem({
+            label: "Dashboard",
+            path: "/dashboard",
+            icon: LayoutDashboard,
+          })}
+
+          {/* =================================================
+              LOGGED-IN AREA
+          ================================================= */}
+
+          {isAuthenticated && (
+            <>
+              {/* CAMPUS */}
+              <div className="nav-section-title">
+                CAMPUS
+              </div>
+
+              {campusNavigation.map((item) =>
+                renderItem(item)
               )}
-            </NavLink>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
 
-export default function Sidebar() {
-  return (
-    <aside className="sidebar">
-      <div className="brand">
-        <div className="brand-mark">
-          <div className="brand-mark-inner">
-            <Cpu size={22} />
-          </div>
+              {/* INTELLIGENCE */}
+              <div className="nav-section-title">
+                INTELLIGENCE
+              </div>
+
+              {intelligenceNavigation.map((item) =>
+                renderItem(item)
+              )}
+
+              {/* STUDENT SERVICES */}
+              {user?.role === "student" && (
+                <>
+                  <div className="nav-section-title">
+                    STUDENT SERVICES
+                  </div>
+
+                  {studentNavigation.map((item) =>
+                    renderItem(item)
+                  )}
+                </>
+              )}
+
+              {/* ADMIN CONTROL */}
+              {user?.role === "admin" && (
+                <>
+                  <div className="nav-section-title">
+                    ADMIN CONTROL
+                  </div>
+
+                  {renderItem({
+                    label: "Campus Management",
+                    path: "/build",
+                    icon: Building2,
+                  })}
+
+                  {renderItem({
+                    label: "Emergency",
+                    path: "/emergency",
+                    icon: ShieldAlert,
+                  })}
+
+                  {renderItem({
+                    label: "Settings",
+                    path: "/settings",
+                    icon: Settings,
+                  })}
+                </>
+              )}
+
+              {/* STUDENT SETTINGS */}
+              {user?.role === "student" && (
+                <>
+                  <div className="nav-section-title">
+                    CAMPUS CONTROL
+                  </div>
+
+                  {renderItem({
+                    label: "Emergency",
+                    path: "/emergency",
+                    icon: ShieldAlert,
+                  })}
+
+                  {renderItem({
+                    label: "Settings",
+                    path: "/settings",
+                    icon: Settings,
+                  })}
+                </>
+              )}
+            </>
+          )}
+        </nav>
+
+        {/* =====================================================
+            USER / LOGIN AREA
+        ===================================================== */}
+
+        <div className="sidebar-bottom">
+
+          {!isAuthenticated ? (
+            <button
+              className="login-sidebar-button"
+              onClick={handleLogin}
+              type="button"
+            >
+              <LogIn size={17} />
+
+              <span>
+                Sign in to access campus
+              </span>
+            </button>
+          ) : (
+            <div className="profile-box">
+
+              <div className="profile-avatar">
+                <CircleUserRound size={20} />
+              </div>
+
+              <div className="profile-info">
+                <strong>
+                  {user?.name || "Campus User"}
+                </strong>
+
+                <span>
+                  {user?.role === "admin"
+                    ? "Administrator"
+                    : "Student"}
+                </span>
+              </div>
+
+              <button
+                onClick={handleLogout}
+                title="Logout"
+                type="button"
+                className="logout-button"
+              >
+                <LogOut size={17} />
+              </button>
+            </div>
+          )}
+
         </div>
-
-        <div className="brand-copy">
-          <strong>CAMPUS OS</strong>
-          <span>Digital Campus Twin</span>
-        </div>
-      </div>
-
-      <div className="sidebar-live-card">
-        <div className="sidebar-live-icon">
-          <HeartPulse size={16} />
-        </div>
-
-        <div>
-          <span>Campus Status</span>
-          <strong>Operational</strong>
-        </div>
-
-        <span className="live-dot" />
-      </div>
-
-      <div className="sidebar-scroll">
-        <NavGroup title="MAIN" items={primary} />
-        <NavGroup title="CAMPUS OPERATIONS" items={operations} />
-        <NavGroup title="ACADEMIC INTELLIGENCE" items={academic} />
-        <NavGroup title="SYSTEM" items={system} />
-      </div>
-
-      <div className="sidebar-footer">
-        <div className="sidebar-footer-card">
-          <div className="footer-icon">
-            <Users size={16} />
-          </div>
-
-          <div>
-            <strong>3,248</strong>
-            <span>Active students</span>
-          </div>
-
-          <DoorOpen size={16} />
-        </div>
-
-        <div className="sidebar-version">
-          CAMPUS OS <span>v1.0.0</span>
-        </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 }

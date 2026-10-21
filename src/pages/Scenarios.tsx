@@ -1,221 +1,79 @@
-import {
-  ArrowRight,
-  Check,
-  Copy,
-  GitCompare,
-  Save,
-  Trash2,
-} from "lucide-react";
-
-import { useState } from "react";
+import { Play, RotateCcw, Zap } from "lucide-react";
 import PageHeader from "../components/PageHeader";
-import { scenarios } from "../data/campus";
+import { useState } from "react";
+
+const scenarios = [
+  {
+    title: "Peak Hour Traffic",
+    description: "Simulate increased vehicle density around campus gates.",
+    impact: "High",
+  },
+  {
+    title: "Event Crowd",
+    description: "Simulate a large event and student movement.",
+    impact: "Medium",
+  },
+  {
+    title: "Emergency Evacuation",
+    description: "Model emergency movement and route availability.",
+    impact: "Critical",
+  },
+  {
+    title: "Rainfall Simulation",
+    description: "Simulate environmental impact and movement changes.",
+    impact: "Medium",
+  },
+];
 
 export default function Scenarios() {
-  const [selected, setSelected] =
-    useState("Normal Campus Day");
+  const [running, setRunning] = useState("");
 
   return (
     <div className="page">
       <PageHeader
-        title="Scenario Management"
-        subtitle="Save, compare and simulate different campus conditions."
-        actions={
-          <button className="primary-button">
-            <Save size={15} />
-            Save Scenario
-          </button>
-        }
+        eyebrow="DIGITAL SIMULATION"
+        title="What-If Scenarios"
+        description="Run controlled campus simulations without affecting the real environment."
       />
 
-      <div className="scenario-layout">
-        <div className="scenario-list">
-          {scenarios.map((scenario) => (
+      <div className="scenario-grid">
+        {scenarios.map((scenario) => (
+          <div className="scenario-card" key={scenario.title}>
+            <div className="scenario-icon">
+              <Zap size={20} />
+            </div>
+
+            <span className={`impact ${scenario.impact.toLowerCase()}`}>
+              {scenario.impact} impact
+            </span>
+
+            <h3>{scenario.title}</h3>
+            <p>{scenario.description}</p>
+
             <button
-              key={scenario.name}
-              className={`scenario-card ${
-                selected === scenario.name
-                  ? "selected"
-                  : ""
-              }`}
-              onClick={() =>
-                setSelected(scenario.name)
-              }
+              className="primary-button"
+              onClick={() => setRunning(scenario.title)}
             >
-              <div className="scenario-card-top">
-                <span>
-                  {selected === scenario.name ? (
-                    <Check size={14} />
-                  ) : (
-                    <Copy size={14} />
-                  )}
-                </span>
-
-                <small>SIMULATION</small>
-              </div>
-
-              <strong>{scenario.name}</strong>
-              <p>{scenario.description}</p>
-
-              <div className="scenario-mini-stats">
-                <span>
-                  <b>{scenario.occupancy}%</b>
-                  occupancy
-                </span>
-
-                <span>
-                  <b>{scenario.traffic}%</b>
-                  traffic
-                </span>
-
-                <span>
-                  <b>{scenario.events}</b>
-                  events
-                </span>
-              </div>
+              <Play size={15} />
+              Run simulation
             </button>
-          ))}
-        </div>
-
-        <div className="scenario-detail">
-          <div className="panel">
-            <div className="scenario-detail-header">
-              <div>
-                <span className="panel-kicker">
-                  SELECTED SCENARIO
-                </span>
-
-                <h2>{selected}</h2>
-
-                <p>
-                  {
-                    scenarios.find(
-                      (item) =>
-                        item.name === selected
-                    )?.description
-                  }
-                </p>
-              </div>
-
-              <span className="status-pill success">
-                READY
-              </span>
-            </div>
-
-            <div className="scenario-metrics">
-              <div>
-                <span>Campus Occupancy</span>
-                <strong>
-                  {
-                    scenarios.find(
-                      (item) =>
-                        item.name === selected
-                    )?.occupancy
-                  }
-                  %
-                </strong>
-                <div className="progress-bar">
-                  <span
-                    style={{
-                      width: `${
-                        scenarios.find(
-                          (item) =>
-                            item.name ===
-                            selected
-                        )?.occupancy
-                      }%`,
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <span>Traffic Load</span>
-                <strong>
-                  {
-                    scenarios.find(
-                      (item) =>
-                        item.name === selected
-                    )?.traffic
-                  }
-                  %
-                </strong>
-                <div className="progress-bar orange">
-                  <span
-                    style={{
-                      width: `${
-                        scenarios.find(
-                          (item) =>
-                            item.name ===
-                            selected
-                        )?.traffic
-                      }%`,
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <span>Events</span>
-                <strong>
-                  {
-                    scenarios.find(
-                      (item) =>
-                        item.name === selected
-                    )?.events
-                  }
-                </strong>
-              </div>
-            </div>
-
-            <div className="scenario-actions">
-              <button className="primary-button">
-                <ArrowRight size={15} />
-                Load Scenario
-              </button>
-
-              <button className="secondary-button">
-                <GitCompare size={15} />
-                Compare
-              </button>
-
-              <button className="danger-outline-button">
-                <Trash2 size={15} />
-                Delete
-              </button>
-            </div>
           </div>
-
-          <div className="scenario-comparison">
-            <div>
-              <span>SCENARIO OUTPUT</span>
-              <strong>Operational Analysis</strong>
-            </div>
-
-            <div className="comparison-row">
-              <span>Student movement</span>
-              <b>High</b>
-            </div>
-
-            <div className="comparison-row">
-              <span>Road congestion</span>
-              <b>Moderate</b>
-            </div>
-
-            <div className="comparison-row">
-              <span>Facility pressure</span>
-              <b>Medium</b>
-            </div>
-
-            <div className="comparison-row">
-              <span>Emergency readiness</span>
-              <b className="success-text">
-                Good
-              </b>
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
+
+      {running && (
+        <div className="simulation-running">
+          <div>
+            <strong>{running}</strong>
+            <span>Simulation engine running...</span>
+          </div>
+
+          <button onClick={() => setRunning("")}>
+            <RotateCcw size={15} />
+            Reset
+          </button>
+        </div>
+      )}
     </div>
   );
 }

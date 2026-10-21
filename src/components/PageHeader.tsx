@@ -1,60 +1,34 @@
-import {
-  Bell,
-  ChevronRight,
-  Command,
-  Search,
-} from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 
-type Props = {
-  title: string;
-  subtitle?: string;
+interface Props {
   eyebrow?: string;
-  actions?: React.ReactNode;
-};
+  title: string;
+  description?: string;
+  action?: string;
+  onAction?: () => void;
+}
 
 export default function PageHeader({
-  title,
-  subtitle,
   eyebrow = "CAMPUS OS",
-  actions,
+  title,
+  description,
+  action,
+  onAction,
 }: Props) {
   return (
-    <header className="page-header">
-      <div className="page-header-copy">
-        <div className="page-eyebrow">
-          <span className="eyebrow-dot" />
-          {eyebrow}
-        </div>
-
-        <div className="breadcrumb">
-          <span>Campus OS</span>
-          <ChevronRight size={13} />
-          <strong>{title}</strong>
-        </div>
-
+    <div className="page-header">
+      <div>
+        <span className="eyebrow">{eyebrow}</span>
         <h1>{title}</h1>
-
-        {subtitle && (
-          <p className="page-subtitle">{subtitle}</p>
-        )}
+        {description && <p>{description}</p>}
       </div>
 
-      <div className="page-header-actions">
-        <div className="header-search">
-          <Search size={16} />
-          <input placeholder="Search campus..." />
-          <span className="shortcut">
-            <Command size={11} /> K
-          </span>
-        </div>
-
-        <button className="icon-button">
-          <Bell size={18} />
-          <span className="notification-dot" />
+      {action && (
+        <button className="secondary-button" onClick={onAction}>
+          {action}
+          <ArrowUpRight size={16} />
         </button>
-
-        {actions}
-      </div>
-    </header>
+      )}
+    </div>
   );
 }

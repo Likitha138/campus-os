@@ -1,37 +1,19 @@
-import {
-  LocateFixed,
-  Maximize,
-  Minus,
-  Plus,
-  RotateCcw,
-  Search,
-} from "lucide-react";
+import { Layers, LocateFixed, Minus, Plus } from "lucide-react";
 
 export default function MapControls() {
   return (
-    <div className="map-controls">
-      <button title="Search">
-        <Search size={16} />
-      </button>
-
-      <button title="Zoom in">
-        <Plus size={16} />
-      </button>
-
-      <button title="Zoom out">
-        <Minus size={16} />
-      </button>
-
-      <button title="Reset">
-        <RotateCcw size={16} />
-      </button>
-
+    <div className="floating-map-controls">
       <button title="Locate">
-        <LocateFixed size={16} />
+        <LocateFixed size={17} />
       </button>
-
-      <button title="Fullscreen">
-        <Maximize size={16} />
+      <button title="Layers">
+        <Layers size={17} />
+      </button>
+      <button title="Zoom in">
+        <Plus size={17} />
+      </button>
+      <button title="Zoom out">
+        <Minus size={17} />
       </button>
     </div>
   );

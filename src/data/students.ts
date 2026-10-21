@@ -1,25 +1,42 @@
-import { students } from "./campus";
-
-export { students };
-
-export const departments = [
-  "Computer Science",
-  "Information Science",
-  "Data Science",
-  "Electronics",
-  "Commerce",
-  "Management",
-];
-
-export const years = [
-  "I Year",
-  "II Year",
-  "III Year",
-];
-
-export const performanceBands = [
-  "Excellent",
-  "Good",
-  "Average",
-  "Needs Attention",
+export const students = [
+  {
+    id: "STU-1001",
+    name: "Aarav Kumar",
+    course: "BCA",
+    year: "III",
+    section: "A",
+    attendance: 88,
+    cgpa: 8.4,
+    status: "Active",
+  },
+  {
+    id: "STU-1002",
+    name: "Ananya Rao",
+    course: "BCA",
+    year: "III",
+    section: "A",
+    attendance: 94,
+    cgpa: 9.1,
+    status: "Active",
+  },
+  {
+    id: "STU-1003",
+    name: "Rahul Shetty",
+    course: "BCA",
+    year: "III",
+    section: "B",
+    attendance: 71,
+    cgpa: 7.3,
+    status: "At Risk",
+  },
+  {
+    id: "STU-1004",
+    name: "Sneha Patil",
+    course: "BCA",
+    year: "III",
+    section: "B",
+    attendance: 82,
+    cgpa: 8.0,
+    status: "Active",
+  },
 ];

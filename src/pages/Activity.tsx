@@ -1,223 +1,72 @@
-import {
-  Activity as ActivityIcon,
-  Clock,
-  Users,
-} from "lucide-react";
-
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-
 import PageHeader from "../components/PageHeader";
 import StatCard from "../components/StatCard";
-import { activityData, campusLocations } from "../data/campus";
+import { activityData } from "../data/campus";
 
 export default function Activity() {
   return (
     <div className="page">
       <PageHeader
-        title="Campus Activity"
-        subtitle="Observe simulated occupancy and movement across the campus."
+        eyebrow="CAMPUS INTELLIGENCE"
+        title="Activity Monitor"
+        description="Monitor student movement and campus utilization in real time."
       />
 
       <div className="stats-grid">
-        <StatCard
-          label="Current Occupancy"
-          value="63%"
-          change="+4.2%"
-          trend="up"
-          icon="users"
-        />
-
-        <StatCard
-          label="Active Zones"
-          value="08"
-          change="6 busy"
-          trend="neutral"
-          icon="building"
-        />
-
-        <StatCard
-          label="Peak Occupancy"
-          value="83%"
-          change="16:00"
-          trend="neutral"
-          icon="chart"
-        />
-
-        <StatCard
-          label="Activity Index"
-          value="78/100"
-          change="+6.8%"
-          trend="up"
-          icon="activity"
-        />
+        <StatCard label="People on Campus" value="2,046" change="+8.2%" trend="up" icon="users" />
+        <StatCard label="Peak Occupancy" value="78%" change="+4.1%" trend="up" icon="activity" />
+        <StatCard label="Active Zones" value="18" icon="buildings" />
+        <StatCard label="Movement Index" value="82" change="+6.7%" trend="up" icon="chart" />
       </div>
 
-      <div className="two-column-grid">
-        <div className="panel large-chart-panel">
-          <div className="panel-header">
+      <div className="content-grid-2">
+        <div className="data-card large">
+          <div className="card-heading">
             <div>
-              <span className="panel-kicker">
-                TIME SIMULATION
-              </span>
-              <h3>Campus Occupancy Timeline</h3>
-            </div>
-
-            <div className="simulation-control">
-              <Clock size={14} />
-              12:00 PM
+              <strong>Campus activity timeline</strong>
+              <small>Student presence throughout the day</small>
             </div>
           </div>
 
-          <div className="chart-wrap tall">
-            <ResponsiveContainer
-              width="100%"
-              height="100%"
-            >
-              <AreaChart data={activityData}>
-                <defs>
-                  <linearGradient
-                    id="activityFill"
-                    x1="0"
-                    y1="0"
-                    x2="0"
-                    y2="1"
-                  >
-                    <stop
-                      offset="0%"
-                      stopColor="#4f8cff"
-                      stopOpacity=".35"
-                    />
-                    <stop
-                      offset="100%"
-                      stopColor="#4f8cff"
-                      stopOpacity="0"
-                    />
-                  </linearGradient>
-                </defs>
-
-                <CartesianGrid
-                  stroke="rgba(255,255,255,.05)"
-                  vertical={false}
-                />
-
-                <XAxis
-                  dataKey="time"
-                  stroke="#667085"
-                  tickLine={false}
-                  axisLine={false}
-                />
-
-                <YAxis
-                  stroke="#667085"
-                  tickLine={false}
-                  axisLine={false}
-                />
-
-                <Tooltip
-                  contentStyle={{
-                    background: "#10151f",
-                    border:
-                      "1px solid rgba(255,255,255,.1)",
-                    borderRadius: 12,
-                  }}
-                />
-
-                <Area
-                  dataKey="occupancy"
-                  type="monotone"
-                  stroke="#4f8cff"
-                  fill="url(#activityFill)"
-                  strokeWidth={3}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="panel">
-          <div className="panel-header">
-            <div>
-              <span className="panel-kicker">
-                LOCATION ANALYSIS
-              </span>
-              <h3>Zone Occupancy</h3>
-            </div>
-
-            <Users size={18} />
-          </div>
-
-          <div className="occupancy-list">
-            {campusLocations.map((location) => (
-              <div
-                className="occupancy-item"
-                key={location.id}
-              >
-                <div className="occupancy-item-top">
-                  <strong>{location.name}</strong>
-                  <span>
-                    {location.occupancy}%
-                  </span>
+          <div className="large-chart">
+            {activityData.map((item) => (
+              <div className="chart-column" key={item.time}>
+                <div
+                  className="chart-bar"
+                  style={{ height: `${item.students / 7}px` }}
+                >
+                  <span>{item.students}</span>
                 </div>
-
-                <div className="progress-bar">
-                  <span
-                    style={{
-                      width: `${location.occupancy}%`,
-                    }}
-                  />
-                </div>
-
-                <small>
-                  {location.capacity.toLocaleString()} capacity
-                </small>
+                <small>{item.time}</small>
               </div>
             ))}
           </div>
         </div>
-      </div>
 
-      <div className="panel simulation-timeline">
-        <div className="panel-header">
-          <div>
-            <span className="panel-kicker">
-              SIMULATION CONTROL
-            </span>
-            <h3>Activity Time Controller</h3>
+        <div className="data-card large">
+          <div className="card-heading">
+            <div>
+              <strong>Zone utilization</strong>
+              <small>Current distribution</small>
+            </div>
           </div>
 
-          <span className="status-pill success">
-            RUNNING
-          </span>
-        </div>
-
-        <div className="time-controller">
-          <div className="time-label">
-            <span>06:00</span>
-            <strong>12:00 PM</strong>
-            <span>20:00</span>
-          </div>
-
-          <input
-            type="range"
-            min="6"
-            max="20"
-            defaultValue="12"
-          />
-
-          <div className="timeline-markers">
-            <span>Morning</span>
-            <span>Peak</span>
-            <span>Afternoon</span>
-            <span>Evening</span>
-          </div>
+          {[
+            ["Academic Block", 82],
+            ["Library", 71],
+            ["Innovation Lab", 64],
+            ["Sports Zone", 49],
+            ["Administration", 38],
+          ].map(([name, value]) => (
+            <div className="progress-row" key={name}>
+              <div>
+                <span>{name}</span>
+                <strong>{value}%</strong>
+              </div>
+              <div className="progress-track">
+                <div style={{ width: `${value}%` }} />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

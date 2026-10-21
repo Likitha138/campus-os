@@ -1,199 +1,65 @@
-import {
-  BriefcaseBusiness,
-  Building2,
-  CheckCircle2,
-  GraduationCap,
-  Target,
-  TrendingUp,
-} from "lucide-react";
-
+import { BriefcaseBusiness, Building2, Code2, TrendingUp } from "lucide-react";
 import PageHeader from "../components/PageHeader";
 
-const careerSkills = [
-  {
-    name: "Frontend Development",
-    score: 88,
-  },
-  {
-    name: "Data Analytics",
-    score: 82,
-  },
-  {
-    name: "Database Management",
-    score: 76,
-  },
-  {
-    name: "Cloud Computing",
-    score: 68,
-  },
-  {
-    name: "AI & Machine Learning",
-    score: 71,
-  },
-];
-
 export default function Career() {
+  const recommendations = [
+    ["Frontend Developer", "92%", "React · TypeScript · UI"],
+    ["Data Analyst", "86%", "Python · SQL · Analytics"],
+    ["Software Engineer", "81%", "Java · DSA · Backend"],
+    ["Business Analyst", "74%", "SQL · Communication · BI"],
+  ];
+
   return (
     <div className="page">
       <PageHeader
+        eyebrow="CAREER INTELLIGENCE"
         title="Career Intelligence"
-        subtitle="Analyse skills, career readiness and placement opportunities."
+        description="Explore career paths based on your academic profile and skills."
       />
 
-      <div className="career-hero">
-        <div>
-          <span className="panel-kicker">
-            CAREER READINESS
-          </span>
-
-          <h2>
-            Your current readiness score is
-            <strong> 84%</strong>.
-          </h2>
-
-          <p>
-            Strong technical fundamentals with
-            opportunities to improve cloud, AI and
-            interview readiness.
-          </p>
+      <div className="career-highlight">
+        <div className="career-highlight-icon">
+          <TrendingUp size={27} />
         </div>
 
-        <div className="career-score">
-          <strong>84</strong>
-          <span>/100</span>
+        <div>
+          <span>CAREER READINESS</span>
+          <strong>82 / 100</strong>
+          <p>Your profile shows strong potential for technology roles.</p>
         </div>
       </div>
 
       <div className="career-grid">
-        <div className="panel">
-          <div className="panel-header">
-            <div>
-              <span className="panel-kicker">
-                SKILL PROFILE
-              </span>
-              <h3>Technical Skills</h3>
+        {recommendations.map(([role, score, skills]) => (
+          <div className="career-card" key={role}>
+            <div className="career-card-top">
+              <div className="career-icon">
+                <BriefcaseBusiness size={18} />
+              </div>
+              <strong>{score}</strong>
             </div>
 
-            <Target size={18} />
+            <h3>{role}</h3>
+            <p>{skills}</p>
+
+            <div className="career-match">
+              <div style={{ width: score }} />
+            </div>
+
+            <button>
+              Explore role →
+            </button>
           </div>
-
-          <div className="career-skills">
-            {careerSkills.map((skill) => (
-              <div
-                className="career-skill"
-                key={skill.name}
-              >
-                <div>
-                  <span>{skill.name}</span>
-                  <strong>
-                    {skill.score}%
-                  </strong>
-                </div>
-
-                <div className="progress-bar">
-                  <span
-                    style={{
-                      width: `${skill.score}%`,
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="panel">
-          <div className="panel-header">
-            <div>
-              <span className="panel-kicker">
-                CAREER PATH
-              </span>
-              <h3>Recommended Roles</h3>
-            </div>
-
-            <BriefcaseBusiness size={18} />
-          </div>
-
-          <div className="career-role-list">
-            <div>
-              <div className="role-icon">
-                <TrendingUp size={17} />
-              </div>
-
-              <div>
-                <strong>Data Analyst</strong>
-                <span>92% match</span>
-              </div>
-            </div>
-
-            <div>
-              <div className="role-icon">
-                <Building2 size={17} />
-              </div>
-
-              <div>
-                <strong>Frontend Developer</strong>
-                <span>88% match</span>
-              </div>
-            </div>
-
-            <div>
-              <div className="role-icon">
-                <GraduationCap size={17} />
-              </div>
-
-              <div>
-                <strong>AI Developer</strong>
-                <span>76% match</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
 
-      <div className="panel career-roadmap">
-        <div className="panel-header">
-          <div>
-            <span className="panel-kicker">
-              DEVELOPMENT PLAN
-            </span>
-            <h3>Career Roadmap</h3>
-          </div>
+      <div className="skill-strip">
+        <Code2 size={20} />
+        <div>
+          <strong>Recommended skill development</strong>
+          <span>React, SQL, Python, Git, communication and problem solving.</span>
         </div>
-
-        <div className="career-roadmap-track">
-          <div className="roadmap-step completed">
-            <i>
-              <CheckCircle2 size={15} />
-            </i>
-            <strong>Core Skills</strong>
-            <span>Completed</span>
-          </div>
-
-          <div className="roadmap-line" />
-
-          <div className="roadmap-step active">
-            <i>2</i>
-            <strong>Advanced Projects</strong>
-            <span>Current</span>
-          </div>
-
-          <div className="roadmap-line" />
-
-          <div className="roadmap-step">
-            <i>3</i>
-            <strong>Interview Preparation</strong>
-            <span>Upcoming</span>
-          </div>
-
-          <div className="roadmap-line" />
-
-          <div className="roadmap-step">
-            <i>4</i>
-            <strong>Placement</strong>
-            <span>Target</span>
-          </div>
-        </div>
+        <Building2 size={20} />
       </div>
     </div>
   );

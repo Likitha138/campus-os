@@ -1,105 +1,84 @@
-import {
-  Bell,
-  CheckCheck,
-  Clock3,
-} from "lucide-react";
-
+import { Bell, CheckCheck } from "lucide-react";
 import PageHeader from "../components/PageHeader";
-import { notifications } from "../data/campus";
+import EventNotificationPanel from "../components/EventNotificationPanel";
+
+type NotificationPreference = {
+  name: string;
+  enabled: boolean;
+};
+
+const notificationPreferences: NotificationPreference[] = [
+  {
+    name: "Campus events",
+    enabled: true,
+  },
+  {
+    name: "Attendance alerts",
+    enabled: true,
+  },
+  {
+    name: "Academic updates",
+    enabled: true,
+  },
+  {
+    name: "Career opportunities",
+    enabled: false,
+  },
+  {
+    name: "Emergency alerts",
+    enabled: true,
+  },
+];
 
 export default function Notifications() {
   return (
     <div className="page">
       <PageHeader
+        eyebrow="COMMUNICATION"
         title="Notifications"
-        subtitle="Stay updated with campus activities and system messages."
-        actions={
-          <button className="secondary-button">
-            <CheckCheck size={15} />
-            Mark all read
-          </button>
-        }
+        description="Campus announcements, event updates and important messages."
       />
 
-      <div className="notification-page-grid">
-        <div className="panel">
-          <div className="panel-header">
-            <div>
-              <span className="panel-kicker">
-                INBOX
-              </span>
-              <h3>Recent Notifications</h3>
-            </div>
+      <div className="notification-page-layout">
+        <EventNotificationPanel />
 
-            <Bell size={18} />
+        <div className="data-card">
+          <div className="card-heading">
+            <div>
+              <strong>Notification preferences</strong>
+              <small>Control what you receive</small>
+            </div>
           </div>
 
-          <div className="notification-page-list">
-            {notifications.map(
-              (notification, index) => (
-                <div
-                  className={`notification-page-row ${
-                    notification.unread
-                      ? "unread"
-                      : ""
-                  }`}
-                  key={index}
-                >
-                  <div className="notification-page-icon">
-                    <Bell size={16} />
-                  </div>
-
-                  <div>
-                    <strong>
-                      {notification.title}
-                    </strong>
-
-                    <p>{notification.text}</p>
-
-                    <span>
-                      <Clock3 size={12} />
-                      {notification.time}
-                    </span>
-                  </div>
-
-                  {notification.unread && (
-                    <i className="unread-dot" />
-                  )}
+          <div className="notification-preferences">
+            {notificationPreferences.map((preference) => (
+              <div
+                className="preference-row"
+                key={`notification-${preference.name}`}
+              >
+                <div className="preference-label">
+                  <Bell size={16} />
+                  <span>{preference.name}</span>
                 </div>
-              )
-            )}
-          </div>
-        </div>
 
-        <div className="panel notification-preferences">
-          <div className="panel-header">
-            <div>
-              <span className="panel-kicker">
-                PREFERENCES
-              </span>
-              <h3>Notification Channels</h3>
-            </div>
+                <div
+                  className={`toggle ${
+                    preference.enabled ? "active" : ""
+                  }`}
+                  role="switch"
+                  aria-checked={preference.enabled}
+                  aria-label={`Toggle ${preference.name}`}
+                >
+                  <span />
+                </div>
+              </div>
+            ))}
           </div>
 
-          {[
-            "Event updates",
-            "Attendance alerts",
-            "Traffic warnings",
-            "Emergency alerts",
-            "AI recommendations",
-          ].map((item) => (
-            <label
-              className="toggle-row"
-              key={item}
-            >
-              <span>{item}</span>
-              <input
-                type="checkbox"
-                defaultChecked
-              />
-              <i />
-            </label>
-          ))}
+          <button className="secondary-button" type="button">
+            <CheckCheck size={15} />
+            Save preferences
+          </button>
         </div>
       </div>
     </div>

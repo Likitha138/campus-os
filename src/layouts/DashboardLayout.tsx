@@ -2,28 +2,34 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
+import { useAuth } from "../auth/AuthContext";
 
 export default function DashboardLayout() {
-  const [mobileOpen, setMobileOpen] =
-    useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const { user, isAuthenticated, logout } = useAuth();
+
+  const session = {
+    user,
+    isAuthenticated,
+    logout,
+  };
 
   return (
-    <div className="app-layout">
-      <Sidebar />
+    <div className="app-shell">
+      <Sidebar
+        mobileOpen={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        session={session}
+      />
 
-      {mobileOpen && (
-        <div
-          className="mobile-sidebar-overlay"
-          onClick={() => setMobileOpen(false)}
-        />
-      )}
-
-      <div className="app-main">
+      <div className="main-shell">
         <Topbar
           onMenu={() => setMobileOpen(true)}
+          session={session}
         />
 
-        <main className="app-content">
+        <main className="page-content">
           <Outlet />
         </main>
       </div>

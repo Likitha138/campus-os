@@ -1,210 +1,62 @@
-import {
-  BrainCircuit,
-  CheckCircle2,
-  ShieldAlert,
-  Sparkles,
-  TrendingDown,
-  TrendingUp,
-} from "lucide-react";
-
+import { BrainCircuit, Target, TrendingUp } from "lucide-react";
 import PageHeader from "../components/PageHeader";
+import StatCard from "../components/StatCard";
 
 export default function AIPerformance() {
   return (
     <div className="page">
       <PageHeader
-        title="AI Performance Intelligence"
-        subtitle="AI-assisted academic performance and student risk analysis."
+        eyebrow="AI ACADEMIC ANALYTICS"
+        title="AI Performance"
+        description="Understand performance patterns and receive intelligent recommendations."
       />
 
-      <div className="ai-performance-hero">
-        <div className="ai-performance-icon">
-          <BrainCircuit size={30} />
-        </div>
+      <div className="stats-grid">
+        <StatCard label="Performance Score" value="86" suffix="/100" change="+5.8%" trend="up" icon="chart" />
+        <StatCard label="Risk Level" value="Low" icon="activity" />
+        <StatCard label="Predicted CGPA" value="8.7" change="+0.3" trend="up" icon="chart" />
+        <StatCard label="Learning Consistency" value="91%" icon="activity" />
+      </div>
 
-        <div>
-          <span className="panel-kicker">
-            AI PERFORMANCE ENGINE
-          </span>
+      <div className="ai-performance-grid">
+        <div className="data-card performance-score-card">
+          <div className="ai-performance-circle">
+            <span>86</span>
+            <small>/ 100</small>
+          </div>
 
-          <h2>
-            Academic performance prediction is
-            currently stable.
-          </h2>
-
+          <span className="eyebrow">AI SCORE</span>
+          <h3>Strong academic trajectory</h3>
           <p>
-            The simulation combines attendance,
-            marks, assignment completion and activity
-            patterns to identify students requiring
-            attention.
+            Your attendance, marks and assignment completion indicate a
+            positive performance trend.
           </p>
         </div>
 
-        <div className="ai-confidence">
-          <span>MODEL CONFIDENCE</span>
-          <strong>91%</strong>
-        </div>
-      </div>
-
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-card-top">
-            <div className="stat-icon">
-              <TrendingUp size={19} />
-            </div>
-          </div>
-
-          <div className="stat-value">
-            2,486
-          </div>
-
-          <div className="stat-label">
-            Low-risk students
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-card-top">
-            <div className="stat-icon">
-              <ShieldAlert size={19} />
-            </div>
-          </div>
-
-          <div className="stat-value">
-            624
-          </div>
-
-          <div className="stat-label">
-            Medium-risk students
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-card-top">
-            <div className="stat-icon">
-              <TrendingDown size={19} />
-            </div>
-          </div>
-
-          <div className="stat-value">
-            138
-          </div>
-
-          <div className="stat-label">
-            High-risk students
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-card-top">
-            <div className="stat-icon">
-              <Sparkles size={19} />
-            </div>
-          </div>
-
-          <div className="stat-value">
-            86%
-          </div>
-
-          <div className="stat-label">
-            Predicted improvement
-          </div>
-        </div>
-      </div>
-
-      <div className="two-column-grid">
-        <div className="panel">
-          <div className="panel-header">
+        <div className="data-card">
+          <div className="card-heading">
             <div>
-              <span className="panel-kicker">
-                RISK FACTORS
-              </span>
-              <h3>AI Signals</h3>
+              <strong>AI recommendations</strong>
+              <small>Personalized next actions</small>
             </div>
+            <BrainCircuit size={20} />
           </div>
 
-          <div className="risk-factor-list">
-            <RiskFactor
-              label="Attendance"
-              value="High impact"
-              width={82}
-            />
-
-            <RiskFactor
-              label="Internal marks"
-              value="Medium impact"
-              width={67}
-            />
-
-            <RiskFactor
-              label="Assignments"
-              value="Medium impact"
-              width={54}
-            />
-
-            <RiskFactor
-              label="Academic activity"
-              value="Low impact"
-              width={31}
-            />
-          </div>
+          {[
+            ["Increase Database practice", "High impact"],
+            ["Maintain attendance above 85%", "Medium impact"],
+            ["Complete assignments earlier", "Medium impact"],
+            ["Strengthen DSA fundamentals", "High impact"],
+          ].map(([title, impact]) => (
+            <div className="recommendation-row" key={title}>
+              <Target size={17} />
+              <div>
+                <strong>{title}</strong>
+                <span>{impact}</span>
+              </div>
+            </div>
+          ))}
         </div>
-
-        <div className="panel">
-          <div className="panel-header">
-            <div>
-              <span className="panel-kicker">
-                RECOMMENDATIONS
-              </span>
-              <h3>AI Actions</h3>
-            </div>
-          </div>
-
-          <div className="recommendation-list">
-            <div>
-              <CheckCircle2 size={16} />
-              Contact high-risk students early.
-            </div>
-
-            <div>
-              <CheckCircle2 size={16} />
-              Prioritise attendance intervention.
-            </div>
-
-            <div>
-              <CheckCircle2 size={16} />
-              Recommend subject-specific revision.
-            </div>
-
-            <div>
-              <CheckCircle2 size={16} />
-              Monitor assignment completion.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function RiskFactor({
-  label,
-  value,
-  width,
-}: {
-  label: string;
-  value: string;
-  width: number;
-}) {
-  return (
-    <div className="risk-factor">
-      <div>
-        <span>{label}</span>
-        <strong>{value}</strong>
-      </div>
-
-      <div className="progress-bar">
-        <span style={{ width: `${width}%` }} />
       </div>
     </div>
   );

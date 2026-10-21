@@ -1,59 +1,51 @@
-import {
-  BellRing,
-  CheckCircle2,
-  Clock3,
-  Users,
-} from "lucide-react";
+import { Bell, CalendarDays, CheckCircle2, MapPin } from "lucide-react";
+import { getNotifications } from "../services/eventNotificationService";
 
 export default function EventNotificationPanel() {
+  const notifications = getNotifications();
+
   return (
-    <div className="panel">
-      <div className="panel-header">
+    <div className="notification-panel">
+      <div className="panel-heading">
         <div>
-          <span className="panel-kicker">
-            EVENT MONITOR
-          </span>
-          <h3>Upcoming Event Notifications</h3>
+          <span className="eyebrow">LIVE FEED</span>
+          <h3>Campus notifications</h3>
         </div>
 
-        <BellRing size={18} />
+        <div className="notification-count">
+          <Bell size={15} />
+          {notifications.length}
+        </div>
       </div>
 
       <div className="notification-list">
-        <div className="notification-row">
-          <div className="notification-status success">
-            <CheckCircle2 size={15} />
-          </div>
+        {notifications.length === 0 ? (
+          <div className="empty-state">No new notifications.</div>
+        ) : (
+          notifications.map((item: any) => (
+            <div className="notification-item" key={item.id}>
+              <div className="notification-icon">
+                <CalendarDays size={16} />
+              </div>
 
-          <div className="notification-content">
-            <strong>Annual Tech Fest</strong>
-            <span>
-              Venue preparation confirmed.
-            </span>
-          </div>
+              <div>
+                <strong>{item.title}</strong>
+                <p>{item.description}</p>
 
-          <div className="notification-meta">
-            <Clock3 size={12} />
-            2 days
-          </div>
-        </div>
-
-        <div className="notification-row">
-          <div className="notification-status warning">
-            <Users size={15} />
-          </div>
-
-          <div className="notification-content">
-            <strong>Placement Drive</strong>
-            <span>
-              Registration approaching capacity.
-            </span>
-          </div>
-
-          <div className="notification-meta">
-            72%
-          </div>
-        </div>
+                <div className="notification-meta">
+                  <span>
+                    <MapPin size={12} />
+                    {item.location}
+                  </span>
+                  <span>
+                    <CheckCircle2 size={12} />
+                    {item.status || "New"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

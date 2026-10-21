@@ -1,80 +1,78 @@
-import { eventsApi } from "./api";
+const STORAGE_KEY = "campus_os_notifications";
 
-export type EventNotification = {
+export interface CampusNotification {
   id: string;
   title: string;
-  message: string;
-  type: "info" | "warning" | "success";
-  createdAt: string;
-};
-
-export async function getEventNotifications(): Promise<
-  EventNotification[]
-> {
-  try {
-    const response: any = await eventsApi.list();
-
-    if (Array.isArray(response)) {
-      return response.map((event: any) => ({
-        id: String(
-          event.id ?? event.event_id ?? crypto.randomUUID()
-        ),
-        title:
-          event.title ??
-          event.name ??
-          "Campus Event",
-        message:
-          event.message ??
-          `Event scheduled at ${
-            event.location ?? "campus"
-          }.`,
-        type: "info",
-        createdAt:
-          event.createdAt ??
-          event.created_at ??
-          new Date().toISOString(),
-      }));
-    }
-  } catch {
-    // Demo fallback intentionally used when backend
-    // is unavailable during frontend development.
-  }
-
-  return [
-    {
-      id: "notification-1",
-      title: "Annual Tech Fest",
-      message:
-        "Venue preparation is scheduled to begin tomorrow.",
-      type: "success",
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: "notification-2",
-      title: "Placement Drive",
-      message:
-        "Registration is approaching venue capacity.",
-      type: "warning",
-      createdAt: new Date().toISOString(),
-    },
-  ];
+  description: string;
+  location: string;
+  date: string;
+  status: string;
 }
 
-export function subscribeToEventNotifications(
-  callback: (
-    notification: EventNotification
-  ) => void
-) {
-  const timer = window.setInterval(async () => {
-    const notifications =
-      await getEventNotifications();
+const initialNotifications: CampusNotification[] = [
+  {
+    id: "N-001",
+    title: "Placement Orientation",
+    description: "Placement orientation has been scheduled for students.",
+    location: "Main Auditorium",
+    date: "21 Oct 2026",
+    status: "New",
+  },
+  {
+    id: "N-002",
+    title: "Campus Safety Drill",
+    description: "A campus safety drill will be conducted this week.",
+    location: "Central Ground",
+    date: "27 Oct 2026",
+    status: "New",
+  },
+];
 
-    if (notifications.length > 0) {
-      callback(notifications[0]);
-    }
-  }, 30000);
+export function getNotifications(): CampusNotification[] {
+  const stored = localStorage.getItem(STORAGE_KEY);
 
-  return () => {
-    window.clearInterval(timer);
+  if (!stored) {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(initialNotifications)
+    );
+
+    return initialNotifications;
+  }
+
+  try {
+    return JSON.parse(stored);
+  } catch {
+    return initialNotifications;
+  }
+}
+
+export function createEvent(event: {
+  title: string;
+  location: string;
+  date: string;
+  description: string;
+}) {
+  const notification: CampusNotification = {
+    id: `N-${Date.now()}`,
+    title: event.title,
+    description:
+      event.description || `New campus event: ${event.title}`,
+    location: event.location,
+    date: event.date,
+    status: "New",
   };
+
+  const current = getNotifications();
+
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify([notification, ...current])
+  );
+
+  return notification;
+}
+
+export function clearNotifications() {
+  localStorage.removeItem(STORAGE_KEY);
 }

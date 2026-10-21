@@ -1,104 +1,98 @@
-import { CalendarPlus, MapPin, Users } from "lucide-react";
-import { FormEvent, useState } from "react";
-import { eventsApi } from "../services/api";
+import { useState } from "react";
+import { CalendarDays, Clock, MapPin, Send } from "lucide-react";
+import { createEvent } from "../services/eventNotificationService";
 
 export default function CreateEventForm() {
   const [title, setTitle] = useState("");
-  const [location, setLocation] = useState("Auditorium");
+  const [location, setLocation] = useState("");
   const [date, setDate] = useState("");
-  const [capacity, setCapacity] = useState("100");
+  const [message, setMessage] = useState("");
 
-  const submit = async (event: FormEvent) => {
-    event.preventDefault();
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
 
-    try {
-      await eventsApi.create({
-        title,
-        location,
-        date,
-        capacity: Number(capacity),
-      });
+    if (!title || !location || !date) return;
 
-      setTitle("");
-      setDate("");
-      setCapacity("100");
-    } catch {
-      console.log("Demo event created locally");
-      setTitle("");
-    }
+    createEvent({
+      title,
+      location,
+      date,
+      description: message,
+    });
+
+    setTitle("");
+    setLocation("");
+    setDate("");
+    setMessage("");
+
+    alert("Event created and student notification generated.");
   };
 
   return (
     <form className="form-card" onSubmit={submit}>
-      <div className="form-card-header">
-        <div className="section-icon">
-          <CalendarPlus size={17} />
-        </div>
-
+      <div className="form-card-heading">
         <div>
-          <h3>Create Event</h3>
-          <p>Schedule a new campus event.</p>
+          <span className="eyebrow">ADMIN CONTROL</span>
+          <h3>Create campus event</h3>
         </div>
       </div>
 
       <div className="form-grid">
-        <label className="field">
-          <span>Event name</span>
+        <label>
+          Event name
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Enter event name"
-            required
+            placeholder="Orientation Programme"
           />
         </label>
 
-        <label className="field">
-          <span>Location</span>
-          <div className="input-with-icon">
-            <MapPin size={15} />
-            <select
+        <label>
+          Location
+          <div className="input-icon">
+            <MapPin size={16} />
+            <input
               value={location}
-              onChange={(e) =>
-                setLocation(e.target.value)
-              }
-            >
-              <option>Auditorium</option>
-              <option>Main Academic Block</option>
-              <option>Central Library</option>
-              <option>Sports Complex</option>
-            </select>
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="Main Auditorium"
+            />
           </div>
         </label>
 
-        <label className="field">
-          <span>Date</span>
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            required
-          />
+        <label>
+          Date & time
+          <div className="input-icon">
+            <CalendarDays size={16} />
+            <input
+              type="datetime-local"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+            />
+          </div>
         </label>
 
-        <label className="field">
-          <span>Expected attendees</span>
-          <div className="input-with-icon">
-            <Users size={15} />
-            <input
-              type="number"
-              value={capacity}
-              onChange={(e) =>
-                setCapacity(e.target.value)
-              }
-              min="1"
-            />
+        <label>
+          Duration
+          <div className="input-icon">
+            <Clock size={16} />
+            <input placeholder="2 hours" />
           </div>
         </label>
       </div>
 
+      <label>
+        Description
+        <textarea
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Enter event details..."
+          rows={4}
+        />
+      </label>
+
       <button className="primary-button" type="submit">
-        <CalendarPlus size={16} />
-        Create Event
+        <Send size={16} />
+        Create & Notify Students
       </button>
     </form>
   );

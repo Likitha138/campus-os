@@ -1,166 +1,93 @@
-import {
-  ArrowUp,
-  Bot,
-  BrainCircuit,
-  Lightbulb,
-  Sparkles,
-  User,
-} from "lucide-react";
-
+import { Bot, MessageSquare, Send, Sparkles } from "lucide-react";
 import { useState } from "react";
 import PageHeader from "../components/PageHeader";
 
-const suggestions = [
-  "Which building has the highest occupancy?",
-  "Where should additional parking be added?",
-  "Analyse today's traffic situation.",
-  "How can the Tech Fest layout be improved?",
-];
-
 export default function AIAssistant() {
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<
-    { role: "ai" | "user"; text: string }[]
-  >([
-    {
-      role: "ai",
-      text: "Hello. I am Campus Intelligence. I can analyse the simulated campus state, occupancy, traffic, events, emergency scenarios and future-campus plans.",
-    },
+  const [messages, setMessages] = useState<string[]>([
+    "Hello! I am the Campus OS intelligence assistant. Ask me about campus activity, traffic, events or student insights.",
   ]);
 
   const send = () => {
     if (!message.trim()) return;
 
-    const current = message;
-
-    setMessages((items) => [
-      ...items,
-      { role: "user", text: current },
-      {
-        role: "ai",
-        text: `Based on the current simulated campus state, I recommend reviewing occupancy, traffic load and event pressure together before making this decision. The current simulation shows moderate-to-high activity.`,
-      },
+    setMessages((prev) => [
+      ...prev,
+      `You: ${message}`,
+      "AI: I would analyze the connected campus data and provide a recommendation here.",
     ]);
 
     setMessage("");
   };
 
   return (
-    <div className="page ai-page">
+    <div className="page">
       <PageHeader
-        title="Campus Intelligence"
-        subtitle="AI-powered analysis and recommendations for the simulated campus."
+        eyebrow="AI INTELLIGENCE"
+        title="Campus AI Assistant"
+        description="Ask questions about your simulated campus environment."
       />
 
       <div className="ai-layout">
-        <aside className="ai-sidebar">
-          <div className="ai-profile">
-            <div className="ai-large-icon">
-              <BrainCircuit size={27} />
-            </div>
-
-            <strong>Campus Intelligence</strong>
-            <span>Gemini-powered analysis layer</span>
-          </div>
-
-          <div className="ai-capabilities">
-            <span>CAPABILITIES</span>
-
-            <div>
-              <Sparkles size={15} />
-              Campus analysis
-            </div>
-
-            <div>
-              <Lightbulb size={15} />
-              Recommendations
-            </div>
-
-            <div>
-              <Bot size={15} />
-              Scenario reasoning
-            </div>
-          </div>
-
-          <div className="ai-note">
-            <strong>Simulation aware</strong>
-            <p>
-              AI responses should be interpreted
-              against the controlled digital-campus
-              dataset.
-            </p>
-          </div>
-        </aside>
-
-        <section className="ai-chat">
+        <div className="ai-chat">
           <div className="ai-chat-header">
-            <div>
-              <span className="panel-kicker">
-                CAMPUS AI
-              </span>
-              <h3>Ask anything about campus</h3>
+            <div className="ai-avatar">
+              <Bot size={22} />
             </div>
 
-            <span className="status-pill success">
-              ONLINE
-            </span>
+            <div>
+              <strong>Campus Intelligence</strong>
+              <span>
+                <span className="live-dot" /> AI engine ready
+              </span>
+            </div>
           </div>
 
-          <div className="chat-messages">
+          <div className="ai-messages">
             {messages.map((item, index) => (
               <div
-                key={index}
-                className={`chat-message ${
-                  item.role === "user"
-                    ? "user"
-                    : "assistant"
+                className={`ai-message ${
+                  index % 2 === 1 ? "user-message" : ""
                 }`}
+                key={`${item}-${index}`}
               >
-                <div className="chat-avatar">
-                  {item.role === "user" ? (
-                    <User size={15} />
-                  ) : (
-                    <Bot size={15} />
-                  )}
-                </div>
-
-                <div className="chat-bubble">
-                  {item.text}
-                </div>
+                {item}
               </div>
             ))}
           </div>
 
-          <div className="ai-suggestions">
-            {suggestions.map((item) => (
-              <button
-                key={item}
-                onClick={() =>
-                  setMessage(item)
-                }
-              >
-                {item}
-              </button>
-            ))}
-          </div>
-
-          <div className="chat-input">
+          <div className="ai-input">
+            <MessageSquare size={18} />
             <input
               value={message}
-              onChange={(e) =>
-                setMessage(e.target.value)
-              }
-              onKeyDown={(e) => {
-                if (e.key === "Enter") send();
-              }}
-              placeholder="Ask Campus Intelligence..."
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && send()}
+              placeholder="Ask about the campus..."
             />
-
             <button onClick={send}>
-              <ArrowUp size={17} />
+              <Send size={16} />
             </button>
           </div>
-        </section>
+        </div>
+
+        <div className="data-card ai-insights">
+          <Sparkles size={22} />
+          <span className="eyebrow">SUGGESTED QUESTIONS</span>
+
+          {[
+            "Which zone has the highest traffic?",
+            "What events are scheduled today?",
+            "Which buildings have high occupancy?",
+            "How is the campus environment?",
+          ].map((question) => (
+            <button
+              key={question}
+              onClick={() => setMessage(question)}
+            >
+              {question}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

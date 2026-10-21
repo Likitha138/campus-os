@@ -1,170 +1,119 @@
-import {
-  Building2,
-  Car,
-  Maximize2,
-  Minus,
-  Plus,
-  Rotate3D,
-  Users,
-} from "lucide-react";
-
 import { useState } from "react";
-import { campusLocations } from "../data/campus";
+import { Car, MapPin, Maximize2, Minus, Plus } from "lucide-react";
+
+const vehicles = [
+  { id: "VH-001", x: 27, y: 34, type: "Car" },
+  { id: "VH-002", x: 55, y: 27, type: "Bus" },
+  { id: "VH-003", x: 70, y: 62, type: "Bike" },
+  { id: "VH-004", x: 43, y: 73, type: "Car" },
+  { id: "VH-005", x: 80, y: 39, type: "Car" },
+];
 
 export default function Campus3D() {
   const [zoom, setZoom] = useState(1);
-  const [selected, setSelected] = useState(
-    campusLocations[0]
-  );
+  const [selected, setSelected] = useState("VH-001");
 
   return (
-    <div className="campus-3d">
-      <div className="campus-toolbar">
-        <div className="campus-toolbar-title">
-          <Rotate3D size={16} />
-          <span>INTERACTIVE CAMPUS VIEW</span>
+    <div className="campus-map">
+      <div className="map-toolbar">
+        <div className="map-title">
+          <span className="live-dot" />
+          <div>
+            <strong>LIVE CAMPUS TWIN</strong>
+            <small>Digital environment • Updated now</small>
+          </div>
         </div>
 
-        <div className="campus-toolbar-actions">
-          <button
-            onClick={() =>
-              setZoom((value) =>
-                Math.min(value + 0.15, 1.6)
-              )
-            }
-          >
-            <Plus size={15} />
+        <div className="map-controls">
+          <button onClick={() => setZoom((z) => Math.min(1.5, z + 0.1))}>
+            <Plus size={16} />
           </button>
-
-          <button
-            onClick={() =>
-              setZoom((value) =>
-                Math.max(value - 0.15, 0.7)
-              )
-            }
-          >
-            <Minus size={15} />
+          <button onClick={() => setZoom((z) => Math.max(0.8, z - 0.1))}>
+            <Minus size={16} />
           </button>
-
           <button>
-            <Maximize2 size={15} />
+            <Maximize2 size={16} />
           </button>
         </div>
       </div>
 
-      <div
-        className="campus-scene"
-        style={{
-          transform: `scale(${zoom})`,
-        }}
-      >
-        <div className="scene-grid" />
+      <div className="map-content">
+        <div
+          className="campus-map-inner"
+          style={{ transform: `scale(${zoom})` }}
+        >
+          <div className="road road-1" />
+          <div className="road road-2" />
+          <div className="road road-3" />
+          <div className="road road-4" />
 
-        <div className="scene-road road-one" />
-        <div className="scene-road road-two" />
-        <div className="scene-road road-three" />
-
-        <div className="scene-zone zone-a">
-          ZONE A
-        </div>
-
-        <div className="scene-zone zone-b">
-          ZONE B
-        </div>
-
-        {campusLocations.map((location) => (
-          <button
-            key={location.id}
-            className={`scene-building ${
-              selected.id === location.id
-                ? "selected"
-                : ""
-            }`}
-            style={{
-              left: `${location.x}%`,
-              top: `${location.y}%`,
-            }}
-            onClick={() => setSelected(location)}
-          >
-            <span className="building-shadow" />
-
-            <span className="building-body">
-              <Building2 size={18} />
-            </span>
-
-            <span className="building-label">
-              {location.name}
-            </span>
-
-            <span
-              className={`occupancy-dot occupancy-${location.status.toLowerCase()}`}
-            />
-          </button>
-        ))}
-
-        <div className="scene-vehicle vehicle-one">
-          <Car size={16} />
-        </div>
-
-        <div className="scene-vehicle vehicle-two">
-          <Car size={16} />
-        </div>
-
-        <div className="scene-crowd">
-          <Users size={15} />
-        </div>
-      </div>
-
-      <div className="campus-info-panel">
-        <div className="campus-info-header">
-          <div>
-            <span className="panel-kicker">
-              SELECTED LOCATION
-            </span>
-
-            <h3>{selected.name}</h3>
+          <div className="campus-building building-a">
+            <span>MAIN BLOCK</span>
+            <small>Academic</small>
           </div>
 
-          <span className="status-pill success">
-            {selected.status}
-          </span>
+          <div className="campus-building building-b">
+            <span>LIBRARY</span>
+            <small>Knowledge Hub</small>
+          </div>
+
+          <div className="campus-building building-c">
+            <span>ADMIN</span>
+            <small>Management</small>
+          </div>
+
+          <div className="campus-building building-d">
+            <span>SCIENCE</span>
+            <small>Labs</small>
+          </div>
+
+          <div className="green-zone zone-a">
+            <span>ZONE A</span>
+          </div>
+
+          <div className="green-zone zone-b">
+            <span>ZONE B</span>
+          </div>
+
+          {vehicles.map((vehicle) => (
+            <button
+              key={vehicle.id}
+              className={`map-vehicle ${
+                selected === vehicle.id ? "selected" : ""
+              }`}
+              style={{ left: `${vehicle.x}%`, top: `${vehicle.y}%` }}
+              onClick={() => setSelected(vehicle.id)}
+              title={vehicle.id}
+            >
+              <Car size={14} />
+            </button>
+          ))}
+
+          <div className="map-location campus-pin">
+            <MapPin size={15} />
+          </div>
         </div>
 
-        <div className="campus-info-grid">
+        <div className="map-legend">
           <div>
-            <span>TYPE</span>
-            <strong>{selected.type}</strong>
+            <span className="legend-dot moving" />
+            Moving
           </div>
-
           <div>
-            <span>ZONE</span>
-            <strong>{selected.zone}</strong>
+            <span className="legend-dot stopped" />
+            Stopped
           </div>
-
           <div>
-            <span>OCCUPANCY</span>
-            <strong>{selected.occupancy}%</strong>
-          </div>
-
-          <div>
-            <span>CAPACITY</span>
-            <strong>
-              {selected.capacity.toLocaleString()}
-            </strong>
+            <span className="legend-dot building" />
+            Building
           </div>
         </div>
-      </div>
 
-      <div className="campus-legend">
-        <span>
-          <i className="legend-green" /> Open
-        </span>
-        <span>
-          <i className="legend-orange" /> Busy
-        </span>
-        <span>
-          <i className="legend-red" /> Restricted
-        </span>
+        <div className="map-selected">
+          <span>SELECTED VEHICLE</span>
+          <strong>{selected}</strong>
+          <small>Real-time simulation</small>
+        </div>
       </div>
     </div>
   );

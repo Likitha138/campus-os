@@ -1,47 +1,17 @@
-import {
-  activityData,
-  alertsData,
-  attendanceData,
-  campusLocations,
-  dashboardStats,
-  eventsData,
-  marksData,
-  scenarios,
-  students,
-  trafficData,
-  trafficVehicles,
-} from "../data/campus";
+import { students } from "../data/students";
+import { events } from "../data/events";
+import { buildings } from "../data/campus";
 
-export const getDemoDashboardData = () => ({
-  stats: dashboardStats,
-  activity: activityData,
-  locations: campusLocations,
-  events: eventsData,
-  alerts: alertsData,
-});
+export const dataService = {
+  getStudents: () => students,
 
-export const getDemoActivityData = () =>
-  activityData;
+  getEvents: () => events,
 
-export const getDemoTrafficData = () => ({
-  chart: trafficData,
-  vehicles: trafficVehicles,
-});
+  getBuildings: () => buildings,
 
-export const getDemoAttendanceData = () =>
-  attendanceData;
+  getStudentById: (id: string) =>
+    students.find((student) => student.id === id),
 
-export const getDemoMarksData = () =>
-  marksData;
-
-export const getDemoStudents = () =>
-  students;
-
-export const getDemoEvents = () =>
-  eventsData;
-
-export const getDemoScenarios = () =>
-  scenarios;
-
-export const getDemoLocations = () =>
-  campusLocations;
+  getEventById: (id: string) =>
+    events.find((event) => event.id === id),
+};

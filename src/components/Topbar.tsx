@@ -1,63 +1,62 @@
 import {
-  Activity,
-  CalendarDays,
-  CloudSun,
+  Bell,
   Menu,
+  Search,
+  UserRound,
   Wifi,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-type Props = {
+interface Props {
   onMenu?: () => void;
-};
+  session?: any;
+}
 
-export default function Topbar({ onMenu }: Props) {
+export default function Topbar({ onMenu, session }: Props) {
+  const navigate = useNavigate();
+
   return (
-    <div className="topbar">
+    <header className="topbar">
       <div className="topbar-left">
-        <button className="mobile-menu-button" onClick={onMenu}>
-          <Menu size={19} />
+        <button className="menu-button" onClick={onMenu}>
+          <Menu size={21} />
         </button>
 
-        <div className="system-status">
-          <span className="live-indicator" />
-          <span>SIMULATION ONLINE</span>
+        <div className="topbar-search">
+          <Search size={17} />
+          <input placeholder="Search campus, students, rooms..." />
+          <kbd>⌘ K</kbd>
         </div>
       </div>
 
-      <div className="topbar-center">
-        <div className="topbar-metric">
-          <Activity size={15} />
-          <span>System Load</span>
-          <strong>42%</strong>
-        </div>
-
-        <div className="topbar-metric">
+      <div className="topbar-actions">
+        <div className="system-live">
           <Wifi size={15} />
-          <span>Network</span>
-          <strong className="success-text">Stable</strong>
+          <span>LIVE</span>
         </div>
 
-        <div className="topbar-metric">
-          <CloudSun size={15} />
-          <span>AQI</span>
-          <strong>42</strong>
-        </div>
-      </div>
+        <button
+          className="icon-button"
+          onClick={() => navigate("/notifications")}
+          title="Notifications"
+        >
+          <Bell size={18} />
+          <i />
+        </button>
 
-      <div className="topbar-right">
-        <div className="topbar-date">
-          <CalendarDays size={15} />
-          <span>20 Oct 2026</span>
-        </div>
-
-        <div className="user-chip">
-          <div className="avatar">BM</div>
-          <div>
-            <strong>Bhuvan M</strong>
-            <span>Administrator</span>
+        <button
+          className="top-user"
+          onClick={() => navigate(session ? "/settings" : "/register")}
+        >
+          <div className="top-user-avatar">
+            <UserRound size={16} />
           </div>
-        </div>
+          <div className="top-user-text">
+            <strong>{session?.name || "Guest User"}</strong>
+            <span>{session?.role || "Guest"}</span>
+          </div>
+        </button>
       </div>
-    </div>
+    </header>
   );
 }
