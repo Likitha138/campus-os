@@ -6,7 +6,6 @@ import { useAuth } from "../auth/AuthContext";
 
 export default function DashboardLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
-
   const { user, isAuthenticated, logout } = useAuth();
 
   const session = {

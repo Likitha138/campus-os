@@ -1,393 +1,192 @@
 import {
   Activity,
+  AlertTriangle,
   BarChart3,
   Bell,
   Bot,
   BriefcaseBusiness,
   Building2,
+  CalendarDays,
   Car,
-  ChevronRight,
-  CircleUserRound,
-  ClipboardCheck,
+  Compass,
   GraduationCap,
   LayoutDashboard,
-  LogIn,
-  LogOut,
-  Map,
-  Megaphone,
-  Navigation2,
+  ClipboardCheck,
   Settings,
   ShieldAlert,
-  Sparkles,
-  Thermometer,
-  Users,
-  X,
+  LogIn,
+  LogOut,
+  UserPlus,
+  Leaf,
+  FileBarChart,
+  Trophy,
 } from "lucide-react";
+
 import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/AuthContext";
 
-interface SessionUser {
-  id: string;
-  name: string;
-  email: string;
-  role: "student" | "admin";
-}
-
-interface Session {
-  user: SessionUser | null;
-  isAuthenticated: boolean;
-  logout: () => void;
-}
-
-interface Props {
+interface SidebarProps {
   mobileOpen?: boolean;
   onClose?: () => void;
-  session?: Session;
+  session?: {
+    user: any;
+    isAuthenticated: boolean;
+    logout: () => void;
+  };
 }
 
-const campusNavigation = [
-  {
-    label: "Activity",
-    path: "/activity",
-    icon: Activity,
-  },
-  {
-    label: "Navigation",
-    path: "/navigation",
-    icon: Navigation2,
-  },
-  {
-    label: "Traffic",
-    path: "/traffic",
-    icon: Car,
-  },
-  {
-    label: "Events",
-    path: "/events",
-    icon: Megaphone,
-  },
-];
-
-const intelligenceNavigation = [
-  {
-    label: "Environment",
-    path: "/environment",
-    icon: Thermometer,
-  },
-  {
-    label: "Scenarios",
-    path: "/scenarios",
-    icon: Building2,
-  },
-  {
-    label: "AI Assistant",
-    path: "/ai",
-    icon: Bot,
-  },
-];
-
-const studentNavigation = [
-  {
-    label: "Attendance",
-    path: "/attendance",
-    icon: ClipboardCheck,
-  },
-  {
-    label: "Marks",
-    path: "/marks",
-    icon: BarChart3,
-  },
-  {
-    label: "Assignments",
-    path: "/assignments",
-    icon: GraduationCap,
-  },
-  {
-    label: "Reports",
-    path: "/reports",
-    icon: Map,
-  },
-  {
-    label: "Notifications",
-    path: "/notifications",
-    icon: Bell,
-  },
-  {
-    label: "Career",
-    path: "/career",
-    icon: BriefcaseBusiness,
-  },
-  {
-    label: "AI Performance",
-    path: "/ai-performance",
-    icon: Sparkles,
-  },
+const navigation = [
+  { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard, public: true },
+  { label: "Attendance", path: "/attendance", icon: ClipboardCheck },
+  { label: "Marks", path: "/marks", icon: Trophy },
+  { label: "Assignments", path: "/assignments", icon: GraduationCap },
+  { label: "Reports", path: "/reports", icon: FileBarChart },
+  { label: "AI Performance", path: "/ai-performance", icon: BarChart3 },
+  { label: "Career Intelligence", path: "/career", icon: BriefcaseBusiness },
+  { label: "AI Assistant", path: "/ai-assistant", icon: Bot },
+  { label: "Navigation", path: "/navigation", icon: Compass },
+  { label: "Activity", path: "/activity", icon: Activity },
+  { label: "Traffic", path: "/traffic", icon: Car },
+  { label: "Events", path: "/events", icon: CalendarDays },
+  { label: "Environment", path: "/environment", icon: Leaf },
+  { label: "Emergency", path: "/emergency", icon: ShieldAlert },
+  { label: "Alerts", path: "/alerts", icon: AlertTriangle },
+  { label: "Notifications", path: "/notifications", icon: Bell },
+  { label: "Settings", path: "/settings", icon: Settings },
 ];
 
 export default function Sidebar({
-  mobileOpen,
+  mobileOpen = false,
   onClose,
   session,
-}: Props) {
+}: SidebarProps) {
+  const auth = useAuth();
   const navigate = useNavigate();
 
-  const isAuthenticated = session?.isAuthenticated ?? false;
-  const user = session?.user ?? null;
+  const user = session?.user ?? auth.user;
+  const isAuthenticated =
+    session?.isAuthenticated ?? auth.isAuthenticated;
+  const logout = session?.logout ?? auth.logout;
 
-  const handleLogout = () => {
-    session?.logout();
+  const isAdmin = user?.role === "admin";
+
+  function handleNavigation(path: string, isPublic?: boolean) {
     onClose?.();
-    navigate("/dashboard", { replace: true });
-  };
 
-  const handleLogin = () => {
+    if (isPublic || isAuthenticated) {
+      navigate(path);
+    } else {
+      navigate("/login", { state: { from: path } });
+    }
+  }
+
+  function handleLogout() {
+    logout();
     onClose?.();
-    navigate("/login");
-  };
-
-  const renderItem = (
-    item: {
-      label: string;
-      path: string;
-      icon: React.ElementType;
-    },
-    closeOnClick = true
-  ) => {
-    const Icon = item.icon;
-
-    return (
-      <NavLink
-        key={item.path}
-        to={item.path}
-        onClick={() => {
-          if (closeOnClick) {
-            onClose?.();
-          }
-        }}
-        className={({ isActive }) =>
-          `side-link ${isActive ? "active" : ""}`
-        }
-      >
-        <Icon size={17} />
-        <span>{item.label}</span>
-
-        <ChevronRight
-          className="side-chevron"
-          size={14}
-        />
-      </NavLink>
-    );
-  };
+    navigate("/dashboard");
+  }
 
   return (
     <>
       {mobileOpen && (
-        <div
-          className="mobile-overlay"
+        <button
+          type="button"
+          className="sidebar-overlay"
+          aria-label="Close sidebar"
           onClick={onClose}
         />
       )}
 
-      <aside
-        className={`sidebar ${
-          mobileOpen ? "mobile-open" : ""
-        }`}
-      >
-        {/* =====================================================
-            SIDEBAR HEADER
-        ===================================================== */}
-
-        <div className="sidebar-top">
-          <div
-            className="sidebar-brand"
-            onClick={() => {
-              navigate("/dashboard");
-              onClose?.();
-            }}
-            role="button"
-            tabIndex={0}
-          >
-            <div className="brand-mark">
-              C
-            </div>
-
-            <div>
-              <strong>CAMPUS OS</strong>
-              <span>Digital Campus Twin</span>
-            </div>
+      <aside className={`sidebar ${mobileOpen ? "sidebar-open" : ""}`}>
+        <div className="sidebar-brand">
+          <div className="sidebar-logo">
+            <Building2 size={25} />
           </div>
 
-          <button
-            className="mobile-close"
-            onClick={onClose}
-            type="button"
-            aria-label="Close navigation"
-          >
-            <X size={20} />
-          </button>
+          <div>
+            <h2>Campus OS</h2>
+            <p>Intelligent Campus</p>
+          </div>
         </div>
 
-        {/* =====================================================
-            SYSTEM STATUS
-        ===================================================== */}
-
-        <div className="sidebar-status">
-          <span className="live-dot" />
-          <span>Campus system online</span>
-        </div>
-
-        {/* =====================================================
-            NAVIGATION
-        ===================================================== */}
+        <div className="sidebar-section-label">WORKSPACE</div>
 
         <nav className="sidebar-nav">
+          {navigation.map(({ label, path, icon: Icon, public: isPublic }) => (
+            <NavLink
+              key={path}
+              to={isPublic || isAuthenticated ? path : "/login"}
+              onClick={(event) => {
+                event.preventDefault();
+                handleNavigation(path, isPublic);
+              }}
+              className={({ isActive }) =>
+                `sidebar-link ${isActive ? "active" : ""}`
+              }
+            >
+              <Icon size={18} />
+              <span>{label}</span>
+            </NavLink>
+          ))}
 
-          {/* PUBLIC */}
-          <div className="nav-section-title">
-            EXPLORE
-          </div>
-
-          {renderItem({
-            label: "Dashboard",
-            path: "/dashboard",
-            icon: LayoutDashboard,
-          })}
-
-          {/* =================================================
-              LOGGED-IN AREA
-          ================================================= */}
-
-          {isAuthenticated && (
-            <>
-              {/* CAMPUS */}
-              <div className="nav-section-title">
-                CAMPUS
-              </div>
-
-              {campusNavigation.map((item) =>
-                renderItem(item)
-              )}
-
-              {/* INTELLIGENCE */}
-              <div className="nav-section-title">
-                INTELLIGENCE
-              </div>
-
-              {intelligenceNavigation.map((item) =>
-                renderItem(item)
-              )}
-
-              {/* STUDENT SERVICES */}
-              {user?.role === "student" && (
-                <>
-                  <div className="nav-section-title">
-                    STUDENT SERVICES
-                  </div>
-
-                  {studentNavigation.map((item) =>
-                    renderItem(item)
-                  )}
-                </>
-              )}
-
-              {/* ADMIN CONTROL */}
-              {user?.role === "admin" && (
-                <>
-                  <div className="nav-section-title">
-                    ADMIN CONTROL
-                  </div>
-
-                  {renderItem({
-                    label: "Campus Management",
-                    path: "/build",
-                    icon: Building2,
-                  })}
-
-                  {renderItem({
-                    label: "Emergency",
-                    path: "/emergency",
-                    icon: ShieldAlert,
-                  })}
-
-                  {renderItem({
-                    label: "Settings",
-                    path: "/settings",
-                    icon: Settings,
-                  })}
-                </>
-              )}
-
-              {/* STUDENT SETTINGS */}
-              {user?.role === "student" && (
-                <>
-                  <div className="nav-section-title">
-                    CAMPUS CONTROL
-                  </div>
-
-                  {renderItem({
-                    label: "Emergency",
-                    path: "/emergency",
-                    icon: ShieldAlert,
-                  })}
-
-                  {renderItem({
-                    label: "Settings",
-                    path: "/settings",
-                    icon: Settings,
-                  })}
-                </>
-              )}
-            </>
+          {isAdmin && (
+            <NavLink
+              to="/build"
+              onClick={onClose}
+              className={({ isActive }) =>
+                `sidebar-link ${isActive ? "active" : ""}`
+              }
+            >
+              <Building2 size={18} />
+              <span>Campus Management</span>
+            </NavLink>
           )}
         </nav>
 
-        {/* =====================================================
-            USER / LOGIN AREA
-        ===================================================== */}
-
         <div className="sidebar-bottom">
+          {isAuthenticated ? (
+            <>
+              <div className="sidebar-user">
+                <div className="sidebar-avatar">
+                  {user?.name?.charAt(0)?.toUpperCase() || "U"}
+                </div>
 
-          {!isAuthenticated ? (
-            <button
-              className="login-sidebar-button"
-              onClick={handleLogin}
-              type="button"
-            >
-              <LogIn size={17} />
-
-              <span>
-                Sign in to access campus
-              </span>
-            </button>
-          ) : (
-            <div className="profile-box">
-
-              <div className="profile-avatar">
-                <CircleUserRound size={20} />
-              </div>
-
-              <div className="profile-info">
-                <strong>
-                  {user?.name || "Campus User"}
-                </strong>
-
-                <span>
-                  {user?.role === "admin"
-                    ? "Administrator"
-                    : "Student"}
-                </span>
+                <div className="sidebar-user-info">
+                  <strong>{user?.name || "Campus User"}</strong>
+                  <span>{isAdmin ? "Administrator" : "Student"}</span>
+                </div>
               </div>
 
               <button
-                onClick={handleLogout}
-                title="Logout"
                 type="button"
-                className="logout-button"
+                className="sidebar-link sidebar-auth-button"
+                onClick={handleLogout}
               >
-                <LogOut size={17} />
+                <LogOut size={18} />
+                <span>Logout</span>
               </button>
+            </>
+          ) : (
+            <div className="sidebar-auth-actions">
+              <NavLink
+                to="/login"
+                onClick={onClose}
+                className="sidebar-link"
+              >
+                <LogIn size={18} />
+                <span>Login</span>
+              </NavLink>
+
+              <NavLink
+                to="/register"
+                onClick={onClose}
+                className="sidebar-link"
+              >
+                <UserPlus size={18} />
+                <span>Student Registration</span>
+              </NavLink>
             </div>
           )}
-
         </div>
       </aside>
     </>
