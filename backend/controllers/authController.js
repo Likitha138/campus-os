@@ -1,160 +1,342 @@
-const { pool } = require("../config/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const db = require("../config/db");
 
-// =====================================================
-// LOGIN USER
-// POST /api/auth/login
-// =====================================================
-const loginUser = async (req, res) => {
+/*
+|--------------------------------------------------------------------------
+| Helper: Generate JWT
+|--------------------------------------------------------------------------
+*/
+
+const generateToken = (user) => {
+  return jwt.sign(
+    {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "7d",
+    }
+  );
+};
+
+/*
+|--------------------------------------------------------------------------
+| STUDENT REGISTRATION
+|--------------------------------------------------------------------------
+|
+| Student creates their account and password.
+| Registration DOES NOT automatically log them in.
+|
+*/
+
+const registerStudent = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const {
+      name,
+      studentId,
+      email,
+      password,
+    } = req.body;
 
-    // Validate input
-    if (!email || !password) {
+    if (
+      !name ||
+      !studentId ||
+      !email ||
+      !password
+    ) {
       return res.status(400).json({
         success: false,
-        message: "Email and password are required"
+        message:
+          "Name, student ID, email and password are required.",
       });
     }
 
-    // Find user
-    const [rows] = await pool.query(
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Password must contain at least 6 characters.",
+      });
+    }
+
+    const cleanEmail = email
+      .trim()
+      .toLowerCase();
+
+    /*
+     * Check whether email already exists.
+     */
+
+    const [existingEmail] = await db.query(
+      "SELECT id FROM users WHERE email = ? LIMIT 1",
+      [cleanEmail]
+    );
+
+    if (existingEmail.length > 0) {
+      return res.status(409).json({
+        success: false,
+        message:
+          "An account with this email already exists.",
+      });
+    }
+
+    /*
+     * Check whether student ID already exists.
+     */
+
+    const [existingStudent] =
+      await db.query(
+        "SELECT id FROM users WHERE student_id = ? LIMIT 1",
+        [studentId.trim()]
+      );
+
+    if (existingStudent.length > 0) {
+      return res.status(409).json({
+        success: false,
+        message:
+          "This student ID is already registered.",
+      });
+    }
+
+    /*
+     * Hash password before storing it.
+     */
+
+    const hashedPassword =
+      await bcrypt.hash(password, 10);
+
+    /*
+     * Insert student.
+     */
+
+    const [result] = await db.query(
+      `
+      INSERT INTO users
+      (
+        name,
+        student_id,
+        email,
+        password,
+        role
+      )
+      VALUES (?, ?, ?, ?, 'student')
+      `,
+      [
+        name.trim(),
+        studentId.trim(),
+        cleanEmail,
+        hashedPassword,
+      ]
+    );
+
+    return res.status(201).json({
+      success: true,
+      message:
+        "Student registration successful. Please login.",
+      userId: result.insertId,
+    });
+  } catch (error) {
+    console.error(
+      "Student registration error:",
+      error
+    );
+
+    next(error);
+  }
+};
+
+/*
+|--------------------------------------------------------------------------
+| LOGIN
+|--------------------------------------------------------------------------
+|
+| Handles both:
+| - Student login
+| - Admin login
+|
+*/
+
+const login = async (req, res, next) => {
+  try {
+    const {
+      email,
+      password,
+      role,
+    } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Email and password are required.",
+      });
+    }
+
+    const cleanEmail = email
+      .trim()
+      .toLowerCase();
+
+    /*
+     * Find user.
+     */
+
+    const [users] = await db.query(
       `
       SELECT
         id,
         name,
+        student_id,
         email,
         password,
-        role,
-        student_id,
-        department,
-        semester
+        role
       FROM users
       WHERE email = ?
       LIMIT 1
       `,
-      [email]
+      [cleanEmail]
     );
 
-    if (rows.length === 0) {
+    if (users.length === 0) {
       return res.status(401).json({
         success: false,
-        message: "Invalid email or password"
+        message:
+          "Invalid email or password.",
       });
     }
 
-    const user = rows[0];
+    const user = users[0];
 
-    // Compare password
-    const passwordMatch = await bcrypt.compare(
-      password,
-      user.password
-    );
+    /*
+     * If frontend specifies a role,
+     * make sure it matches the database.
+     */
 
-    if (!passwordMatch) {
+    if (
+      role &&
+      user.role !== role
+    ) {
+      return res.status(403).json({
+        success: false,
+        message:
+          "You do not have permission to login using this role.",
+      });
+    }
+
+    /*
+     * Verify password.
+     */
+
+    const passwordMatches =
+      await bcrypt.compare(
+        password,
+        user.password
+      );
+
+    if (!passwordMatches) {
       return res.status(401).json({
         success: false,
-        message: "Invalid email or password"
+        message:
+          "Invalid email or password.",
       });
     }
 
-    // JWT secret
-    const secret = process.env.JWT_SECRET;
+    /*
+     * Create JWT.
+     */
 
-    if (!secret) {
-      console.error("JWT_SECRET is missing in .env");
+    const token =
+      generateToken(user);
 
-      return res.status(500).json({
-        success: false,
-        message: "Authentication configuration is missing"
-      });
-    }
+    /*
+     * Do not send password back
+     * to frontend.
+     */
 
-    // Create token
-    const token = jwt.sign(
-      {
-        id: user.id,
-        email: user.email,
-        role: user.role
-      },
-      secret,
-      {
-        expiresIn: "7d"
-      }
-    );
-
-    // Never send password to frontend
-    delete user.password;
-
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      message: "Login successful",
+      message: "Login successful.",
       token,
-      user
-    });
 
+      user: {
+        id: user.id,
+        name: user.name,
+        studentId:
+          user.student_id,
+        email: user.email,
+        role: user.role,
+      },
+    });
   } catch (error) {
-    console.error("LOGIN ERROR:", error);
+    console.error(
+      "Login error:",
+      error
+    );
 
-    res.status(500).json({
-      success: false,
-      message: "Login failed",
-      error: error.message
-    });
+    next(error);
   }
 };
 
+/*
+|--------------------------------------------------------------------------
+| GET CURRENT USER
+|--------------------------------------------------------------------------
+|
+| This endpoint requires authMiddleware.
+|
+*/
 
-// =====================================================
-// GET CURRENT USER
-// GET /api/auth/me
-// =====================================================
-const getCurrentUser = async (req, res) => {
+const getMe = async (req, res, next) => {
   try {
-    const [rows] = await pool.query(
+    const userId = req.user.id;
+
+    const [users] = await db.query(
       `
       SELECT
         id,
         name,
-        email,
-        role,
         student_id,
-        department,
-        semester,
-        created_at
+        email,
+        role
       FROM users
       WHERE id = ?
       LIMIT 1
       `,
-      [req.user.id]
+      [userId]
     );
 
-    if (rows.length === 0) {
+    if (users.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "User not found"
+        message: "User not found.",
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      data: rows[0]
+      user: {
+        id: users[0].id,
+        name: users[0].name,
+        studentId:
+          users[0].student_id,
+        email: users[0].email,
+        role: users[0].role,
+      },
     });
-
   } catch (error) {
-    console.error("GET CURRENT USER ERROR:", error);
+    console.error(
+      "Get current user error:",
+      error
+    );
 
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch current user",
-      error: error.message
-    });
+    next(error);
   }
 };
 
-
 module.exports = {
-  loginUser,
-  getCurrentUser
+  registerStudent,
+  login,
+  getMe,
 };
