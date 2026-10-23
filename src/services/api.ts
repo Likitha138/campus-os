@@ -5,24 +5,30 @@ async function request<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
+  const token = localStorage.getItem("campus_os_token");
+
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    ...options,
     headers: {
       "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.headers || {}),
     },
-    ...options,
   });
 
+  const data = await response.json().catch(() => null);
+
   if (!response.ok) {
-    throw new Error(`API request failed: ${response.status}`);
+    const message =
+      data?.message || `API request failed: ${response.status}`;
+    throw new Error(message);
   }
 
-  return response.json();
+  return data as T;
 }
 
 export const api = {
-  get: <T>(endpoint: string) =>
-    request<T>(endpoint),
+  get: <T>(endpoint: string) => request<T>(endpoint),
 
   post: <T>(endpoint: string, body: unknown) =>
     request<T>(endpoint, {

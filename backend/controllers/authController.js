@@ -1,337 +1,222 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const db = require("../config/db");
+const { pool } = require("../config/db");
 
-/*
-|--------------------------------------------------------------------------
-| Helper: Generate JWT
-|--------------------------------------------------------------------------
-*/
+const createToken = (user) => {
+  const secret = process.env.JWT_SECRET;
 
-const generateToken = (user) => {
+  if (!secret) {
+    throw new Error("JWT_SECRET is missing from backend/.env");
+  }
+
   return jwt.sign(
     {
       id: user.id,
       email: user.email,
       role: user.role,
     },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: "7d",
-    }
+    secret,
+    { expiresIn: "1d" }
   );
 };
 
-/*
-|--------------------------------------------------------------------------
-| STUDENT REGISTRATION
-|--------------------------------------------------------------------------
-|
-| Student creates their account and password.
-| Registration DOES NOT automatically log them in.
-|
-*/
-
-const registerStudent = async (req, res, next) => {
+// POST /api/auth/student/register
+const registerStudent = async (req, res) => {
   try {
-    const {
-      name,
-      studentId,
-      email,
-      password,
-    } = req.body;
+    const { name, studentId, email, password } = req.body;
 
-    if (
-      !name ||
-      !studentId ||
-      !email ||
-      !password
-    ) {
+    if (!name?.trim() || !studentId?.trim() ||
+        !email?.trim() || !password) {
       return res.status(400).json({
         success: false,
-        message:
-          "Name, student ID, email and password are required.",
+        message: "Name, student ID, email and password are required.",
       });
     }
 
-    if (password.length < 6) {
+    if (password.length < 8) {
       return res.status(400).json({
         success: false,
-        message:
-          "Password must contain at least 6 characters.",
+        message: "Password must contain at least 8 characters.",
       });
     }
 
-    const cleanEmail = email
-      .trim()
-      .toLowerCase();
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedStudentId = studentId.trim();
 
-    /*
-     * Check whether email already exists.
-     */
-
-    const [existingEmail] = await db.query(
-      "SELECT id FROM users WHERE email = ? LIMIT 1",
-      [cleanEmail]
+    const [existing] = await pool.query(
+      "SELECT id FROM users WHERE email = ? OR student_id = ? LIMIT 1",
+      [normalizedEmail, normalizedStudentId]
     );
 
-    if (existingEmail.length > 0) {
+    if (existing.length > 0) {
       return res.status(409).json({
         success: false,
-        message:
-          "An account with this email already exists.",
+        message: "This email or student ID is already registered.",
       });
     }
 
-    /*
-     * Check whether student ID already exists.
-     */
+    const hashedPassword = await bcrypt.hash(password, 12);
 
-    const [existingStudent] =
-      await db.query(
-        "SELECT id FROM users WHERE student_id = ? LIMIT 1",
-        [studentId.trim()]
-      );
-
-    if (existingStudent.length > 0) {
-      return res.status(409).json({
-        success: false,
-        message:
-          "This student ID is already registered.",
-      });
-    }
-
-    /*
-     * Hash password before storing it.
-     */
-
-    const hashedPassword =
-      await bcrypt.hash(password, 10);
-
-    /*
-     * Insert student.
-     */
-
-    const [result] = await db.query(
-      `
-      INSERT INTO users
-      (
-        name,
-        student_id,
-        email,
-        password,
-        role
-      )
-      VALUES (?, ?, ?, ?, 'student')
-      `,
+    const [result] = await pool.query(
+      `INSERT INTO users
+       (name, student_id, email, password, role)
+       VALUES (?, ?, ?, ?, 'student')`,
       [
         name.trim(),
-        studentId.trim(),
-        cleanEmail,
+        normalizedStudentId,
+        normalizedEmail,
         hashedPassword,
       ]
     );
 
     return res.status(201).json({
       success: true,
-      message:
-        "Student registration successful. Please login.",
-      userId: result.insertId,
+      message: "Student registered successfully. Please log in.",
+      user: {
+        id: result.insertId,
+        name: name.trim(),
+        studentId: normalizedStudentId,
+        email: normalizedEmail,
+        role: "student",
+      },
     });
   } catch (error) {
-    console.error(
-      "Student registration error:",
-      error
-    );
+    console.error("Student registration error:", error.message);
 
-    next(error);
+    return res.status(500).json({
+      success: false,
+      message: "Registration failed. Check the users table and database configuration.",
+    });
   }
 };
 
-/*
-|--------------------------------------------------------------------------
-| LOGIN
-|--------------------------------------------------------------------------
-|
-| Handles both:
-| - Student login
-| - Admin login
-|
-*/
-
-const login = async (req, res, next) => {
+// POST /api/auth/login
+const login = async (req, res) => {
   try {
-    const {
-      email,
-      password,
-      role,
-    } = req.body;
+    const { email, password, role } = req.body;
 
-    if (!email || !password) {
+    if (!email?.trim() || !password || !role) {
       return res.status(400).json({
         success: false,
-        message:
-          "Email and password are required.",
+        message: "Email, password and role are required.",
       });
     }
 
-    const cleanEmail = email
-      .trim()
-      .toLowerCase();
+    if (!["student", "admin"].includes(role)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid account role.",
+      });
+    }
 
-    /*
-     * Find user.
-     */
+    const normalizedEmail = email.trim().toLowerCase();
 
-    const [users] = await db.query(
-      `
-      SELECT
-        id,
-        name,
-        student_id,
-        email,
-        password,
-        role
-      FROM users
-      WHERE email = ?
-      LIMIT 1
-      `,
-      [cleanEmail]
+    const [rows] = await pool.query(
+      `SELECT id, name, student_id, email, password, role
+       FROM users
+       WHERE email = ?
+       LIMIT 1`,
+      [normalizedEmail]
     );
 
-    if (users.length === 0) {
+    if (rows.length === 0) {
       return res.status(401).json({
         success: false,
-        message:
-          "Invalid email or password.",
+        message: "Invalid email or password.",
       });
     }
 
-    const user = users[0];
+    const user = rows[0];
 
-    /*
-     * If frontend specifies a role,
-     * make sure it matches the database.
-     */
-
-    if (
-      role &&
-      user.role !== role
-    ) {
+    if (user.role !== role) {
       return res.status(403).json({
         success: false,
-        message:
-          "You do not have permission to login using this role.",
+        message: `This account is not registered as ${role}.`,
       });
     }
 
-    /*
-     * Verify password.
-     */
-
-    const passwordMatches =
-      await bcrypt.compare(
-        password,
-        user.password
-      );
+    const passwordMatches = await bcrypt.compare(
+      password,
+      user.password
+    );
 
     if (!passwordMatches) {
       return res.status(401).json({
         success: false,
-        message:
-          "Invalid email or password.",
+        message: "Invalid email or password.",
       });
     }
 
-    /*
-     * Create JWT.
-     */
-
-    const token =
-      generateToken(user);
-
-    /*
-     * Do not send password back
-     * to frontend.
-     */
+    const token = createToken(user);
 
     return res.status(200).json({
       success: true,
       message: "Login successful.",
       token,
-
       user: {
         id: user.id,
         name: user.name,
-        studentId:
-          user.student_id,
+        studentId: user.student_id,
         email: user.email,
         role: user.role,
       },
     });
   } catch (error) {
-    console.error(
-      "Login error:",
-      error
-    );
+    console.error("Login error:", error.message);
 
-    next(error);
+    return res.status(500).json({
+      success: false,
+      message: "Login failed. Check the backend configuration.",
+    });
   }
 };
 
-/*
-|--------------------------------------------------------------------------
-| GET CURRENT USER
-|--------------------------------------------------------------------------
-|
-| This endpoint requires authMiddleware.
-|
-*/
-
-const getMe = async (req, res, next) => {
+// GET /api/auth/me
+const getMe = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user?.id;
 
-    const [users] = await db.query(
-      `
-      SELECT
-        id,
-        name,
-        student_id,
-        email,
-        role
-      FROM users
-      WHERE id = ?
-      LIMIT 1
-      `,
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required.",
+      });
+    }
+
+    const [rows] = await pool.query(
+      `SELECT id, name, student_id, email, role
+       FROM users
+       WHERE id = ?
+       LIMIT 1`,
       [userId]
     );
 
-    if (users.length === 0) {
+    if (rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "User not found.",
+        message: "User account not found.",
       });
     }
+
+    const user = rows[0];
 
     return res.status(200).json({
       success: true,
       user: {
-        id: users[0].id,
-        name: users[0].name,
-        studentId:
-          users[0].student_id,
-        email: users[0].email,
-        role: users[0].role,
+        id: user.id,
+        name: user.name,
+        studentId: user.student_id,
+        email: user.email,
+        role: user.role,
       },
     });
   } catch (error) {
-    console.error(
-      "Get current user error:",
-      error
-    );
+    console.error("Get current user error:", error.message);
 
-    next(error);
+    return res.status(500).json({
+      success: false,
+      message: "Unable to retrieve account details.",
+    });
   }
 };
 

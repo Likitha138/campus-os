@@ -35,53 +35,135 @@ export default function App() {
       <AuthProvider>
         <Routes>
           {/* =====================================================
-              PUBLIC AREA
+              MAIN APPLICATION LAYOUT
           ===================================================== */}
 
           <Route element={<DashboardLayout />}>
-            <Route index element={<Navigate to="/dashboard" replace />} />
+            {/* PUBLIC DASHBOARD */}
 
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/explore" element={<Dashboard />} />
+            <Route
+              index
+              element={<Navigate to="/dashboard" replace />}
+            />
+
+            <Route
+              path="/dashboard"
+              element={<Dashboard />}
+            />
+
+            <Route
+              path="/explore"
+              element={<Dashboard />}
+            />
 
             {/* =================================================
                 LOGIN / REGISTER
             ================================================= */}
 
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+            <Route
+              path="/login"
+              element={<Login />}
+            />
+
+            <Route
+              path="/register"
+              element={<Register />}
+            />
 
             {/* =================================================
-                PROTECTED STUDENT AREA
+                PROTECTED CAMPUS OS AREA
             ================================================= */}
 
             <Route element={<ProtectedRoute />}>
-              <Route path="/activity" element={<Activity />} />
-              <Route path="/navigation" element={<Navigation />} />
-              <Route path="/traffic" element={<Traffic />} />
-              <Route path="/events" element={<Events />} />
-              <Route path="/emergency" element={<Emergency />} />
+              <Route
+                path="/activity"
+                element={<Activity />}
+              />
 
-              <Route path="/build" element={<Build />} />
-              <Route path="/environment" element={<Environment />} />
-              <Route path="/scenarios" element={<Scenarios />} />
-              <Route path="/ai" element={<AIAssistant />} />
+              <Route
+                path="/navigation"
+                element={<Navigation />}
+              />
 
-              <Route path="/attendance" element={<Attendance />} />
-              <Route path="/marks" element={<Marks />} />
-              <Route path="/assignments" element={<Assignments />} />
-              <Route path="/reports" element={<Reports />} />
-              <Route path="/alerts" element={<Alerts />} />
+              <Route
+                path="/traffic"
+                element={<Traffic />}
+              />
+
+              <Route
+                path="/events"
+                element={<Events />}
+              />
+
+              <Route
+                path="/emergency"
+                element={<Emergency />}
+              />
+
+              <Route
+                path="/build"
+                element={<Build />}
+              />
+
+              <Route
+                path="/environment"
+                element={<Environment />}
+              />
+
+              <Route
+                path="/scenarios"
+                element={<Scenarios />}
+              />
+
+              <Route
+                path="/ai"
+                element={<AIAssistant />}
+              />
+
+              <Route
+                path="/attendance"
+                element={<Attendance />}
+              />
+
+              <Route
+                path="/marks"
+                element={<Marks />}
+              />
+
+              <Route
+                path="/assignments"
+                element={<Assignments />}
+              />
+
+              <Route
+                path="/reports"
+                element={<Reports />}
+              />
+
+              <Route
+                path="/alerts"
+                element={<Alerts />}
+              />
+
               <Route
                 path="/notifications"
                 element={<Notifications />}
               />
-              <Route path="/career" element={<Career />} />
+
+              <Route
+                path="/career"
+                element={<Career />}
+              />
+
               <Route
                 path="/ai-performance"
                 element={<AIPerformance />}
               />
-              <Route path="/settings" element={<Settings />} />
+
+              <Route
+                path="/settings"
+                element={<Settings />}
+              />
             </Route>
 
             {/* =================================================
@@ -90,7 +172,12 @@ export default function App() {
 
             <Route
               path="*"
-              element={<Navigate to="/dashboard" replace />}
+              element={
+                <Navigate
+                  to="/dashboard"
+                  replace
+                />
+              }
             />
           </Route>
         </Routes>

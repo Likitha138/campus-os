@@ -5,7 +5,9 @@ import {
   MapPin,
   Send,
   Tag,
+  LoaderCircle,
 } from "lucide-react";
+
 import { createEvent } from "../services/eventNotificationService";
 
 interface CreateEventFormProps {
@@ -25,9 +27,31 @@ export default function CreateEventForm({
   const [description, setDescription] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  // Format the current local date/time for datetime-local.
+  function getLocalDateTimeMin() {
+    const now = new Date();
+    const localDate = new Date(
+      now.getTime() - now.getTimezoneOffset() * 60_000
+    );
+
+    return localDate.toISOString().slice(0, 16);
+  }
+
+  function resetForm() {
+    setTitle("");
+    setLocation("");
+    setDate("");
+    setDuration("2 hours");
+    setCategory("Campus");
+    setDescription("");
+  }
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (saving) return;
 
     setError("");
     setSuccess("");
@@ -44,10 +68,12 @@ export default function CreateEventForm({
       return;
     }
 
-    if (selectedDate.getTime() < Date.now()) {
+    if (selectedDate.getTime() <= Date.now()) {
       setError("Please select a future date and time.");
       return;
     }
+
+    setSaving(true);
 
     try {
       createEvent({
@@ -59,20 +85,18 @@ export default function CreateEventForm({
         duration: duration.trim() || "Not specified",
       });
 
-      setTitle("");
-      setLocation("");
-      setDate("");
-      setDuration("2 hours");
-      setCategory("Campus");
-      setDescription("");
+      resetForm();
 
       setSuccess(
-        "Event created successfully and notification generated."
+        "Event created successfully. The event list has been updated."
       );
 
       onCreated?.();
-    } catch {
+    } catch (err) {
+      console.error("Failed to create campus event:", err);
       setError("The event could not be saved. Please try again.");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -122,7 +146,7 @@ export default function CreateEventForm({
               type="datetime-local"
               value={date}
               onChange={(event) => setDate(event.target.value)}
-              min={new Date().toISOString().slice(0, 16)}
+              min={getLocalDateTimeMin()}
               required
             />
           </div>
@@ -185,9 +209,18 @@ export default function CreateEventForm({
       )}
 
       <div className="form-actions">
-        <button className="primary-button" type="submit">
-          <Send size={16} />
-          Create & Notify Students
+        <button
+          className="primary-button"
+          type="submit"
+          disabled={saving}
+        >
+          {saving ? (
+            <LoaderCircle size={16} className="animate-spin" />
+          ) : (
+            <Send size={16} />
+          )}
+
+          {saving ? "Creating event..." : "Create & Notify Students"}
         </button>
 
         {onCancel && (
@@ -195,6 +228,7 @@ export default function CreateEventForm({
             className="secondary-button"
             type="button"
             onClick={onCancel}
+            disabled={saving}
           >
             Close
           </button>
