@@ -1,5 +1,4 @@
-const STORAGE_KEY = "campus_os_notifications";
-const EVENTS_STORAGE_KEY = "campus_os_events";
+import { api } from "./api";
 
 export interface CampusEvent {
   id: string;
@@ -23,193 +22,217 @@ export interface CampusNotification {
   status: string;
 }
 
-const initialEvents: CampusEvent[] = [
-  {
-    id: "EVT-001",
-    title: "Placement Orientation",
-    date: "21 Oct 2026",
-    time: "10:00 AM",
-    location: "Main Auditorium",
-    category: "Career",
-    status: "Upcoming",
-    description: "Placement orientation has been scheduled for students.",
-    duration: "2 hours",
-  },
-  {
-    id: "EVT-002",
-    title: "Inter College Hackathon",
-    date: "24 Oct 2026",
-    time: "09:00 AM",
-    location: "Innovation Lab",
-    category: "Competition",
-    status: "Upcoming",
-    description:
-      "Participate in the inter-college hackathon and showcase your technical skills.",
-    duration: "Full day",
-  },
-  {
-    id: "EVT-003",
-    title: "Campus Safety Drill",
-    date: "27 Oct 2026",
-    time: "02:00 PM",
-    location: "Central Ground",
-    category: "Safety",
-    status: "Scheduled",
-    description:
-      "A campus safety drill will be conducted for students and staff.",
-    duration: "1 hour",
-  },
-];
-
-const initialNotifications: CampusNotification[] = [
-  {
-    id: "N-001",
-    title: "Placement Orientation",
-    description: "Placement orientation has been scheduled for students.",
-    location: "Main Auditorium",
-    date: "21 Oct 2026",
-    status: "New",
-  },
-  {
-    id: "N-002",
-    title: "Campus Safety Drill",
-    description: "A campus safety drill will be conducted this week.",
-    location: "Central Ground",
-    date: "27 Oct 2026",
-    status: "New",
-  },
-];
-
-function emitUpdate(): void {
-  if (typeof window !== "undefined") {
-    window.dispatchEvent(new Event("campus-os-events-updated"));
-  }
+interface BackendEvent {
+  id: number | string;
+  title: string;
+  description?: string | null;
+  event_date: string;
+  start_time?: string | null;
+  end_time?: string | null;
+  location?: string | null;
+  event_type?: string | null;
+  status?: string | null;
+  created_at?: string;
 }
 
-function formatEventDate(value: string): { date: string; time: string } {
-  const parsed = new Date(value);
+interface ApiResponse<T> {
+  success: boolean;
+  message?: string;
+  data: T;
+}
 
-  if (Number.isNaN(parsed.getTime())) {
-    return {
-      date: value,
-      time: "Time to be announced",
-    };
-  }
+function formatDate(value: string): string {
+  if (!value) return "";
 
-  return {
-    date: parsed.toLocaleDateString("en-GB", {
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+
+  if (match) {
+    const [, year, month, day] = match;
+    const date = new Date(
+      Number(year),
+      Number(month) - 1,
+      Number(day)
+    );
+
+    return date.toLocaleDateString("en-IN", {
       day: "2-digit",
       month: "short",
       year: "numeric",
-    }),
-    time: parsed.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    }),
+    });
+  }
+
+  const parsed = new Date(value);
+
+  if (Number.isNaN(parsed.getTime())) return value;
+
+  return parsed.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+function formatTime(value?: string | null): string {
+  if (!value) return "";
+
+  const match = value.match(/^(\d{1,2}):(\d{2})/);
+
+  if (!match) return value;
+
+  let hours = Number(match[1]);
+  const minutes = match[2];
+  const suffix = hours >= 12 ? "PM" : "AM";
+
+  hours = hours % 12 || 12;
+
+  return `${String(hours).padStart(2, "0")}:${minutes} ${suffix}`;
+}
+
+function normalizeEvent(event: BackendEvent): CampusEvent {
+  const startTime = formatTime(event.start_time);
+  const endTime = formatTime(event.end_time);
+
+  return {
+    id: String(event.id),
+    title: event.title,
+    date: formatDate(event.event_date),
+    time: startTime,
+    location: event.location || "Location to be announced",
+    category: event.event_type || "Campus",
+    status: event.status || "upcoming",
+    description: event.description || "",
+    duration:
+      startTime && endTime
+        ? `${startTime} - ${endTime}`
+        : "Not specified",
+    createdAt: event.created_at,
   };
 }
 
-export function getEvents(): CampusEvent[] {
-  const stored = localStorage.getItem(EVENTS_STORAGE_KEY);
+/**
+ * Load events from the backend.
+ * GET /api/events
+ */
+export async function getEvents(): Promise<CampusEvent[]> {
+  const response = await api.get<ApiResponse<BackendEvent[]>>("/events");
 
-  if (!stored) {
-    localStorage.setItem(
-      EVENTS_STORAGE_KEY,
-      JSON.stringify(initialEvents)
-    );
-
-    return [...initialEvents];
+  if (response.success === false) {
+    throw new Error(response.message || "Failed to load events.");
   }
 
-  try {
-    const parsed: unknown = JSON.parse(stored);
-
-    return Array.isArray(parsed)
-      ? (parsed as CampusEvent[])
-      : [...initialEvents];
-  } catch {
-    return [...initialEvents];
-  }
+  return (response.data || []).map(normalizeEvent);
 }
 
-export function createEvent(event: {
+/**
+ * Create an event in MySQL through the backend.
+ * POST /api/events
+ */
+export async function createEvent(input: {
   title: string;
   location: string;
   date: string;
   description: string;
-  category?: string;
-  duration?: string;
-}): CampusEvent {
-  const formatted = formatEventDate(event.date);
+  category: string;
+  duration: string;
+}): Promise<CampusEvent> {
+  const rawDate = input.date?.trim();
 
-  const newEvent: CampusEvent = {
-    id: `EVT-${Date.now()}`,
-    title: event.title.trim(),
-    date: formatted.date,
-    time: formatted.time,
-    location: event.location.trim(),
-    category: event.category || "Campus",
-    status: "Upcoming",
-    description:
-      event.description.trim() ||
-      `New campus event: ${event.title.trim()}`,
-    duration: event.duration || "Not specified",
-    createdAt: new Date().toISOString(),
-  };
-
-  const currentEvents = getEvents();
-
-  localStorage.setItem(
-    EVENTS_STORAGE_KEY,
-    JSON.stringify([newEvent, ...currentEvents])
-  );
-
-  const notification: CampusNotification = {
-    id: `N-${Date.now()}`,
-    title: newEvent.title,
-    description: newEvent.description,
-    location: newEvent.location,
-    date: newEvent.date,
-    status: "New",
-  };
-
-  const currentNotifications = getNotifications();
-
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify([notification, ...currentNotifications])
-  );
-
-  emitUpdate();
-
-  return newEvent;
-}
-
-export function getNotifications(): CampusNotification[] {
-  const stored = localStorage.getItem(STORAGE_KEY);
-
-  if (!stored) {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(initialNotifications)
+  if (!rawDate) {
+    throw new Error(
+      "Date is empty. Please select the event date and time again."
     );
-
-    return [...initialNotifications];
   }
 
-  try {
-    const parsed: unknown = JSON.parse(stored);
+  // datetime-local format: YYYY-MM-DDTHH:mm
+  const match = rawDate.match(
+    /^(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2})$/
+  );
 
-    return Array.isArray(parsed)
-      ? (parsed as CampusNotification[])
-      : [...initialNotifications];
-  } catch {
-    return [...initialNotifications];
+  if (!match) {
+    throw new Error(
+      "Invalid date format. Please select the date using the calendar field."
+    );
   }
+
+  const eventDate = match[1];
+  const hours = Number(match[2]);
+  const minutes = Number(match[3]);
+
+  const startMinutes = hours * 60 + minutes;
+
+  const durationMatch = (input.duration || "").match(
+    /(\d+(?:\.\d+)?)/
+  );
+
+  const durationValue = durationMatch
+    ? Number(durationMatch[1])
+    : 2;
+
+  const durationMinutes = (input.duration || "")
+    .toLowerCase()
+    .includes("min")
+    ? durationValue
+    : durationValue * 60;
+
+  const endMinutes = startMinutes + durationMinutes;
+  const endHours = Math.floor(endMinutes / 60) % 24;
+  const endMins = Math.floor(endMinutes % 60);
+
+  const startTime =
+    `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:00`;
+
+  const endTime =
+    `${String(endHours).padStart(2, "0")}:${String(endMins).padStart(2, "0")}:00`;
+
+ const payload = {
+  title: input.title.trim(),
+  description: input.description.trim(),
+  date: eventDate,
+  startTime,
+  endTime,
+  location: input.location.trim(),
+  eventType: input.category,
+};
+
+  // Diagnostic: verify the exact payload sent to the backend.
+  console.log("Creating campus event payload:", payload);
+
+  const response = await api.post<
+    ApiResponse<BackendEvent> & { event?: BackendEvent }
+  >("/events", payload);
+
+  const created = response.data || response.event;
+
+  if (!response.success || !created) {
+    throw new Error(
+      response.message || "The event could not be saved."
+    );
+  }
+
+  window.dispatchEvent(new Event("campus-os-events-updated"));
+
+  return normalizeEvent(created);
 }
 
-export function clearNotifications(): void {
-  localStorage.removeItem(STORAGE_KEY);
-  emitUpdate();
+/**
+ * Generate notification entries from events.
+ */
+export async function getNotifications(): Promise<CampusNotification[]> {
+  const events = await getEvents();
+
+  return events.map((event) => ({
+    id: `event-${event.id}`,
+    title: event.title,
+    description: event.description || "A campus event is scheduled.",
+    location: event.location,
+    date: event.date,
+    status: event.status,
+  }));
+}
+
+export async function clearNotifications(): Promise<void> {
+  localStorage.setItem(
+    "campus_os_notifications_dismissed",
+    JSON.stringify([])
+  );
 }

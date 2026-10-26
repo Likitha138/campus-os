@@ -1,52 +1,142 @@
-import { Bell, CalendarDays, CheckCircle2, MapPin } from "lucide-react";
-import { getNotifications } from "../services/eventNotificationService";
+import { useCallback, useEffect, useState } from "react";
+import {
+  Bell,
+  CalendarDays,
+  MapPin,
+  LoaderCircle,
+  RefreshCw,
+} from "lucide-react";
+
+import {
+  getNotifications,
+  type CampusNotification,
+} from "../services/eventNotificationService";
 
 export default function EventNotificationPanel() {
-  const notifications = getNotifications();
+  const [notifications, setNotifications] = useState<
+    CampusNotification[]
+  >([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const loadNotifications = useCallback(async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const result = await getNotifications();
+      setNotifications(result);
+    } catch (err) {
+      console.error("Failed to load event notifications:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to load notifications."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadNotifications();
+
+    const handleEventsUpdated = () => {
+      void loadNotifications();
+    };
+
+    window.addEventListener(
+      "campus-os-events-updated",
+      handleEventsUpdated
+    );
+
+    return () => {
+      window.removeEventListener(
+        "campus-os-events-updated",
+        handleEventsUpdated
+      );
+    };
+  }, [loadNotifications]);
 
   return (
-    <div className="notification-panel">
-      <div className="panel-heading">
+    <section className="notification-panel">
+      <div className="notification-panel-header">
         <div>
-          <span className="eyebrow">LIVE FEED</span>
-          <h3>Campus notifications</h3>
+          <span className="eyebrow">CAMPUS UPDATES</span>
+          <h3>
+            <Bell size={18} />
+            Event Notifications
+          </h3>
+          <p>Keep track of upcoming campus events.</p>
         </div>
 
-        <div className="notification-count">
-          <Bell size={15} />
-          {notifications.length}
-        </div>
+        <button
+          type="button"
+          className="secondary-button"
+          onClick={() => void loadNotifications()}
+          disabled={loading}
+          aria-label="Refresh notifications"
+        >
+          {loading ? (
+            <LoaderCircle size={16} className="animate-spin" />
+          ) : (
+            <RefreshCw size={16} />
+          )}
+        </button>
       </div>
 
-      <div className="notification-list">
-        {notifications.length === 0 ? (
-          <div className="empty-state">No new notifications.</div>
-        ) : (
-          notifications.map((item: any) => (
-            <div className="notification-item" key={item.id}>
-              <div className="notification-icon">
-                <CalendarDays size={16} />
+      {loading && (
+        <div className="notification-empty" role="status">
+          <LoaderCircle size={22} className="animate-spin" />
+          <p>Loading notifications...</p>
+        </div>
+      )}
+
+      {!loading && error && (
+        <div className="notification-empty" role="alert">
+          <p>{error}</p>
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={() => void loadNotifications()}
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
+      {!loading && !error && notifications.length === 0 && (
+        <div className="notification-empty">
+          <Bell size={24} />
+          <p>No event notifications yet.</p>
+        </div>
+      )}
+
+      {!loading && !error && notifications.length > 0 && (
+        <div className="notification-list">
+          {notifications.map((item) => (
+            <article className="notification-item" key={item.id}>
+              <div className="notification-item-icon">
+                <CalendarDays size={18} />
               </div>
 
-              <div>
-                <strong>{item.title}</strong>
+              <div className="notification-item-content">
+                <h4>{item.title}</h4>
                 <p>{item.description}</p>
 
-                <div className="notification-meta">
+                <div className="notification-item-meta">
                   <span>
-                    <MapPin size={12} />
-                    {item.location}
+                    <MapPin size={13} />
+                    {item.location || "Campus"}
                   </span>
-                  <span>
-                    <CheckCircle2 size={12} />
-                    {item.status || "New"}
-                  </span>
+
+                  <span>{item.date}</span>
                 </div>
               </div>
-            </div>
-          ))
-        )}
-      </div>
-    </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
   );
 }

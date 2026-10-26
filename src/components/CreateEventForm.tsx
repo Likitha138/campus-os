@@ -22,6 +22,7 @@ export default function CreateEventForm({
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
   const [date, setDate] = useState("");
+  const [time, setTime] = useState("10:00");
   const [duration, setDuration] = useState("2 hours");
   const [category, setCategory] = useState("Campus");
   const [description, setDescription] = useState("");
@@ -29,26 +30,40 @@ export default function CreateEventForm({
   const [success, setSuccess] = useState("");
   const [saving, setSaving] = useState(false);
 
-  // Format the current local date/time for datetime-local.
-  function getLocalDateTimeMin() {
-    const now = new Date();
-    const localDate = new Date(
-      now.getTime() - now.getTimezoneOffset() * 60_000
-    );
-
-    return localDate.toISOString().slice(0, 16);
-  }
-
   function resetForm() {
     setTitle("");
     setLocation("");
     setDate("");
+    setTime("10:00");
     setDuration("2 hours");
     setCategory("Campus");
     setDescription("");
   }
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  function convertDateToISO(value: string): string | null {
+    const match = value.trim().match(/^(\d{2})-(\d{2})-(\d{4})$/);
+
+    if (!match) return null;
+
+    const day = Number(match[1]);
+    const month = Number(match[2]);
+    const year = Number(match[3]);
+
+    const parsed = new Date(year, month - 1, day);
+
+    // Reject impossible dates, such as 31-02-2026.
+    if (
+      parsed.getFullYear() !== year ||
+      parsed.getMonth() !== month - 1 ||
+      parsed.getDate() !== day
+    ) {
+      return null;
+    }
+
+    return `${match[3]}-${match[2]}-${match[1]}`;
+  }
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (saving) return;
@@ -56,45 +71,53 @@ export default function CreateEventForm({
     setError("");
     setSuccess("");
 
-    if (!title.trim() || !location.trim() || !date) {
-      setError("Please enter the event name, location, and date.");
+    if (!title.trim() || !location.trim() || !date.trim() || !time) {
+      setError("Please enter the event name, location, date, and time.");
       return;
     }
 
-    const selectedDate = new Date(date);
+    const isoDate = convertDateToISO(date);
 
-    if (Number.isNaN(selectedDate.getTime())) {
-      setError("Please enter a valid date and time.");
+    if (!isoDate) {
+      setError("Enter a valid date in DD-MM-YYYY format, for example 28-10-2026.");
       return;
     }
+
+    const [year, month, day] = isoDate.split("-").map(Number);
+    const [hours, minutes] = time.split(":").map(Number);
+    const selectedDate = new Date(year, month - 1, day, hours, minutes);
 
     if (selectedDate.getTime() <= Date.now()) {
       setError("Please select a future date and time.");
       return;
     }
 
+    // The service expects YYYY-MM-DDTHH:mm.
+    const apiDate = `${isoDate}T${time}`;
+
     setSaving(true);
 
     try {
-      createEvent({
+      await createEvent({
         title: title.trim(),
         location: location.trim(),
-        date,
+        date: apiDate,
         description: description.trim(),
         category,
-        duration: duration.trim() || "Not specified",
+        duration: duration.trim() || "2 hours",
       });
 
       resetForm();
-
-      setSuccess(
-        "Event created successfully. The event list has been updated."
-      );
-
+      setSuccess("Event created successfully. The event list has been updated.");
       onCreated?.();
     } catch (err) {
       console.error("Failed to create campus event:", err);
-      setError("The event could not be saved. Please try again.");
+
+      setError(
+        err instanceof Error
+          ? err.message
+          : "The event could not be saved. Please try again."
+      );
     } finally {
       setSaving(false);
     }
@@ -119,7 +142,7 @@ export default function CreateEventForm({
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             placeholder="Orientation Programme"
-            maxLength={120}
+            maxLength={200}
             required
           />
         </label>
@@ -132,21 +155,39 @@ export default function CreateEventForm({
               value={location}
               onChange={(event) => setLocation(event.target.value)}
               placeholder="Main Auditorium"
-              maxLength={120}
+              maxLength={200}
               required
             />
           </div>
         </label>
 
         <label>
-          Date & time *
+          Date (DD-MM-YYYY) *
           <div className="input-icon">
             <CalendarDays size={16} />
             <input
-              type="datetime-local"
+              type="text"
               value={date}
               onChange={(event) => setDate(event.target.value)}
-              min={getLocalDateTimeMin()}
+              placeholder="28-10-2026"
+              inputMode="numeric"
+              autoComplete="off"
+              maxLength={10}
+              pattern="(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-[0-9]{4}"
+              title="Enter the date as DD-MM-YYYY, for example 28-10-2026"
+              required
+            />
+          </div>
+        </label>
+
+        <label>
+          Event time *
+          <div className="input-icon">
+            <Clock size={16} />
+            <input
+              type="time"
+              value={time}
+              onChange={(event) => setTime(event.target.value)}
               required
             />
           </div>
@@ -209,17 +250,12 @@ export default function CreateEventForm({
       )}
 
       <div className="form-actions">
-        <button
-          className="primary-button"
-          type="submit"
-          disabled={saving}
-        >
+        <button className="primary-button" type="submit" disabled={saving}>
           {saving ? (
             <LoaderCircle size={16} className="animate-spin" />
           ) : (
             <Send size={16} />
           )}
-
           {saving ? "Creating event..." : "Create & Notify Students"}
         </button>
 
