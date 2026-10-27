@@ -28,7 +28,8 @@ async function request<T>(
 }
 
 export const api = {
-  get: <T>(endpoint: string) => request<T>(endpoint),
+  get: <T>(endpoint: string) =>
+    request<T>(endpoint),
 
   post: <T>(endpoint: string, body: unknown) =>
     request<T>(endpoint, {
@@ -39,6 +40,12 @@ export const api = {
   put: <T>(endpoint: string, body: unknown) =>
     request<T>(endpoint, {
       method: "PUT",
+      body: JSON.stringify(body),
+    }),
+
+  patch: <T>(endpoint: string, body: unknown) =>
+    request<T>(endpoint, {
+      method: "PATCH",
       body: JSON.stringify(body),
     }),
 
