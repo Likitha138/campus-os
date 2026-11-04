@@ -43,7 +43,7 @@ const navigation = [
   { label: "Reports", path: "/reports", icon: FileBarChart },
   { label: "AI Performance", path: "/ai-performance", icon: BarChart3 },
   { label: "Career Intelligence", path: "/career", icon: BriefcaseBusiness },
-  { label: "AI Assistant", path: "/ai-assistant", icon: Bot },
+  { label: "AI Assistant", path: "/ai", icon: Bot },
   { label: "Navigation", path: "/navigation", icon: Compass },
   { label: "Activity", path: "/activity", icon: Activity },
   { label: "Traffic", path: "/traffic", icon: Car },
